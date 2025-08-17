@@ -22,6 +22,8 @@ declare global {
              * Default is 50000 meters (50 km).
              */
             maxDistance: number;
+
+            pollIntervalCurrently: number;
         }
     }
 }

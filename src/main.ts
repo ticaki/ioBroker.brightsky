@@ -52,28 +52,54 @@ class Brightsky extends utils.Adapter {
             this.log.warn(`Invalid poll interval: ${this.config.pollInterval}. Using default value of 12 hour.`);
             this.config.pollInterval = 12; // Default to 1 hour if invalid
         }
+        if (
+            this.config.pollIntervalCurrently == undefined ||
+            this.config.pollIntervalCurrently < 5 ||
+            this.config.pollIntervalCurrently > 31 ** 2 / 60000
+        ) {
+            this.log.warn(
+                `Invalid poll interval currently: ${this.config.pollIntervalCurrently}. Using default value of 30 minute.`,
+            );
+            this.config.pollIntervalCurrently = 30; // Default to 1 minute if invalid
+        }
 
         if (this.config.maxDistance == undefined || this.config.maxDistance < 1000) {
             this.log.warn(`Invalid max distance: ${this.config.maxDistance}. Using default value of 50000 meters.`);
             this.config.maxDistance = 50000; // Default to 50 km if invalid
         }
-        await this.delay(1000); // Wait for 1 second to ensure the adapter is ready
-        void this.weatherloop();
+        await this.delay(2000); // Wait for 1 second to ensure the adapter is ready
+        await this.weatherCurrentlyLoop();
+        await this.delay(5000);
+        await this.weatherHourlyLoop();
     }
-    async weatherloop(): Promise<void> {
+    async weatherCurrentlyLoop(): Promise<void> {
         if (this.weatherTimeout) {
             clearTimeout(this.weatherTimeout);
         }
-        await this.weatherUpdate();
+        await this.weatherCurrentlyUpdate();
+
+        this.weatherTimeout = this.setTimeout(
+            () => {
+                void this.weatherCurrentlyLoop();
+            },
+            this.config.pollIntervalCurrently * 60000 + Math.ceil(Math.random() * 8000),
+        );
+    }
+
+    async weatherHourlyLoop(): Promise<void> {
+        if (this.weatherTimeout) {
+            clearTimeout(this.weatherTimeout);
+        }
+        await this.weatherHourlyUpdate();
         const loopTime =
             new Date().setHours(new Date().getHours() + this.config.pollInterval, 0, 0) +
             3000 +
             Math.ceil(Math.random() * 5000); // Add a random delay of up to 5 second
         this.weatherTimeout = this.setTimeout(() => {
-            void this.weatherloop();
+            void this.weatherHourlyLoop();
         }, loopTime - Date.now());
     }
-    async weatherUpdate(): Promise<void> {
+    async weatherHourlyUpdate(): Promise<void> {
         const startTime = new Date(new Date().setMinutes(0, 0, 0)).toISOString();
         const endTime = new Date(new Date().setHours(new Date().getHours() + this.config.hours, 0, 0, 0)).toISOString();
         try {
@@ -81,9 +107,9 @@ class Brightsky extends utils.Adapter {
                 `https://api.brightsky.dev/weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
             if (result.data) {
-                this.log.debug(`Weather data fetched successfully: ${JSON.stringify(result.data)}`);
+                this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
                 if (result.data.weather && Array.isArray(result.data.weather)) {
-                    for (const item in result.data.weather) {
+                    /*for (const item in result.data.weather) {
                         const index = this.weatherArray.findIndex(
                             el => el.timestamp === result.data.weather[item].timestamp,
                         );
@@ -92,16 +118,44 @@ class Brightsky extends utils.Adapter {
                         } else {
                             this.weatherArray.push(result.data.weather[item]);
                         }
-                    }
+                    }*/
                     await this.library.writeFromJson(
-                        'weather.hourly.r',
+                        'hourly.r',
                         'weather.hourly',
                         genericStateObjects,
                         result.data.weather,
                         true,
                     );
                     await this.library.writeFromJson(
-                        'weather.hourly.sources.r',
+                        'hourly.sources.r',
+                        'weather.sources',
+                        genericStateObjects,
+                        result.data.sources,
+                        true,
+                    );
+                }
+            }
+        } catch (error) {
+            this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
+        }
+    }
+    async weatherCurrentlyUpdate(): Promise<void> {
+        try {
+            const result = await axios.get(
+                `https://api.brightsky.dev/current_weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}`,
+            );
+            if (result.data) {
+                this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
+                if (result.data.weather) {
+                    await this.library.writeFromJson(
+                        'current',
+                        'weather.current',
+                        genericStateObjects,
+                        result.data.weather,
+                        true,
+                    );
+                    await this.library.writeFromJson(
+                        'current.sources.r',
                         'weather.sources',
                         genericStateObjects,
                         result.data.sources,

@@ -2,37 +2,24 @@
     "common": {
         "name": "brightsky",
         "version": "0.0.1",
-        "news": {
-            "0.0.1": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
-                "ru": "Начальная версия",
-                "pt": "lançamento inicial",
-                "nl": "Eerste uitgave",
-                "fr": "Première version",
-                "it": "Versione iniziale",
-                "es": "Versión inicial",
-                "pl": "Pierwsze wydanie",
-                "uk": "Початкова версія",
-                "zh-cn": "首次出版"
-            }
+        "news": {   
         },
         "titleLang": {
             "en": "Bright Sky",
-            "de": "Heller Himmel",
-            "ru": "Яркое небо",
-            "pt": "Céu brilhante",
+            "de": "Bright Sky",
+            "ru": "Bright Sky",
+            "pt": "Bright Sky",
             "nl": "Bright Sky",
-            "fr": "Ciel brillant",
-            "it": "Cielo luminoso",
-            "es": "Cielo brillante",
-            "pl": "Jasne niebo",
-            "uk": "Яскраве небо",
-            "zh-cn": "明亮的天空"
+            "fr": "Bright Sky",
+            "it": "Bright Sky",
+            "es": "Bright Sky",
+            "pl": "Bright Sky",
+            "uk": "Bright Sky",
+            "zh-cn": "Bright Sky"
         },
         "desc": {
             "en": "Retrieve data from Bright Sky",
-            "de": "Daten vom hellen Himmel abrufen",
+            "de": "Daten vom Bright Sky abrufen",
             "ru": "Получить данные с яркого неба",
             "pt": "Recuperar dados do céu brilhante",
             "nl": "Gegevens ophalen van Bright Sky",

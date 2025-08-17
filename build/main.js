@@ -55,24 +55,44 @@ class Brightsky extends utils.Adapter {
       this.log.warn(`Invalid poll interval: ${this.config.pollInterval}. Using default value of 12 hour.`);
       this.config.pollInterval = 12;
     }
+    if (this.config.pollIntervalCurrently == void 0 || this.config.pollIntervalCurrently < 5 || this.config.pollIntervalCurrently > 31 ** 2 / 6e4) {
+      this.log.warn(
+        `Invalid poll interval currently: ${this.config.pollIntervalCurrently}. Using default value of 30 minute.`
+      );
+      this.config.pollIntervalCurrently = 30;
+    }
     if (this.config.maxDistance == void 0 || this.config.maxDistance < 1e3) {
       this.log.warn(`Invalid max distance: ${this.config.maxDistance}. Using default value of 50000 meters.`);
       this.config.maxDistance = 5e4;
     }
-    await this.delay(1e3);
-    void this.weatherloop();
+    await this.delay(2e3);
+    await this.weatherCurrentlyLoop();
+    await this.delay(5e3);
+    await this.weatherHourlyLoop();
   }
-  async weatherloop() {
+  async weatherCurrentlyLoop() {
     if (this.weatherTimeout) {
       clearTimeout(this.weatherTimeout);
     }
-    await this.weatherUpdate();
+    await this.weatherCurrentlyUpdate();
+    this.weatherTimeout = this.setTimeout(
+      () => {
+        void this.weatherCurrentlyLoop();
+      },
+      this.config.pollIntervalCurrently * 6e4 + Math.ceil(Math.random() * 8e3)
+    );
+  }
+  async weatherHourlyLoop() {
+    if (this.weatherTimeout) {
+      clearTimeout(this.weatherTimeout);
+    }
+    await this.weatherHourlyUpdate();
     const loopTime = (/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.pollInterval, 0, 0) + 3e3 + Math.ceil(Math.random() * 5e3);
     this.weatherTimeout = this.setTimeout(() => {
-      void this.weatherloop();
+      void this.weatherHourlyLoop();
     }, loopTime - Date.now());
   }
-  async weatherUpdate() {
+  async weatherHourlyUpdate() {
     const startTime = new Date((/* @__PURE__ */ new Date()).setMinutes(0, 0, 0)).toISOString();
     const endTime = new Date((/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.hours, 0, 0, 0)).toISOString();
     try {
@@ -80,27 +100,45 @@ class Brightsky extends utils.Adapter {
         `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
       if (result.data) {
-        this.log.debug(`Weather data fetched successfully: ${JSON.stringify(result.data)}`);
+        this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
         if (result.data.weather && Array.isArray(result.data.weather)) {
-          for (const item in result.data.weather) {
-            const index = this.weatherArray.findIndex(
-              (el) => el.timestamp === result.data.weather[item].timestamp
-            );
-            if (index !== -1) {
-              this.weatherArray[index] = result.data.weather[item];
-            } else {
-              this.weatherArray.push(result.data.weather[item]);
-            }
-          }
           await this.library.writeFromJson(
-            "weather.hourly.r",
+            "hourly.r",
             "weather.hourly",
             import_definition.genericStateObjects,
             result.data.weather,
             true
           );
           await this.library.writeFromJson(
-            "weather.hourly.sources.r",
+            "hourly.sources.r",
+            "weather.sources",
+            import_definition.genericStateObjects,
+            result.data.sources,
+            true
+          );
+        }
+      }
+    } catch (error) {
+      this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
+    }
+  }
+  async weatherCurrentlyUpdate() {
+    try {
+      const result = await import_axios.default.get(
+        `https://api.brightsky.dev/current_weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}`
+      );
+      if (result.data) {
+        this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
+        if (result.data.weather) {
+          await this.library.writeFromJson(
+            "current",
+            "weather.current",
+            import_definition.genericStateObjects,
+            result.data.weather,
+            true
+          );
+          await this.library.writeFromJson(
+            "current.sources.r",
             "weather.sources",
             import_definition.genericStateObjects,
             result.data.sources,

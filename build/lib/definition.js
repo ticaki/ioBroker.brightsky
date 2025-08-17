@@ -21,7 +21,8 @@ __export(definition_exports, {
   Defaults: () => Defaults,
   defaultChannel: () => defaultChannel,
   genericStateObjects: () => genericStateObjects,
-  testdata: () => testdata
+  testdata: () => testdata,
+  testdata2: () => testdata2
 });
 module.exports = __toCommonJS(definition_exports);
 const defaultChannel = {
@@ -31,6 +32,239 @@ const defaultChannel = {
     name: "Hey no description... "
   },
   native: {}
+};
+const BrightskyCurrentlyFallback = {
+  cloud_cover: {
+    _id: "cloud_cover",
+    type: "state",
+    common: {
+      name: "Cloud Cover",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false,
+      unit: "%"
+    },
+    native: {}
+  },
+  condition: {
+    _id: "condition",
+    type: "state",
+    common: {
+      name: "Condition",
+      type: "string",
+      role: "text",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
+  solar_10: {
+    _id: "solar_10",
+    type: "state",
+    common: {
+      name: "Solar Radiation 10 min",
+      type: "number",
+      role: "value.power",
+      read: true,
+      write: false,
+      unit: "kWh/m\xB2"
+    },
+    native: {}
+  },
+  solar_30: {
+    _id: "solar_30",
+    type: "state",
+    common: {
+      name: "Solar Radiation 30 min",
+      type: "number",
+      role: "value.power",
+      read: true,
+      write: false,
+      unit: "kWh/m\xB2"
+    },
+    native: {}
+  },
+  solar_60: {
+    _id: "solar_60",
+    type: "state",
+    common: {
+      name: "Solar Radiation 60 min",
+      type: "number",
+      role: "value.power",
+      read: true,
+      write: false,
+      unit: "kWh/m\xB2"
+    },
+    native: {}
+  },
+  precipitation_10: {
+    _id: "precipitation_10",
+    type: "state",
+    common: {
+      name: "Precipitation 10 min",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false,
+      unit: "mm"
+    },
+    native: {}
+  },
+  precipitation_30: {
+    _id: "precipitation_30",
+    type: "state",
+    common: {
+      name: "Precipitation 30 min",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false,
+      unit: "mm"
+    },
+    native: {}
+  },
+  precipitation_60: {
+    _id: "",
+    type: "state",
+    common: {
+      name: "Precipitation 60 min",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false,
+      unit: "mm"
+    },
+    native: {}
+  },
+  relative_humidity: {
+    _id: "relative_humidity",
+    type: "state",
+    common: {
+      name: "Relative Humidity",
+      type: "number",
+      role: "value.humidity",
+      read: true,
+      write: false,
+      unit: "%"
+    },
+    native: {}
+  },
+  visibility: {
+    _id: "visibility",
+    type: "state",
+    common: {
+      name: "Visibility",
+      type: "number",
+      role: "value.distance",
+      read: true,
+      write: false,
+      unit: "m"
+    },
+    native: {}
+  },
+  wind_gust_direction_10: {
+    _id: "wind_gust_direction_10",
+    type: "state",
+    common: {
+      name: "Wind Gust Direction 10 min",
+      type: "number",
+      role: "value.direction",
+      read: true,
+      write: false,
+      unit: "\xB0"
+    },
+    native: {}
+  },
+  wind_gust_direction_30: {
+    _id: "wind_gust_direction_30",
+    type: "state",
+    common: {
+      name: "Wind Gust Direction 30 min",
+      type: "number",
+      role: "value.direction",
+      read: true,
+      write: false,
+      unit: "\xB0"
+    },
+    native: {}
+  },
+  wind_gust_direction_60: {
+    _id: "wind_gust_direction_60",
+    type: "state",
+    common: {
+      name: "Wind Gust Direction 60 min",
+      type: "number",
+      role: "value.direction",
+      read: true,
+      write: false,
+      unit: "\xB0"
+    },
+    native: {}
+  },
+  wind_gust_speed_10: {
+    _id: "wind_gust_speed_10",
+    type: "state",
+    common: {
+      name: "Wind Gust Speed 10 min",
+      type: "number",
+      role: "value.speed",
+      read: true,
+      write: false,
+      unit: "km/h"
+    },
+    native: {}
+  },
+  wind_gust_speed_30: {
+    _id: "wind_gust_speed_30",
+    type: "state",
+    common: {
+      name: "Wind Gust Speed 30 min",
+      type: "number",
+      role: "value.speed",
+      read: true,
+      write: false,
+      unit: "km/h"
+    },
+    native: {}
+  },
+  wind_gust_speed_60: {
+    _id: "wind_gust_speed_60",
+    type: "state",
+    common: {
+      name: "Wind Gust Speed 60 min",
+      type: "number",
+      role: "value.speed",
+      read: true,
+      write: false,
+      unit: "km/h"
+    },
+    native: {}
+  },
+  sunshine_30: {
+    _id: "sunshine_30",
+    type: "state",
+    common: {
+      name: "Sunshine 30 min",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
+  sunshine_60: {
+    _id: "sunshine_60",
+    type: "state",
+    common: {
+      name: "Sunshine 60 min",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false
+    },
+    native: {}
+  }
 };
 const genericStateObjects = {
   default: {
@@ -467,6 +701,181 @@ const genericStateObjects = {
         },
         native: {}
       }
+    },
+    current: {
+      ...BrightskyCurrentlyFallback,
+      _channel: {
+        _id: "",
+        type: "folder",
+        common: {
+          name: "Current Weather"
+        },
+        native: {}
+      },
+      timestamp: {
+        _id: "timestamp",
+        type: "state",
+        common: {
+          name: "Timestamp",
+          type: "string",
+          role: "date",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      source_id: {
+        _id: "source_id",
+        type: "state",
+        common: {
+          name: "Source ID",
+          type: "number",
+          role: "value",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      dew_point: {
+        _id: "dew_point",
+        type: "state",
+        common: {
+          name: "Dew Point",
+          type: "number",
+          role: "value.temperature.dewpoint",
+          read: true,
+          write: false,
+          unit: "\xB0C"
+        },
+        native: {}
+      },
+      pressure_msl: {
+        _id: "pressure_msl",
+        type: "state",
+        common: {
+          name: "Pressure MSL",
+          type: "number",
+          role: "value",
+          read: true,
+          write: false,
+          unit: "hPa"
+        },
+        native: {}
+      },
+      wind_direction_10: {
+        _id: "wind_direction_10",
+        type: "state",
+        common: {
+          name: "Wind Direction 10 min",
+          type: "number",
+          role: "value.direction",
+          read: true,
+          write: false,
+          unit: "\xB0"
+        },
+        native: {}
+      },
+      wind_direction_30: {
+        _id: "wind_direction_30",
+        type: "state",
+        common: {
+          name: "Wind Direction 30 min",
+          type: "number",
+          role: "value.direction",
+          read: true,
+          write: false,
+          unit: "\xB0"
+        },
+        native: {}
+      },
+      wind_direction_60: {
+        _id: "wind_direction_60",
+        type: "state",
+        common: {
+          name: "Wind Direction 60 min",
+          type: "number",
+          role: "value.direction",
+          read: true,
+          write: false,
+          unit: "\xB0"
+        },
+        native: {}
+      },
+      wind_speed_10: {
+        _id: "wind_speed_10",
+        type: "state",
+        common: {
+          name: "Wind Speed 10 min",
+          type: "number",
+          role: "value.speed",
+          read: true,
+          write: false,
+          unit: "km/h"
+        },
+        native: {}
+      },
+      wind_speed_30: {
+        _id: "wind_speed_30",
+        type: "state",
+        common: {
+          name: "Wind Speed 30 min",
+          type: "number",
+          role: "value.speed",
+          read: true,
+          write: false,
+          unit: "km/h"
+        },
+        native: {}
+      },
+      wind_speed_60: {
+        _id: "wind_speed_60",
+        type: "state",
+        common: {
+          name: "Wind Speed 60 min",
+          type: "number",
+          role: "value.speed",
+          read: true,
+          write: false,
+          unit: "km/h"
+        },
+        native: {}
+      },
+      temperature: {
+        _id: "temperature",
+        type: "state",
+        common: {
+          name: "Temperature",
+          type: "number",
+          role: "value.temperature",
+          read: true,
+          write: false,
+          unit: "\xB0C"
+        },
+        native: {}
+      },
+      fallback_source_ids: {
+        _channel: {
+          _id: "fallback_source_ids",
+          type: "folder",
+          common: {
+            name: "Fallback Source IDs"
+          },
+          native: {}
+        },
+        ...BrightskyCurrentlyFallback
+      },
+      icon: {
+        _id: "icon",
+        type: "state",
+        common: {
+          name: "Weather Icon",
+          type: "string",
+          role: "text",
+          read: true,
+          write: false
+        },
+        native: {}
+      }
     }
   }
 };
@@ -776,11 +1185,94 @@ const testdata = {
     }
   ]
 };
+const testdata2 = {
+  weather: {
+    source_id: 11182,
+    timestamp: "2025-08-17T20:00:00+00:00",
+    cloud_cover: 88,
+    condition: "dry",
+    dew_point: 11.9,
+    solar_10: 0,
+    solar_30: 0,
+    solar_60: 0,
+    precipitation_10: 0,
+    precipitation_30: 0,
+    precipitation_60: 0,
+    pressure_msl: 1019.5,
+    relative_humidity: 69,
+    visibility: 54768,
+    wind_direction_10: 330,
+    wind_direction_30: 330,
+    wind_direction_60: 330,
+    wind_speed_10: 10.8,
+    wind_speed_30: 10.8,
+    wind_speed_60: 10.8,
+    wind_gust_direction_10: 300,
+    wind_gust_direction_30: 300,
+    wind_gust_direction_60: 300,
+    wind_gust_speed_10: 11.9,
+    wind_gust_speed_30: 11.9,
+    wind_gust_speed_60: 12.2,
+    sunshine_30: 0,
+    sunshine_60: 0,
+    temperature: 15.4,
+    fallback_source_ids: {
+      cloud_cover: 254907,
+      condition: 254907,
+      solar_10: 254907,
+      solar_30: 254907,
+      solar_60: 254907,
+      precipitation_10: 254907,
+      precipitation_30: 254907,
+      precipitation_60: 254907,
+      relative_humidity: 254907,
+      visibility: 254907,
+      wind_gust_direction_10: 254907,
+      wind_gust_direction_30: 254907,
+      wind_gust_direction_60: 254907,
+      wind_gust_speed_10: 254907,
+      wind_gust_speed_30: 254907,
+      wind_gust_speed_60: 254907,
+      sunshine_30: 254907,
+      sunshine_60: 254907
+    },
+    icon: "cloudy"
+  },
+  sources: [
+    {
+      id: 11182,
+      dwd_station_id: "00403",
+      observation_type: "synop",
+      lat: 52.4537,
+      lon: 13.3017,
+      height: 51,
+      station_name: "Berlin-Dahlem(FU)",
+      wmo_station_id: "10381",
+      first_record: "2025-08-16T14:00:00+00:00",
+      last_record: "2025-08-17T20:00:00+00:00",
+      distance: 5360
+    },
+    {
+      id: 254907,
+      dwd_station_id: "03987",
+      observation_type: "synop",
+      lat: 52.3813,
+      lon: 13.0622,
+      height: 80.9,
+      station_name: "Potsdam",
+      wmo_station_id: "10379",
+      first_record: "2025-08-16T13:30:00+00:00",
+      last_record: "2025-08-17T20:00:00+00:00",
+      distance: 19825
+    }
+  ]
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Defaults,
   defaultChannel,
   genericStateObjects,
-  testdata
+  testdata,
+  testdata2
 });
 //# sourceMappingURL=definition.js.map
