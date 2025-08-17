@@ -22,92 +22,104 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var utils = __toESM(require("@iobroker/adapter-core"));
+var import_axios = __toESM(require("axios"));
+var import_library = require("./lib/library");
+var import_definition = require("./lib/definition");
 class Brightsky extends utils.Adapter {
+  library;
+  unload = false;
+  weatherTimeout = null;
+  weatherArray = [];
   constructor(options = {}) {
     super({
       ...options,
       name: "brightsky"
     });
     this.on("ready", this.onReady.bind(this));
-    this.on("stateChange", this.onStateChange.bind(this));
     this.on("unload", this.onUnload.bind(this));
+    this.library = new import_library.Library(this, "Brightsky");
   }
   /**
    * Is called when databases are connected and adapter received configuration.
    */
   async onReady() {
-    this.setState("info.connection", false, true);
-    this.log.info("config option1: " + this.config.option1);
-    this.log.info("config option2: " + this.config.option2);
-    await this.setObjectNotExistsAsync("testVariable", {
-      type: "state",
-      common: {
-        name: "testVariable",
-        type: "boolean",
-        role: "indicator",
-        read: true,
-        write: true
-      },
-      native: {}
-    });
-    this.subscribeStates("testVariable");
-    await this.setStateAsync("testVariable", true);
-    await this.setStateAsync("testVariable", { val: true, ack: true });
-    await this.setStateAsync("testVariable", { val: true, ack: true, expire: 30 });
-    let result = await this.checkPasswordAsync("admin", "iobroker");
-    this.log.info("check user admin pw iobroker: " + result);
-    result = await this.checkGroupAsync("admin", "admin");
-    this.log.info("check group user admin group admin: " + result);
+    if (!this.config.position || typeof this.config.position !== "string" || !this.config.position.split(",").every((coord) => !isNaN(parseFloat(coord)))) {
+      this.log.error("Position is not set in the adapter configuration. Please set it in the adapter settings.");
+      return;
+    }
+    if (this.config.hours == void 0 || this.config.hours < 0 || this.config.hours > 48) {
+      this.log.warn(`Invalid hours to display: ${this.config.hours}. Using default value of 24 hours.`);
+      this.config.hours = 24;
+    }
+    if (this.config.pollInterval == void 0 || this.config.pollInterval < 1) {
+      this.log.warn(`Invalid poll interval: ${this.config.pollInterval}. Using default value of 12 hour.`);
+      this.config.pollInterval = 12;
+    }
+    if (this.config.maxDistance == void 0 || this.config.maxDistance < 1e3) {
+      this.log.warn(`Invalid max distance: ${this.config.maxDistance}. Using default value of 50000 meters.`);
+      this.config.maxDistance = 5e4;
+    }
+    await this.delay(1e3);
+    void this.weatherloop();
   }
-  /**
-   * Is called when adapter shuts down - callback has to be called under any circumstances!
-   */
+  async weatherloop() {
+    if (this.weatherTimeout) {
+      clearTimeout(this.weatherTimeout);
+    }
+    await this.weatherUpdate();
+    const loopTime = (/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.pollInterval, 0, 0) + 3e3 + Math.ceil(Math.random() * 5e3);
+    this.weatherTimeout = this.setTimeout(() => {
+      void this.weatherloop();
+    }, loopTime - Date.now());
+  }
+  async weatherUpdate() {
+    const startTime = new Date((/* @__PURE__ */ new Date()).setMinutes(0, 0, 0)).toISOString();
+    const endTime = new Date((/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.hours, 0, 0, 0)).toISOString();
+    try {
+      const result = await import_axios.default.get(
+        `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
+      );
+      if (result.data) {
+        this.log.debug(`Weather data fetched successfully: ${JSON.stringify(result.data)}`);
+        if (result.data.weather && Array.isArray(result.data.weather)) {
+          for (const item in result.data.weather) {
+            const index = this.weatherArray.findIndex(
+              (el) => el.timestamp === result.data.weather[item].timestamp
+            );
+            if (index !== -1) {
+              this.weatherArray[index] = result.data.weather[item];
+            } else {
+              this.weatherArray.push(result.data.weather[item]);
+            }
+          }
+          await this.library.writeFromJson(
+            "weather.hourly.r",
+            "weather.hourly",
+            import_definition.genericStateObjects,
+            result.data.weather,
+            true
+          );
+          await this.library.writeFromJson(
+            "weather.hourly.sources.r",
+            "weather.sources",
+            import_definition.genericStateObjects,
+            result.data.sources,
+            true
+          );
+        }
+      }
+    } catch (error) {
+      this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
+    }
+  }
   onUnload(callback) {
+    this.unload;
     try {
       callback();
-    } catch (e) {
+    } catch {
       callback();
     }
   }
-  // If you need to react to object changes, uncomment the following block and the corresponding line in the constructor.
-  // You also need to subscribe to the objects with `this.subscribeObjects`, similar to `this.subscribeStates`.
-  // /**
-  //  * Is called if a subscribed object changes
-  //  */
-  // private onObjectChange(id: string, obj: ioBroker.Object | null | undefined): void {
-  //     if (obj) {
-  //         // The object was changed
-  //         this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-  //     } else {
-  //         // The object was deleted
-  //         this.log.info(`object ${id} deleted`);
-  //     }
-  // }
-  /**
-   * Is called if a subscribed state changes
-   */
-  onStateChange(id, state) {
-    if (state) {
-      this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
-    } else {
-      this.log.info(`state ${id} deleted`);
-    }
-  }
-  // If you need to accept messages in your adapter, uncomment the following block and the corresponding line in the constructor.
-  // /**
-  //  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-  //  * Using this method requires "common.messagebox" property to be set to true in io-package.json
-  //  */
-  // private onMessage(obj: ioBroker.Message): void {
-  //     if (typeof obj === 'object' && obj.message) {
-  //         if (obj.command === 'send') {
-  //             // e.g. send email or pushover or whatever
-  //             this.log.info('send command');
-  //             // Send response in callback if required
-  //             if (obj.callback) this.sendTo(obj.from, obj.command, 'Message received', obj.callback);
-  //         }
-  //     }
-  // }
 }
 if (require.main !== module) {
   module.exports = (options) => new Brightsky(options);

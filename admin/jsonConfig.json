@@ -2,15 +2,60 @@
     "i18n": true,
     "type": "panel",
     "items": {
-        "option1": {
-            "type": "checkbox",
-            "label": "option1",
-            "newLine": true
+        "position": {
+            "type": "coordinates",
+            "label": "position",
+            "autoInit": true,
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
         },
-        "option2": {
-            "type": "text",
-            "label": "option2",
-            "newLine": true
-        }
+        "hours": {
+            "type": "number",
+            "label": "Hours-to-display",
+            "default": 12,
+            "min": 0,
+            "max": 48,
+            "unit": "hours",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        
+        "maxDistance": {
+            "type": "number",
+            "label": "maxDistance",
+            "default": 50000,
+            "min": 1000,
+            "step": 1,
+            "unit": "m",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        }, 
+        "pollInterval": {
+            "type": "number",
+            "label": "pollInterval",
+            "default": 1,
+            "min": 1,
+            "max": 24,
+            "step": 1,
+            "unit": "hours",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        }     
     }
 }

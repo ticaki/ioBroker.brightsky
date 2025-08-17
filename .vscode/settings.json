@@ -1,21 +1,28 @@
 {
     "typescript.tsdk": "node_modules/typescript/lib",
     "eslint.enable": true,
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "[typescript]": {
-        "editor.codeActionsOnSave": {
-            "source.organizeImports": true
-        }
-    },
+    "eslint.format.enable": true,
+    "debug.javascript.autoAttachFilter": "always",
     "json.schemas": [
         {
-            "fileMatch": ["io-package.json"],
+            "fileMatch": [
+                "io-package.json"
+            ],
             "url": "https://raw.githubusercontent.com/ioBroker/ioBroker.js-controller/master/schemas/io-package.json"
         },
         {
-            "fileMatch": ["admin/jsonConfig.json", "admin/jsonCustom.json", "admin/jsonTab.json"],
-            "url": "https://raw.githubusercontent.com/ioBroker/adapter-react-v5/main/schemas/jsonConfig.json"
+            "fileMatch": [
+                "admin/jsonConfig.json5",
+                "admin/jsonCustom.json",
+                "admin/jsonTab.json"
+            ],
+            "url": "https://raw.githubusercontent.com/ioBroker/ioBroker.admin/master/packages/jsonConfig/schemas/jsonConfig.json"
         }
-    ]
+    ],
+    "findUnusedExports.detectCircularImports": true,
+    "editor.formatOnSave": false,
+    "eslint.autoFixOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+    }
 }

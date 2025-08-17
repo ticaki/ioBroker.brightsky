@@ -55,7 +55,7 @@
         "extIcon": "https://raw.githubusercontent.com/ticaki/ioBroker.brightsky/main/admin/brightsky.png",
         "readme": "https://github.com/ticaki/ioBroker.brightsky/blob/main/README.md",
         "loglevel": "info",
-        "tier": 3,
+        "tier": 2,
         "mode": "daemon",
         "type": "weather",
         "compact": true,
@@ -71,13 +71,14 @@
         ],
         "globalDependencies": [
             {
-                "admin": "7.0.23"
+                "admin": ">=7.6.17"
             }
         ]
     },
     "native": {
-        "option1": true,
-        "option2": "42"
+        "position": "",
+        "pollInterval": 1,
+        "maxDistance": 50000
     },
     "objects": [],
     "instanceObjects": [
