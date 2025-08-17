@@ -1,0 +1,106 @@
+{
+    "common": {
+        "name": "brightsky",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "uk": "Початкова версія",
+                "zh-cn": "首次出版"
+            }
+        },
+        "titleLang": {
+            "en": "Bright Sky",
+            "de": "Heller Himmel",
+            "ru": "Яркое небо",
+            "pt": "Céu brilhante",
+            "nl": "Bright Sky",
+            "fr": "Ciel brillant",
+            "it": "Cielo luminoso",
+            "es": "Cielo brillante",
+            "pl": "Jasne niebo",
+            "uk": "Яскраве небо",
+            "zh-cn": "明亮的天空"
+        },
+        "desc": {
+            "en": "Retrieve data from Bright Sky",
+            "de": "Daten vom hellen Himmel abrufen",
+            "ru": "Получить данные с яркого неба",
+            "pt": "Recuperar dados do céu brilhante",
+            "nl": "Gegevens ophalen van Bright Sky",
+            "fr": "Récupérer les données de Bright Sky",
+            "it": "Recupera i dati dal cielo luminoso",
+            "es": "Recuperar datos de Bright Sky",
+            "pl": "Odzyskać dane z jasnego nieba",
+            "uk": "Отримати дані з яскравого неба",
+            "zh-cn": "从明亮的天空检索数据"
+        },
+        "authors": ["ticaki <github@renopoint.de>"],
+        "keywords": ["iobroker", "weather", "Bright Sky"],
+        "licenseInformation": {
+            "type": "free",
+            "license": "MIT"
+        },
+        "platform": "Javascript/Node.js",
+        "icon": "brightsky.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/ticaki/ioBroker.brightsky/main/admin/brightsky.png",
+        "readme": "https://github.com/ticaki/ioBroker.brightsky/blob/main/README.md",
+        "loglevel": "info",
+        "tier": 3,
+        "mode": "daemon",
+        "type": "weather",
+        "compact": true,
+        "connectionType": "cloud",
+        "dataSource": "poll",
+        "adminUI": {
+            "config": "json"
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=6.0.11"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": "7.0.23"
+            }
+        ]
+    },
+    "native": {
+        "option1": true,
+        "option2": "42"
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}
