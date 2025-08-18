@@ -266,6 +266,250 @@ const BrightskyCurrentlyFallback = {
     native: {}
   }
 };
+const hourly = {
+  timestamp: {
+    _id: "timestamp",
+    type: "state",
+    common: {
+      name: "Timestamp",
+      type: "string",
+      role: "date",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
+  source_id: {
+    _id: "source_id",
+    type: "state",
+    common: {
+      name: "Source ID",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
+  precipitation: {
+    _id: "precipitation",
+    type: "state",
+    common: {
+      name: "Precipitation",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false,
+      unit: "mm"
+    },
+    native: {}
+  },
+  pressure_msl: {
+    _id: "pressure_msl",
+    type: "state",
+    common: {
+      name: "Pressure MSL",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false,
+      unit: "hPa"
+    },
+    native: {}
+  },
+  sunshine: {
+    _id: "sunshine",
+    type: "state",
+    common: {
+      name: "Sunshine",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
+  temperature: {
+    _id: "temperature",
+    type: "state",
+    common: {
+      name: "Temperature",
+      type: "number",
+      role: "value.temperature",
+      read: true,
+      write: false,
+      unit: "\xB0C"
+    },
+    native: {}
+  },
+  wind_direction: {
+    _id: "wind_direction",
+    type: "state",
+    common: {
+      name: "Wind Direction",
+      type: "number",
+      role: "value.direction",
+      read: true,
+      write: false,
+      unit: "\xB0"
+    },
+    native: {}
+  },
+  wind_speed: {
+    _id: "wind_speed",
+    type: "state",
+    common: {
+      name: "Wind Speed",
+      type: "number",
+      role: "value.speed",
+      read: true,
+      write: false,
+      unit: "km/h"
+    },
+    native: {}
+  },
+  cloud_cover: {
+    _id: "cloud_cover",
+    type: "state",
+    common: {
+      name: "Cloud Cover",
+      type: "number",
+      role: "value",
+      read: true,
+      write: false,
+      unit: "%"
+    },
+    native: {}
+  },
+  dew_point: {
+    _id: "dew_point",
+    type: "state",
+    common: {
+      name: "Dew Point",
+      type: "number",
+      role: "value.temperature.dewpoint",
+      read: true,
+      write: false,
+      unit: "\xB0C"
+    },
+    native: {}
+  },
+  relative_humidity: {
+    _id: "relative_humidity",
+    type: "state",
+    common: {
+      name: "Relative Humidity",
+      type: "number",
+      role: "value.humidity",
+      read: true,
+      write: false,
+      unit: "%"
+    },
+    native: {}
+  },
+  visibility: {
+    _id: "visibility",
+    type: "state",
+    common: {
+      name: "Visibility",
+      type: "number",
+      role: "value.distance",
+      read: true,
+      write: false,
+      unit: "m"
+    },
+    native: {}
+  },
+  wind_gust_direction: {
+    _id: "wind_gust_direction",
+    type: "state",
+    common: {
+      name: "Wind Gust Direction",
+      type: "number",
+      role: "value.direction",
+      read: true,
+      write: false,
+      unit: "\xB0"
+    },
+    native: {}
+  },
+  wind_gust_speed: {
+    _id: "wind_gust_speed",
+    type: "state",
+    common: {
+      name: "Wind Gust Speed",
+      type: "number",
+      role: "value.speed",
+      read: true,
+      write: false,
+      unit: "km/h"
+    },
+    native: {}
+  },
+  condition: {
+    _id: "condition",
+    type: "state",
+    common: {
+      name: "Condition",
+      type: "string",
+      role: "text",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
+  precipitation_probability: {
+    _id: "precipitation_probability",
+    type: "state",
+    common: {
+      name: "Precipitation Probability",
+      type: "number",
+      role: "value.probability",
+      read: true,
+      write: false,
+      unit: "%"
+    },
+    native: {}
+  },
+  precipitation_probability_6h: {
+    _id: "precipitation_probability_6h",
+    type: "state",
+    common: {
+      name: "Precipitation Probability 6h",
+      type: "number",
+      role: "value.probability",
+      read: true,
+      write: false,
+      unit: "%"
+    },
+    native: {}
+  },
+  solar: {
+    _id: "solar",
+    type: "state",
+    common: {
+      name: "Solar Radiation",
+      type: "number",
+      role: "value.power",
+      read: true,
+      write: false,
+      unit: "kWh/m\xB2"
+    },
+    native: {}
+  },
+  icon: {
+    _id: "icon",
+    type: "state",
+    common: {
+      name: "Weather Icon",
+      type: "string",
+      role: "text",
+      read: true,
+      write: false
+    },
+    native: {}
+  }
+};
 const genericStateObjects = {
   default: {
     _id: "No_definition",
@@ -317,35 +561,31 @@ const genericStateObjects = {
         },
         native: {}
       },
-      timestamp: {
-        _id: "timestamp",
-        type: "state",
+      ...hourly
+    },
+    daily: {
+      _channel: {
+        _id: "",
+        type: "folder",
         common: {
-          name: "Timestamp",
-          type: "string",
-          role: "date",
-          read: true,
-          write: false
+          name: "Daily"
         },
         native: {}
       },
-      source_id: {
-        _id: "source_id",
-        type: "state",
+      _array: {
+        _id: "",
+        type: "folder",
         common: {
-          name: "Source ID",
-          type: "number",
-          role: "value",
-          read: true,
-          write: false
+          name: "Daily"
         },
         native: {}
       },
-      precipitation: {
-        _id: "precipitation",
+      ...hourly,
+      precipitation_min: {
+        _id: "precipitation_min",
         type: "state",
         common: {
-          name: "Precipitation",
+          name: "Precipitation Min",
           type: "number",
           role: "value",
           read: true,
@@ -354,62 +594,24 @@ const genericStateObjects = {
         },
         native: {}
       },
-      pressure_msl: {
-        _id: "pressure_msl",
+      precipitation_max: {
+        _id: "precipitation_max",
         type: "state",
         common: {
-          name: "Pressure MSL",
+          name: "Precipitation Max",
           type: "number",
           role: "value",
           read: true,
           write: false,
-          unit: "hPa"
+          unit: "mm"
         },
         native: {}
       },
-      sunshine: {
-        _id: "sunshine",
+      wind_speed_min: {
+        _id: "wind_speed_min",
         type: "state",
         common: {
-          name: "Sunshine",
-          type: "number",
-          role: "value",
-          read: true,
-          write: false
-        },
-        native: {}
-      },
-      temperature: {
-        _id: "temperature",
-        type: "state",
-        common: {
-          name: "Temperature",
-          type: "number",
-          role: "value.temperature",
-          read: true,
-          write: false,
-          unit: "\xB0C"
-        },
-        native: {}
-      },
-      wind_direction: {
-        _id: "wind_direction",
-        type: "state",
-        common: {
-          name: "Wind Direction",
-          type: "number",
-          role: "value.direction",
-          read: true,
-          write: false,
-          unit: "\xB0"
-        },
-        native: {}
-      },
-      wind_speed: {
-        _id: "wind_speed",
-        type: "state",
-        common: {
-          name: "Wind Speed",
+          name: "Wind Speed Min",
           type: "number",
           role: "value.speed",
           read: true,
@@ -418,76 +620,11 @@ const genericStateObjects = {
         },
         native: {}
       },
-      cloud_cover: {
-        _id: "cloud_cover",
+      wind_speed_max: {
+        _id: "wind_speed_max",
         type: "state",
         common: {
-          name: "Cloud Cover",
-          type: "number",
-          role: "value",
-          read: true,
-          write: false,
-          unit: "%"
-        },
-        native: {}
-      },
-      dew_point: {
-        _id: "dew_point",
-        type: "state",
-        common: {
-          name: "Dew Point",
-          type: "number",
-          role: "value.temperature.dewpoint",
-          read: true,
-          write: false,
-          unit: "\xB0C"
-        },
-        native: {}
-      },
-      relative_humidity: {
-        _id: "relative_humidity",
-        type: "state",
-        common: {
-          name: "Relative Humidity",
-          type: "number",
-          role: "value.humidity",
-          read: true,
-          write: false,
-          unit: "%"
-        },
-        native: {}
-      },
-      visibility: {
-        _id: "visibility",
-        type: "state",
-        common: {
-          name: "Visibility",
-          type: "number",
-          role: "value.distance",
-          read: true,
-          write: false,
-          unit: "m"
-        },
-        native: {}
-      },
-      wind_gust_direction: {
-        _id: "wind_gust_direction",
-        type: "state",
-        common: {
-          name: "Wind Gust Direction",
-          type: "number",
-          role: "value.direction",
-          read: true,
-          write: false,
-          unit: "\xB0"
-        },
-        native: {}
-      },
-      wind_gust_speed: {
-        _id: "wind_gust_speed",
-        type: "state",
-        common: {
-          name: "Wind Gust Speed",
+          name: "Wind Speed Max",
           type: "number",
           role: "value.speed",
           read: true,
@@ -496,66 +633,29 @@ const genericStateObjects = {
         },
         native: {}
       },
-      condition: {
-        _id: "condition",
+      temperature_min: {
+        _id: "temperature_min",
         type: "state",
         common: {
-          name: "Condition",
-          type: "string",
-          role: "text",
-          read: true,
-          write: false
-        },
-        native: {}
-      },
-      precipitation_probability: {
-        _id: "precipitation_probability",
-        type: "state",
-        common: {
-          name: "Precipitation Probability",
+          name: "Temperature Min",
           type: "number",
-          role: "value.probability",
+          role: "value.temperature.minmax.min",
           read: true,
           write: false,
-          unit: "%"
+          unit: "\xB0C"
         },
         native: {}
       },
-      precipitation_probability_6h: {
-        _id: "precipitation_probability_6h",
+      temperature_max: {
+        _id: "temperature_max",
         type: "state",
         common: {
-          name: "Precipitation Probability 6h",
+          name: "Temperature Max",
           type: "number",
-          role: "value.probability",
+          role: "value.temperature.minmax.max",
           read: true,
           write: false,
-          unit: "%"
-        },
-        native: {}
-      },
-      solar: {
-        _id: "solar",
-        type: "state",
-        common: {
-          name: "Solar Radiation",
-          type: "number",
-          role: "value.power",
-          read: true,
-          write: false,
-          unit: "kWh/m\xB2"
-        },
-        native: {}
-      },
-      icon: {
-        _id: "icon",
-        type: "state",
-        common: {
-          name: "Weather Icon",
-          type: "string",
-          role: "text",
-          read: true,
-          write: false
+          unit: "\xB0C"
         },
         native: {}
       }

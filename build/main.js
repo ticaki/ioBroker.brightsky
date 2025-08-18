@@ -68,11 +68,107 @@ class Brightsky extends utils.Adapter {
     }
     await this.delay(2e3);
     await this.weatherCurrentlyLoop();
-    await this.delay(5e3);
+    await this.delay(2e3);
     await this.weatherHourlyLoop();
+    await this.delay(3e3);
+    await this.weatherDailyLoop();
     this.log.info(
       `Adapter ${this.namespace} is now ready. Weather data will be updated every ${this.config.pollIntervalCurrently} minutes for current weather and every ${this.config.pollInterval} hours for hourly weather.`
     );
+  }
+  async weatherDailyLoop() {
+    if (this.weatherTimeout[2]) {
+      this.clearTimeout(this.weatherTimeout[2]);
+    }
+    await this.weatherDailyUpdate();
+    let loopTime = 1;
+    if ((/* @__PURE__ */ new Date()).getHours() >= 5 && (/* @__PURE__ */ new Date()).getHours() < 18) {
+      loopTime = (/* @__PURE__ */ new Date()).setHours(18, 0, 0, 0) + 3e4 + Math.ceil(Math.random() * 5e3);
+    } else {
+      loopTime = (/* @__PURE__ */ new Date()).setHours(5, 0, 0, 0) + 3e4 + Math.ceil(Math.random() * 5e3);
+    }
+    this.weatherTimeout[2] = this.setTimeout(() => {
+      void this.weatherDailyLoop();
+    }, loopTime - Date.now());
+  }
+  async weatherDailyUpdate() {
+    const startTime = new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0)).toISOString();
+    const endTime = new Date(
+      new Date((/* @__PURE__ */ new Date()).setHours(23, 59, 59, 999)).setDate((/* @__PURE__ */ new Date()).getDate() + 7)
+    ).toISOString();
+    const result = await import_axios.default.get(
+      `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
+    );
+    this.log.debug(
+      `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
+    );
+    if (result.data) {
+      this.log.debug(`Daily weather data fetched successfully: ${JSON.stringify(result.data)}`);
+      if (result.data.weather && Array.isArray(result.data.weather)) {
+        const weatherArr = {
+          d: [],
+          min: [],
+          max: [],
+          result: []
+        };
+        const currentDay = Math.floor((/* @__PURE__ */ new Date()).getTime() / (24 * 60 * 60 * 1e3));
+        for (const item of result.data.weather) {
+          if (!item) {
+            continue;
+          }
+          const dataDay = Math.floor(new Date(item.timestamp).getTime() / (24 * 60 * 60 * 1e3));
+          const day = dataDay - currentDay;
+          if (weatherArr.d[day] === void 0) {
+            weatherArr.d[day] = JSON.parse(JSON.stringify(item));
+            weatherArr.min[day] = JSON.parse(JSON.stringify(item));
+            weatherArr.max[day] = JSON.parse(JSON.stringify(item));
+          } else {
+            for (const key of Object.keys(item)) {
+              const k = key;
+              const value = item[k];
+              if (value !== null && value !== void 0 && typeof value === "number") {
+                if (typeof weatherArr.min[day][k] === "number" && value < weatherArr.min[day][k]) {
+                  weatherArr.min[day][k] = value;
+                }
+                if (typeof weatherArr.max[day][k] === "number" && value > weatherArr.max[day][k]) {
+                  weatherArr.max[day][k] = value;
+                }
+                const t = weatherArr.d[day][k];
+                if (typeof t === "number") {
+                  weatherArr.d[day][k] = t + value;
+                }
+              }
+            }
+          }
+        }
+        for (let i = 0; i < weatherArr.d.length; i++) {
+          for (const key of Object.keys(weatherArr.d[i])) {
+            const k = key;
+            if (typeof weatherArr.d[i][k] === "number") {
+              weatherArr.d[i][k] = Math.round(weatherArr.d[i][k] / 24 * 10) / 10;
+            }
+          }
+          const dailyData = {
+            ...weatherArr.d[i],
+            precipitation_min: weatherArr.min[i].precipitation,
+            precipitation_max: weatherArr.max[i].precipitation,
+            wind_speed_min: weatherArr.min[i].wind_speed,
+            wind_speed_max: weatherArr.max[i].wind_speed,
+            temperature_min: weatherArr.min[i].temperature,
+            temperature_max: weatherArr.max[i].temperature
+          };
+          weatherArr.result.push(dailyData);
+        }
+        await this.library.writeFromJson(
+          "daily.r",
+          "weather.daily",
+          import_definition.genericStateObjects,
+          weatherArr.result,
+          true
+        );
+        await this.setState("info.connection", true, true);
+      }
+    }
   }
   async weatherCurrentlyLoop() {
     if (this.weatherTimeout[0]) {

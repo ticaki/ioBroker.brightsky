@@ -33,6 +33,7 @@ export default [
             "require-await": "off",
             "@typescript-eslint/require-await": "off",
             "no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
+            "@typescript-eslint/no-unnecessary-type-assertion": "off",
         },
     },
 

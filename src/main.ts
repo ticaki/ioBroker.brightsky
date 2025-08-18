@@ -7,6 +7,7 @@
 import * as utils from '@iobroker/adapter-core';
 import axios from 'axios';
 import { Library } from './lib/library';
+import type { BrightskyDailyData, BrightskyWeather } from './lib/definition';
 import { genericStateObjects } from './lib/definition';
 
 // Load your modules here, e.g.:
@@ -70,12 +71,126 @@ class Brightsky extends utils.Adapter {
         }
         await this.delay(2000); // Wait for 1 second to ensure the adapter is ready
         await this.weatherCurrentlyLoop();
-        await this.delay(5000);
+        await this.delay(2000);
         await this.weatherHourlyLoop();
+        await this.delay(3000);
+        await this.weatherDailyLoop();
         this.log.info(
             `Adapter ${this.namespace} is now ready. Weather data will be updated every ${this.config.pollIntervalCurrently} minutes for current weather and every ${this.config.pollInterval} hours for hourly weather.`,
         );
     }
+
+    async weatherDailyLoop(): Promise<void> {
+        if (this.weatherTimeout[2]) {
+            this.clearTimeout(this.weatherTimeout[2]);
+        }
+        await this.weatherDailyUpdate();
+        let loopTime = 1;
+        if (new Date().getHours() >= 5 && new Date().getHours() < 18) {
+            loopTime = new Date().setHours(18, 0, 0, 0) + 30000 + Math.ceil(Math.random() * 5000);
+        } else {
+            loopTime = new Date().setHours(5, 0, 0, 0) + 30000 + Math.ceil(Math.random() * 5000);
+        }
+        this.weatherTimeout[2] = this.setTimeout(() => {
+            void this.weatherDailyLoop();
+        }, loopTime - Date.now());
+    }
+
+    async weatherDailyUpdate(): Promise<void> {
+        const startTime = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+        const endTime = new Date(
+            new Date(new Date().setHours(23, 59, 59, 999)).setDate(new Date().getDate() + 7),
+        ).toISOString();
+        //try {
+        const result = await axios.get(
+            `https://api.brightsky.dev/weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
+        );
+        this.log.debug(
+            `https://api.brightsky.dev/weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
+        );
+        if (result.data) {
+            this.log.debug(`Daily weather data fetched successfully: ${JSON.stringify(result.data)}`);
+            if (result.data.weather && Array.isArray(result.data.weather)) {
+                const weatherArr: {
+                    d: BrightskyWeather[];
+                    min: BrightskyWeather[];
+                    max: BrightskyWeather[];
+                    result: BrightskyDailyData[];
+                } = {
+                    d: [],
+                    min: [],
+                    max: [],
+                    result: [],
+                };
+
+                const currentDay = Math.floor(new Date().getTime() / (24 * 60 * 60 * 1000)); // Current day in milliseconds
+                for (const item of result.data.weather as BrightskyWeather[]) {
+                    if (!item) {
+                        continue; // Skip if item is null or undefined
+                    }
+                    const dataDay = Math.floor(new Date(item.timestamp).getTime() / (24 * 60 * 60 * 1000));
+                    const day = dataDay - currentDay;
+                    if (weatherArr.d[day] === undefined) {
+                        weatherArr.d[day] = JSON.parse(JSON.stringify(item));
+                        weatherArr.min[day] = JSON.parse(JSON.stringify(item));
+                        weatherArr.max[day] = JSON.parse(JSON.stringify(item));
+                    } else {
+                        for (const key of Object.keys(item)) {
+                            const k = key as keyof BrightskyWeather;
+                            const value = item[k];
+                            if (value !== null && value !== undefined && typeof value === 'number') {
+                                if (typeof weatherArr.min[day][k] === 'number' && value < weatherArr.min[day][k]) {
+                                    (weatherArr.min[day][k] as number) = value;
+                                }
+                                if (typeof weatherArr.max[day][k] === 'number' && value > weatherArr.max[day][k]) {
+                                    (weatherArr.max[day][k] as number) = value;
+                                }
+                                const t = weatherArr.d[day][k];
+                                if (typeof t === 'number') {
+                                    (weatherArr.d[day][k] as number) = t + value;
+                                }
+                            }
+                        }
+                    }
+                }
+                for (let i = 0; i < weatherArr.d.length; i++) {
+                    for (const key of Object.keys(weatherArr.d[i])) {
+                        const k = key as keyof BrightskyWeather;
+                        if (typeof weatherArr.d[i][k] === 'number') {
+                            (weatherArr.d[i][k] as number) =
+                                Math.round(((weatherArr.d[i][k] as number) / 24) * 10) / 10;
+                        }
+                    }
+
+                    const dailyData: BrightskyDailyData = {
+                        ...weatherArr.d[i],
+                        precipitation_min: weatherArr.min[i].precipitation,
+                        precipitation_max: weatherArr.max[i].precipitation,
+                        wind_speed_min: weatherArr.min[i].wind_speed,
+                        wind_speed_max: weatherArr.max[i].wind_speed,
+                        temperature_min: weatherArr.min[i].temperature,
+                        temperature_max: weatherArr.max[i].temperature,
+                    };
+                    weatherArr.result.push(dailyData);
+                }
+
+                await this.library.writeFromJson(
+                    'daily.r',
+                    'weather.daily',
+                    genericStateObjects,
+                    weatherArr.result,
+                    true,
+                );
+
+                await this.setState('info.connection', true, true);
+            }
+        }
+        /*} catch (error) {
+            await this.setState('info.connection', false, true);
+            this.log.error(`Error fetching daily weather data: ${JSON.stringify(error)}`);
+        }*/
+    }
+
     async weatherCurrentlyLoop(): Promise<void> {
         if (this.weatherTimeout[0]) {
             this.clearTimeout(this.weatherTimeout[0]);
