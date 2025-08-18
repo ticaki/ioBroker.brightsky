@@ -28,7 +28,7 @@ var import_definition = require("./lib/definition");
 class Brightsky extends utils.Adapter {
   library;
   unload = false;
-  weatherTimeout = null;
+  weatherTimeout = [];
   weatherArray = [];
   constructor(options = {}) {
     super({
@@ -43,6 +43,7 @@ class Brightsky extends utils.Adapter {
    * Is called when databases are connected and adapter received configuration.
    */
   async onReady() {
+    await this.setState("info.connection", false, true);
     if (!this.config.position || typeof this.config.position !== "string" || !this.config.position.split(",").every((coord) => !isNaN(parseFloat(coord)))) {
       this.log.error("Position is not set in the adapter configuration. Please set it in the adapter settings.");
       return;
@@ -55,7 +56,7 @@ class Brightsky extends utils.Adapter {
       this.log.warn(`Invalid poll interval: ${this.config.pollInterval}. Using default value of 12 hour.`);
       this.config.pollInterval = 12;
     }
-    if (this.config.pollIntervalCurrently == void 0 || this.config.pollIntervalCurrently < 5 || this.config.pollIntervalCurrently > 31 ** 2 / 6e4) {
+    if (this.config.pollIntervalCurrently == void 0 || this.config.pollIntervalCurrently < 10 || this.config.pollIntervalCurrently >= 2 ** 21 / 6e4) {
       this.log.warn(
         `Invalid poll interval currently: ${this.config.pollIntervalCurrently}. Using default value of 30 minute.`
       );
@@ -69,13 +70,16 @@ class Brightsky extends utils.Adapter {
     await this.weatherCurrentlyLoop();
     await this.delay(5e3);
     await this.weatherHourlyLoop();
+    this.log.info(
+      `Adapter ${this.namespace} is now ready. Weather data will be updated every ${this.config.pollIntervalCurrently} minutes for current weather and every ${this.config.pollInterval} hours for hourly weather.`
+    );
   }
   async weatherCurrentlyLoop() {
-    if (this.weatherTimeout) {
-      clearTimeout(this.weatherTimeout);
+    if (this.weatherTimeout[0]) {
+      this.clearTimeout(this.weatherTimeout[0]);
     }
     await this.weatherCurrentlyUpdate();
-    this.weatherTimeout = this.setTimeout(
+    this.weatherTimeout[0] = this.setTimeout(
       () => {
         void this.weatherCurrentlyLoop();
       },
@@ -83,12 +87,12 @@ class Brightsky extends utils.Adapter {
     );
   }
   async weatherHourlyLoop() {
-    if (this.weatherTimeout) {
-      clearTimeout(this.weatherTimeout);
+    if (this.weatherTimeout[1]) {
+      this.clearTimeout(this.weatherTimeout[1]);
     }
     await this.weatherHourlyUpdate();
     const loopTime = (/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.pollInterval, 0, 0) + 3e3 + Math.ceil(Math.random() * 5e3);
-    this.weatherTimeout = this.setTimeout(() => {
+    this.weatherTimeout[1] = this.setTimeout(() => {
       void this.weatherHourlyLoop();
     }, loopTime - Date.now());
   }
@@ -116,9 +120,11 @@ class Brightsky extends utils.Adapter {
             result.data.sources,
             true
           );
+          await this.setState("info.connection", true, true);
         }
       }
     } catch (error) {
+      await this.setState("info.connection", false, true);
       this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
     }
   }
@@ -144,15 +150,22 @@ class Brightsky extends utils.Adapter {
             result.data.sources,
             true
           );
+          await this.setState("info.connection", true, true);
         }
       }
     } catch (error) {
+      await this.setState("info.connection", false, true);
       this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
     }
   }
   onUnload(callback) {
-    this.unload;
+    this.unload = true;
     try {
+      for (const timeout of this.weatherTimeout) {
+        if (timeout) {
+          this.clearTimeout(timeout);
+        }
+      }
       callback();
     } catch {
       callback();

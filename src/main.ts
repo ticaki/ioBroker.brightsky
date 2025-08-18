@@ -15,7 +15,7 @@ import { genericStateObjects } from './lib/definition';
 class Brightsky extends utils.Adapter {
     library: Library;
     unload: boolean = false;
-    weatherTimeout: ioBroker.Timeout | null | undefined = null;
+    weatherTimeout: (ioBroker.Timeout | null | undefined)[] = [];
 
     weatherArray: any[] = [];
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
@@ -35,6 +35,7 @@ class Brightsky extends utils.Adapter {
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
+        await this.setState('info.connection', false, true);
         if (
             !this.config.position ||
             typeof this.config.position !== 'string' ||
@@ -54,8 +55,8 @@ class Brightsky extends utils.Adapter {
         }
         if (
             this.config.pollIntervalCurrently == undefined ||
-            this.config.pollIntervalCurrently < 5 ||
-            this.config.pollIntervalCurrently > 31 ** 2 / 60000
+            this.config.pollIntervalCurrently < 10 ||
+            this.config.pollIntervalCurrently >= 2 ** 21 / 60000
         ) {
             this.log.warn(
                 `Invalid poll interval currently: ${this.config.pollIntervalCurrently}. Using default value of 30 minute.`,
@@ -71,14 +72,17 @@ class Brightsky extends utils.Adapter {
         await this.weatherCurrentlyLoop();
         await this.delay(5000);
         await this.weatherHourlyLoop();
+        this.log.info(
+            `Adapter ${this.namespace} is now ready. Weather data will be updated every ${this.config.pollIntervalCurrently} minutes for current weather and every ${this.config.pollInterval} hours for hourly weather.`,
+        );
     }
     async weatherCurrentlyLoop(): Promise<void> {
-        if (this.weatherTimeout) {
-            clearTimeout(this.weatherTimeout);
+        if (this.weatherTimeout[0]) {
+            this.clearTimeout(this.weatherTimeout[0]);
         }
         await this.weatherCurrentlyUpdate();
 
-        this.weatherTimeout = this.setTimeout(
+        this.weatherTimeout[0] = this.setTimeout(
             () => {
                 void this.weatherCurrentlyLoop();
             },
@@ -87,15 +91,15 @@ class Brightsky extends utils.Adapter {
     }
 
     async weatherHourlyLoop(): Promise<void> {
-        if (this.weatherTimeout) {
-            clearTimeout(this.weatherTimeout);
+        if (this.weatherTimeout[1]) {
+            this.clearTimeout(this.weatherTimeout[1]);
         }
         await this.weatherHourlyUpdate();
         const loopTime =
             new Date().setHours(new Date().getHours() + this.config.pollInterval, 0, 0) +
             3000 +
             Math.ceil(Math.random() * 5000); // Add a random delay of up to 5 second
-        this.weatherTimeout = this.setTimeout(() => {
+        this.weatherTimeout[1] = this.setTimeout(() => {
             void this.weatherHourlyLoop();
         }, loopTime - Date.now());
     }
@@ -133,9 +137,11 @@ class Brightsky extends utils.Adapter {
                         result.data.sources,
                         true,
                     );
+                    await this.setState('info.connection', true, true);
                 }
             }
         } catch (error) {
+            await this.setState('info.connection', false, true);
             this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
         }
     }
@@ -161,21 +167,24 @@ class Brightsky extends utils.Adapter {
                         result.data.sources,
                         true,
                     );
+                    await this.setState('info.connection', true, true);
                 }
             }
         } catch (error) {
+            await this.setState('info.connection', false, true);
             this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
         }
     }
 
     private onUnload(callback: () => void): void {
-        this.unload;
+        this.unload = true;
+
         try {
-            // Here you must clear all timeouts or intervals that may still be active
-            // clearTimeout(timeout1);
-            // clearTimeout(timeout2);
-            // ...
-            // clearInterval(interval1);
+            for (const timeout of this.weatherTimeout) {
+                if (timeout) {
+                    this.clearTimeout(timeout);
+                }
+            }
 
             callback();
         } catch {

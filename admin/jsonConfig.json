@@ -46,7 +46,7 @@
             "type": "number",
             "label": "pollIntervalCurrently",
             "default": 60,
-            "min": 5,
+            "min": 10,
             "step": 1,
             "unit": "minutes",
             "newLine": true,
