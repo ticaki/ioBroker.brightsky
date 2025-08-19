@@ -185,7 +185,25 @@ class Brightsky extends utils.Adapter {
                                 }
                             }
                             // eslint-disable-next-line no-fallthrough
-                            case 'sunshine':
+                            case 'sunshine': {
+                                if (k === 'precipitation' || k === 'sunshine') {
+                                    const t = weatherArr[i][k].reduce((sum, value) => {
+                                        if (typeof sum !== 'number') {
+                                            sum = 0; // Initialize sum to 0 if it's not a number
+                                        }
+                                        if (value != null && typeof value === 'number') {
+                                            return sum + value;
+                                        }
+                                        return sum;
+                                    }, 0);
+                                    dailyData[k] = null;
+                                    if (t !== null && typeof t === 'number') {
+                                        dailyData[k] = Math.round(t * 10) / 10; // Round to one decimal place
+                                    }
+                                    break;
+                                }
+                            }
+                            // eslint-disable-next-line no-fallthrough
                             case 'wind_direction':
                             case 'cloud_cover':
                             case 'dew_point':

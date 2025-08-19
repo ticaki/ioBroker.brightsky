@@ -325,7 +325,8 @@ const hourly = {
       type: "number",
       role: "value",
       read: true,
-      write: false
+      write: false,
+      unit: "min"
     },
     native: {}
   },
@@ -581,6 +582,188 @@ const genericStateObjects = {
         native: {}
       },
       ...hourly,
+      solar_max: {
+        _id: "solar_max",
+        type: "state",
+        common: {
+          name: "Solar Max",
+          type: "number",
+          role: "value.power",
+          read: true,
+          write: false,
+          unit: "kWh/m\xB2"
+        },
+        native: {}
+      },
+      solar_median: {
+        _id: "solar_median",
+        type: "state",
+        common: {
+          name: "Solar Median",
+          type: "number",
+          role: "value.power",
+          read: true,
+          write: false,
+          unit: "kWh/m\xB2"
+        },
+        native: {}
+      },
+      wind_direction_median: {
+        _id: "wind_direction_median",
+        type: "state",
+        common: {
+          name: "Wind Direction Median",
+          type: "number",
+          role: "value.direction",
+          read: true,
+          write: false,
+          unit: "\xB0"
+        },
+        native: {}
+      },
+      wind_speed_median: {
+        _id: "wind_speed_median",
+        type: "state",
+        common: {
+          name: "Wind Speed Median",
+          type: "number",
+          role: "value.speed",
+          read: true,
+          write: false,
+          unit: "km/h"
+        },
+        native: {}
+      },
+      cloud_cover_median: {
+        _id: "cloud_cover_median",
+        type: "state",
+        common: {
+          name: "Cloud Cover Median",
+          type: "number",
+          role: "value",
+          read: true,
+          write: false,
+          unit: "%"
+        },
+        native: {}
+      },
+      relative_humidity_median: {
+        _id: "relative_humidity_median",
+        type: "state",
+        common: {
+          name: "Relative Humidity Median",
+          type: "number",
+          role: "value.humidity",
+          read: true,
+          write: false,
+          unit: "%"
+        },
+        native: {}
+      },
+      visibility_median: {
+        _id: "visibility_median",
+        type: "state",
+        common: {
+          name: "Visibility Median",
+          type: "number",
+          role: "value.distance",
+          read: true,
+          write: false,
+          unit: "m"
+        },
+        native: {}
+      },
+      dew_point_median: {
+        _id: "dew_point_median",
+        type: "state",
+        common: {
+          name: "Dew Point Median",
+          type: "number",
+          role: "value.temperature.dewpoint",
+          read: true,
+          write: false,
+          unit: "\xB0C"
+        },
+        native: {}
+      },
+      temperature_median: {
+        _id: "temperature_median",
+        type: "state",
+        common: {
+          name: "Temperature Median",
+          type: "number",
+          role: "value.temperature",
+          read: true,
+          write: false,
+          unit: "\xB0C"
+        },
+        native: {}
+      },
+      wind_gust_direction_median: {
+        _id: "wind_gust_direction_median",
+        type: "state",
+        common: {
+          name: "Wind Gust Direction Median",
+          type: "number",
+          role: "value.direction",
+          read: true,
+          write: false,
+          unit: "\xB0"
+        },
+        native: {}
+      },
+      wind_gust_speed_median: {
+        _id: "wind_gust_speed_median",
+        type: "state",
+        common: {
+          name: "Wind Gust Speed Median",
+          type: "number",
+          role: "value.speed",
+          read: true,
+          write: false,
+          unit: "km/h"
+        },
+        native: {}
+      },
+      precipitation_probability_median: {
+        _id: "precipitation_probability_median",
+        type: "state",
+        common: {
+          name: "Precipitation Probability Median",
+          type: "number",
+          role: "value.probability",
+          read: true,
+          write: false,
+          unit: "%"
+        },
+        native: {}
+      },
+      precipitation_probability_6h_median: {
+        _id: "precipitation_probability_6h_median",
+        type: "state",
+        common: {
+          name: "Precipitation Probability 6h Median",
+          type: "number",
+          role: "value.probability",
+          read: true,
+          write: false,
+          unit: "%"
+        },
+        native: {}
+      },
+      pressure_msl_median: {
+        _id: "pressure_msl_median",
+        type: "state",
+        common: {
+          name: "Pressure MSL Median",
+          type: "number",
+          role: "value",
+          read: true,
+          write: false,
+          unit: "hPa"
+        },
+        native: {}
+      },
       precipitation_min: {
         _id: "precipitation_min",
         type: "state",

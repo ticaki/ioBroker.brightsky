@@ -180,7 +180,25 @@ class Brightsky extends utils.Adapter {
                 }
               }
               // eslint-disable-next-line no-fallthrough
-              case "sunshine":
+              case "sunshine": {
+                if (k === "precipitation" || k === "sunshine") {
+                  const t = weatherArr[i][k].reduce((sum, value) => {
+                    if (typeof sum !== "number") {
+                      sum = 0;
+                    }
+                    if (value != null && typeof value === "number") {
+                      return sum + value;
+                    }
+                    return sum;
+                  }, 0);
+                  dailyData[k] = null;
+                  if (t !== null && typeof t === "number") {
+                    dailyData[k] = Math.round(t * 10) / 10;
+                  }
+                  break;
+                }
+              }
+              // eslint-disable-next-line no-fallthrough
               case "wind_direction":
               case "cloud_cover":
               case "dew_point":
