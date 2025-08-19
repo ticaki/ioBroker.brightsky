@@ -9,5 +9,6 @@
     "pollIntervalCurrently": "Intervalo de consulta para o clima atual (em minutos)",
     "createDaily": "Crie dados climáticos diários",
     "createHourly": "Cria uma visão geral por hora",
-    "createCurrently": "Cria dados climáticos atuais"
+    "createCurrently": "Cria dados climáticos atuais",
+    "wmo_station": "ID da estação WMO (opcional, o padrão está vazio)"
 }

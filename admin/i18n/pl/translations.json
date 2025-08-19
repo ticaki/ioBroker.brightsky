@@ -9,5 +9,6 @@
     "pollIntervalCurrently": "Interwał zapytania dla aktualnej pogody (w minutach)",
     "createDaily": "Twórz codzienne dane pogodowe",
     "createHourly": "Tworzy przegląd godzin",
-    "createCurrently": "Tworzy aktualne dane pogodowe"
+    "createCurrently": "Tworzy aktualne dane pogodowe",
+    "wmo_station": "Identyfikator stacji WMO (opcjonalnie, domyślnie jest pusty)"
 }

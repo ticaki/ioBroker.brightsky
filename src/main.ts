@@ -51,6 +51,10 @@ class Brightsky extends utils.Adapter {
             );
             return;
         }
+        if (this.config.wmo_station == undefined || typeof this.config.wmo_station !== 'string') {
+            this.log.warn(`Invalid WMO station ID. Using default value of "".`);
+            this.config.wmo_station = ''; // Default to 0 if invalid
+        }
         if (
             !this.config.position ||
             typeof this.config.position !== 'string' ||
@@ -356,7 +360,7 @@ class Brightsky extends utils.Adapter {
         const endTime = new Date(new Date().setHours(new Date().getHours() + this.config.hours, 0, 0, 0)).toISOString();
         try {
             const result = await axios.get(
-                `https://api.brightsky.dev/weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
+                `https://api.brightsky.dev/weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}${this.config.wmo_station != '' ? `&wmo_station_id=${this.config.wmo_station}` : ''}`,
             );
             if (result.data) {
                 this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);

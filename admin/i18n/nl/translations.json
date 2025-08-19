@@ -9,5 +9,6 @@
     "pollIntervalCurrently": "Vraaginterval voor het huidige weer (in minuten)",
     "createDaily": "Maak dagelijkse weergegevens",
     "createHourly": "Creëert uur overzichten",
-    "createCurrently": "Creëert huidige weergegevens"
+    "createCurrently": "Creëert huidige weergegevens",
+    "wmo_station": "WMO Station ID (optioneel, standaard is leeg)"
 }

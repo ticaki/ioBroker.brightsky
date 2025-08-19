@@ -9,5 +9,6 @@
     "pollIntervalCurrently": "Intervalle de requête pour la météo actuelle (en minutes)",
     "createDaily": "Créer des données météorologiques quotidiennes",
     "createHourly": "Crée des aperçus horaires",
-    "createCurrently": "Crée des données météorologiques actuelles"
+    "createCurrently": "Crée des données météorologiques actuelles",
+    "wmo_station": "ID de station WMO (facultatif, par défaut est vide)"
 }

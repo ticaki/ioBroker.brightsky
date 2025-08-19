@@ -7,5 +7,6 @@
     "pollIntervalCurrently": "Query Interval for current weather (in minutes)",
     "createDaily": "Creates daily overviews (after 5:00 and 18:00)",
     "createHourly": "Creates hourly overviews",
-    "createCurrently": "Creates current weather data"
+    "createCurrently": "Creates current weather data",
+    "wmo_station": "WMO station ID (optional, default is empty)"
 }

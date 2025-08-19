@@ -7,5 +7,6 @@
     "pollIntervalCurrently": "Abfrageintervall für aktuelles Wetter (in Minuten)",
     "createDaily": "Erstellt Tagesübersichten (nach 5:00 und 18:00 Uhr)",
     "createHourly": "Erstellt stündliche Übersichten",
-    "createCurrently": "Erstellt aktuelle Wetterdatenübersicht"
+    "createCurrently": "Erstellt aktuelle Wetterdatenübersicht",
+    "wmo_station": "WMO Station ID (optional, Default ist leer)"
 }

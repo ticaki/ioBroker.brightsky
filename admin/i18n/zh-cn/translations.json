@@ -9,5 +9,6 @@
     "pollIntervalCurrently": "查询当前天气的间隔（几分钟内）",
     "createDaily": "创建每日天气数据",
     "createHourly": "创建每小时的概述",
-    "createCurrently": "创建当前的天气数据"
+    "createCurrently": "创建当前的天气数据",
+    "wmo_station": "WMO站ID（可选，默认为空）"
 }

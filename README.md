@@ -20,6 +20,7 @@ Retrieve weather data from Bright Sky. The data used comes from weather stations
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+* (ticaki) WMO station ID added
 * (ticaki) Deactivation of data options added
 
 ### 0.1.1 (2025-08-19)

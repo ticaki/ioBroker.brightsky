@@ -58,6 +58,19 @@
             "lg": 4,
             "xl": 4
         },
+        "wmo_station": {
+            "type": "text",
+            "label": "wmo_station",
+            "disabled": "!data.createHourly",
+            "default": "",
+            "step": 1,
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        }, 
         "hours": {
             "type": "number",
             "label": "Hours-to-display",
