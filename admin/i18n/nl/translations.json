@@ -1,5 +1,11 @@
 {
     "brightsky adapter settings": "Adapterinstellingen voor brightsky",
     "option1": "Option1",
-    "option2": "Optie2"
+    "option2": "Optie2",
+    "position": "Positie",
+    "pollInterval": "Vraaginterval (elk uur op het uur)",
+    "Hours-to-display": "Uren om weer te geven",
+    "maxDistance": "Maximale afstand tot het weerstation",
+    "pollIntervalCurrently": "Vraaginterval voor het huidige weer (in minuten)",
+    "createDaily": "Maak dagelijkse weergegevens"
 }

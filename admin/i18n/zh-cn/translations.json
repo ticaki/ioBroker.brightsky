@@ -1,5 +1,11 @@
 {
     "brightsky adapter settings": "brightsky的适配器设置",
     "option1": "选项1",
-    "option2": "选项2"
+    "option2": "选项2",
+    "position": "位置",
+    "pollInterval": "查询间隔（小时每小时）",
+    "Hours-to-display": "显示的小时",
+    "maxDistance": "气象站的最大距离",
+    "pollIntervalCurrently": "查询当前天气的间隔（几分钟内）",
+    "createDaily": "创建每日天气数据"
 }

@@ -1,5 +1,11 @@
 {
     "brightsky adapter settings": "Настройки адаптера для brightsky",
     "option1": "вариант1",
-    "option2": "вариант2"
+    "option2": "вариант2",
+    "position": "Позиция",
+    "pollInterval": "Интервал запроса (каждый час в час)",
+    "Hours-to-display": "Часы для отображения",
+    "maxDistance": "Максимальное расстояние до метеостанции",
+    "pollIntervalCurrently": "Интервал запроса для текущей погоды (за считанные минуты)",
+    "createDaily": "Создать данные о погоде"
 }

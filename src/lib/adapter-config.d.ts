@@ -24,6 +24,8 @@ declare global {
             maxDistance: number;
 
             pollIntervalCurrently: number;
+
+            createDaily: boolean;
         }
     }
 }

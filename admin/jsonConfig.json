@@ -41,7 +41,7 @@
             "md": 6,
             "lg": 4,
             "xl": 4
-        }, 
+        },       
         "pollIntervalCurrently": {
             "type": "number",
             "label": "pollIntervalCurrently",
@@ -58,12 +58,23 @@
         },
         "pollInterval": {
             "type": "number",
-            "label": "pollIntervalHourly",
+            "label": "pollInterval",
             "default": 1,
             "min": 1,
             "max": 24,
             "step": 1,
             "unit": "hours",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        "createDaily": {
+            "type": "checkbox",
+            "label": "createDaily",
+            "default": true,
             "newLine": true,
             "xs": 12,
             "sm": 12,

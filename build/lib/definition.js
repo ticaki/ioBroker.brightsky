@@ -300,7 +300,7 @@ const hourly = {
       role: "value",
       read: true,
       write: false,
-      unit: "mm"
+      unit: "mm/h"
     },
     native: {}
   },
@@ -582,6 +582,19 @@ const genericStateObjects = {
         native: {}
       },
       ...hourly,
+      solar: {
+        _id: "solar",
+        type: "state",
+        common: {
+          name: "Solar Radiation",
+          type: "number",
+          role: "value.power",
+          read: true,
+          write: false,
+          unit: "kW/m\xB2"
+        },
+        native: {}
+      },
       solar_max: {
         _id: "solar_max",
         type: "state",
@@ -773,7 +786,7 @@ const genericStateObjects = {
           role: "value",
           read: true,
           write: false,
-          unit: "mm"
+          unit: "mm/h"
         },
         native: {}
       },
@@ -786,7 +799,7 @@ const genericStateObjects = {
           role: "value",
           read: true,
           write: false,
-          unit: "mm"
+          unit: "mm/h"
         },
         native: {}
       },

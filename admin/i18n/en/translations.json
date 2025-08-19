@@ -1,5 +1,9 @@
 {
     "brightsky adapter settings": "Adapter settings for brightsky",
-    "option1": "option1",
-    "option2": "option2"
+    "position": "Position",
+    "pollInterval": "Query interval overview of hours (every hour on the hour)",
+    "Hours-to-display": "Hours to display",
+    "maxDistance": "Maximum distance to the weather station",    
+    "pollIntervalCurrently": "Query Interval for current weather (in minutes)",
+    "createDaily": "Creates daily overviews (after 5:00 and 18:00)"
 }

@@ -2,8 +2,7 @@
     "common": {
         "name": "brightsky",
         "version": "0.0.1",
-        "news": {   
-        },
+        "news": {},
         "titleLang": {
             "en": "Bright Sky",
             "de": "Bright Sky",
@@ -30,8 +29,14 @@
             "uk": "Отримати дані з яскравого неба",
             "zh-cn": "从明亮的天空检索数据"
         },
-        "authors": ["ticaki <github@renopoint.de>"],
-        "keywords": ["iobroker", "weather", "Bright Sky"],
+        "authors": [
+            "ticaki <github@renopoint.de>"
+        ],
+        "keywords": [
+            "iobroker",
+            "weather",
+            "Bright Sky"
+        ],
         "licenseInformation": {
             "type": "free",
             "license": "MIT"

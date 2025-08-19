@@ -36,6 +36,9 @@ class Brightsky extends utils.Adapter {
      */
     private async onReady(): Promise<void> {
         await this.setState('info.connection', false, true);
+        if (!this.config.createDaily) {
+            await this.delObjectAsync('daily', { recursive: true });
+        }
         if (
             !this.config.position ||
             typeof this.config.position !== 'string' ||
@@ -72,10 +75,12 @@ class Brightsky extends utils.Adapter {
         await this.weatherCurrentlyLoop();
         await this.delay(2000);
         await this.weatherHourlyLoop();
-        await this.delay(3000);
-        await this.weatherDailyLoop();
+        if (this.config.createDaily) {
+            await this.delay(3000);
+            await this.weatherDailyLoop();
+        }
         this.log.info(
-            `Adapter ${this.namespace} is now ready. Weather data will be updated every ${this.config.pollIntervalCurrently} minutes for current weather and every ${this.config.pollInterval} hours for hourly weather.`,
+            `Adapter ${this.namespace} is now ready. Weather data will be updated every ${this.config.pollIntervalCurrently} minutes for current weather and every ${this.config.pollInterval} hours for hourly weather. ${this.config.createDaily ? 'Daily weather data will also be created.' : 'Daily weather data creation is disabled.'}`,
         );
     }
 

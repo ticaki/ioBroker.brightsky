@@ -1,5 +1,11 @@
 {
     "brightsky adapter settings": "Ustawienia adaptera dla brightsky",
     "option1": "opcja 1",
-    "option2": "opcja2"
+    "option2": "opcja2",
+    "position": "Pozycja",
+    "pollInterval": "Interwał zapytania (co godzinę w godzinach)",
+    "Hours-to-display": "Godziny do wyświetlenia",
+    "maxDistance": "Maksymalna odległość do stacji pogodowej",
+    "pollIntervalCurrently": "Interwał zapytania dla aktualnej pogody (w minutach)",
+    "createDaily": "Twórz codzienne dane pogodowe"
 }
