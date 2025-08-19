@@ -181,7 +181,7 @@ class Brightsky extends utils.Adapter {
               }
               // eslint-disable-next-line no-fallthrough
               case "sunshine": {
-                if (k === "precipitation" || k === "sunshine") {
+                if (k === "precipitation" || k === "sunshine" || k === "solar") {
                   const t = weatherArr[i][k].reduce((sum, value) => {
                     if (typeof sum !== "number") {
                       sum = 0;
@@ -193,7 +193,7 @@ class Brightsky extends utils.Adapter {
                   }, 0);
                   dailyData[k] = null;
                   if (t !== null && typeof t === "number") {
-                    dailyData[k] = Math.round(t * 10) / 10;
+                    dailyData[k] = k !== "solar" ? Math.round(t * 10) / 10 : Math.round(t * 1e3) / 1e3;
                   }
                   break;
                 }
