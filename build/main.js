@@ -81,15 +81,19 @@ class Brightsky extends utils.Adapter {
       this.clearTimeout(this.weatherTimeout[2]);
     }
     await this.weatherDailyUpdate();
-    let loopTime = 1;
+    let loopTime = 1e5;
     if ((/* @__PURE__ */ new Date()).getHours() >= 5 && (/* @__PURE__ */ new Date()).getHours() < 18) {
       loopTime = (/* @__PURE__ */ new Date()).setHours(18, 0, 0, 0) + 3e4 + Math.ceil(Math.random() * 5e3);
     } else {
       loopTime = (/* @__PURE__ */ new Date()).setHours(5, 0, 0, 0) + 3e4 + Math.ceil(Math.random() * 5e3);
     }
+    loopTime = loopTime - Date.now();
+    if (loopTime <= 0) {
+      loopTime = loopTime + 24 * 60 * 60 * 1e3;
+    }
     this.weatherTimeout[2] = this.setTimeout(() => {
       void this.weatherDailyLoop();
-    }, loopTime - Date.now());
+    }, loopTime);
   }
   async weatherDailyUpdate() {
     var _a;
