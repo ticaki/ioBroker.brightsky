@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "news": {
+      "0.1.1": {
+        "en": "Reduce required Nodej's version to 20",
+        "de": "Reduzieren Sie die erforderliche Nodej-Version auf 20",
+        "ru": "Сокращение требуемой версии Nodej до 20",
+        "pt": "Reduza a versão necessária de Nodej para 20",
+        "nl": "Verminder de vereiste Nodej versie naar 20",
+        "fr": "Réduire la version requise de Nodej à 20",
+        "it": "Ridurre la versione di Nodej richiesta a 20",
+        "es": "Reducir la versión requerida de Nodej a 20",
+        "pl": "Zredukuj wymaganą wersję Nodeja do 20",
+        "uk": "Зменшити необхідну версію Nodej до 20",
+        "zh-cn": "将 Nodej 的版本减少到 20"
+      },
       "0.1.0": {
         "en": "initial release",
         "de": "erstausstrahlung",
