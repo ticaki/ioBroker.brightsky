@@ -47,6 +47,18 @@ class Brightsky extends utils.Adapter {
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
     }
+    if (!this.config.createCurrently) {
+      await this.delObjectAsync("current", { recursive: true });
+    }
+    if (!this.config.createHourly) {
+      await this.delObjectAsync("hourly", { recursive: true });
+    }
+    if (!this.config.createCurrently && !this.config.createHourly && !this.config.createDaily) {
+      this.log.error(
+        "No data creation is enabled in the adapter configuration. Please enable at least one of the options: Currently, Hourly, or Daily."
+      );
+      return;
+    }
     if (!this.config.position || typeof this.config.position !== "string" || !this.config.position.split(",").every((coord) => !isNaN(parseFloat(coord)))) {
       this.log.error("Position is not set in the adapter configuration. Please set it in the adapter settings.");
       return;
@@ -69,10 +81,14 @@ class Brightsky extends utils.Adapter {
       this.log.warn(`Invalid max distance: ${this.config.maxDistance}. Using default value of 50000 meters.`);
       this.config.maxDistance = 5e4;
     }
-    await this.delay(2e3);
-    await this.weatherCurrentlyLoop();
-    await this.delay(2e3);
-    await this.weatherHourlyLoop();
+    if (this.config.createCurrently) {
+      await this.delay(3e3);
+      await this.weatherCurrentlyLoop();
+    }
+    if (this.config.createHourly) {
+      await this.delay(3e3);
+      await this.weatherHourlyLoop();
+    }
     if (this.config.createDaily) {
       await this.delay(3e3);
       await this.weatherDailyLoop();

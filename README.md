@@ -19,6 +19,9 @@ Retrieve weather data from Bright Sky. The data used comes from weather stations
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (ticaki) Deactivation of data options added
+
 ### 0.1.1 (2025-08-19)
 * (ticaki) Reduce required Nodej's version to 20
 

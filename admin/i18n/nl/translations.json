@@ -7,5 +7,7 @@
     "Hours-to-display": "Uren om weer te geven",
     "maxDistance": "Maximale afstand tot het weerstation",
     "pollIntervalCurrently": "Vraaginterval voor het huidige weer (in minuten)",
-    "createDaily": "Maak dagelijkse weergegevens"
+    "createDaily": "Maak dagelijkse weergegevens",
+    "createHourly": "Creëert uur overzichten",
+    "createCurrently": "Creëert huidige weergegevens"
 }

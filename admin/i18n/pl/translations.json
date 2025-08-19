@@ -7,5 +7,7 @@
     "Hours-to-display": "Godziny do wyświetlenia",
     "maxDistance": "Maksymalna odległość do stacji pogodowej",
     "pollIntervalCurrently": "Interwał zapytania dla aktualnej pogody (w minutach)",
-    "createDaily": "Twórz codzienne dane pogodowe"
+    "createDaily": "Twórz codzienne dane pogodowe",
+    "createHourly": "Tworzy przegląd godzin",
+    "createCurrently": "Tworzy aktualne dane pogodowe"
 }
