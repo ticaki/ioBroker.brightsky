@@ -12,5 +12,6 @@
     "createCurrently": "Cria dados climáticos atuais",
     "wmo_station": "ID da estação WMO (opcional, o padrão está vazio)",
     "wmo_station_link": "Link para informações da estação WMO",
-    "dwd_station_id": "ID da estação DWD (opcional, o padrão está vazio)"
+    "dwd_station_id": "ID da estação DWD (opcional, o padrão está vazio)",
+    "dwd_station_id_link": "Link to DWD station information"
 }

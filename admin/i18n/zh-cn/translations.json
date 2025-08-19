@@ -12,5 +12,6 @@
     "createCurrently": "创建当前的天气数据",
     "wmo_station": "WMO站ID（可选，默认为空）",
     "wmo_station_link": "链接到WMO站信息",
-    "dwd_station_id": "DWD站ID（可选，默认为空）"
+    "dwd_station_id": "DWD站ID（可选，默认为空）",
+    "dwd_station_id_link": "链接到DWD站信息"
 }

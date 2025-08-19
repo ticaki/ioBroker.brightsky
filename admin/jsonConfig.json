@@ -83,6 +83,18 @@
             "lg": 4,
             "xl": 4
         }, 
+        "staticLink2": {
+                    "type": "staticLink",
+                    "text": "dwd_station_id_link",
+                    "href": "https://www.dwd.de/DE/leistungen/klimadatendeutschland/stationsuebersicht.html",
+                    "icon": "info",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
         "dwd_station_id": {
             "type": "text",
             "label": "dwd_station_id",

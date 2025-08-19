@@ -12,5 +12,6 @@
     "createCurrently": "Crée des données météorologiques actuelles",
     "wmo_station": "ID de station WMO (facultatif, par défaut est vide)",
     "wmo_station_link": "Lien vers les informations de la station WMO",
-    "dwd_station_id": "ID de station DWD (facultatif, la valeur par défaut est vide)"
+    "dwd_station_id": "ID de station DWD (facultatif, la valeur par défaut est vide)",
+    "dwd_station_id_link": "Lien vers les informations de la station DWD"
 }

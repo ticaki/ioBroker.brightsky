@@ -10,5 +10,6 @@
     "createCurrently": "Erstellt aktuelle Wetterdatenübersicht",
     "wmo_station": "WMO Station ID (optional, Default ist leer)",
     "wmo_station_link": "Link zu WMO Stationsinformationen",
-    "dwd_station_id": "DWD Station ID (optional, Default ist leer)"
+    "dwd_station_id": "DWD Station ID (optional, Default ist leer)",
+    "dwd_station_id_link": "Link zu DWD-Stationsinformationen"
 }
