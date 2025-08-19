@@ -18,7 +18,7 @@
     "url": "https://github.com/ticaki/ioBroker.brightsky.git"
   },
   "engines": {
-    "node": ">= 22"
+    "node": ">= 20"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.3.2",
