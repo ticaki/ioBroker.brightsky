@@ -12,7 +12,7 @@
 
 ## brightsky adapter for ioBroker
 
-Retrieve data from Bright Sky
+Retrieve weather data from Bright Sky. The data used comes from weather stations located in Germany.
 
 ## Changelog
 <!--
