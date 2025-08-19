@@ -1010,6 +1010,23 @@ export type BrightskyDailyData = BrightskyWeather & {
     wind_speed_max: number | null;
     temperature_min: number | null;
     temperature_max: number | null;
+    solar_max: number | null;
+    precipitation_median: number | null;
+    pressure_msl_median: number | null;
+    sunshine_median: number | null;
+    temperature_median: number | null;
+    wind_direction_median: number | null;
+    wind_speed_median: number | null;
+    cloud_cover_median: number | null;
+    dew_point_median: number | null;
+    relative_humidity_median: number | null;
+    visibility_median: number | null;
+    wind_gust_direction_median: number | null;
+    wind_gust_speed_median: number | null;
+    condition: string | null;
+    precipitation_probability_median: number | null;
+    precipitation_probability_6h_median: number | null;
+    solar_median: number | null;
 };
 
 // Gemeinsame Typen für Wetterdaten

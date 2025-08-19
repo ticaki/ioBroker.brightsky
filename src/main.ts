@@ -166,16 +166,21 @@ class Brightsky extends utils.Adapter {
                             }
                             case 'precipitation':
                             case 'wind_speed':
+                            case 'solar':
                             case 'temperature': {
                                 const values = weatherArr[i][k] as (number | null)[];
                                 if (values && values.length > 0) {
                                     const min = Math.min(...(values.filter(v => v !== null) as number[]));
                                     const max = Math.max(...(values.filter(v => v !== null) as number[]));
 
-                                    dailyData[`${k}_min`] = min !== Infinity ? min : null;
+                                    if (k !== 'solar') {
+                                        dailyData[`${k}_min`] = min !== Infinity ? min : null;
+                                    }
                                     dailyData[`${k}_max`] = max !== -Infinity ? max : null;
                                 } else {
-                                    dailyData[`${k}_min`] = null;
+                                    if (k !== 'solar') {
+                                        dailyData[`${k}_min`] = null;
+                                    }
                                     dailyData[`${k}_max`] = null;
                                 }
                             }
@@ -189,11 +194,20 @@ class Brightsky extends utils.Adapter {
                             case 'wind_gust_direction':
                             case 'wind_gust_speed':
                             case 'precipitation_probability':
-                            case 'precipitation_probability_6h':
-                            case 'solar': {
+                            case 'precipitation_probability_6h': {
                                 const values = weatherArr[i][k] as (number | null)[];
                                 if (values && values.length > 0) {
                                     if (values && values.length > 0) {
+                                        let median: number | null = null;
+                                        if (values.filter(v => v !== null).length > 0) {
+                                            const sortedValues = values.filter(v => v !== null).sort((a, b) => a - b);
+                                            const mid = Math.floor(sortedValues.length / 2);
+                                            if (sortedValues.length % 2 === 0) {
+                                                median = (sortedValues[mid - 1] + sortedValues[mid]) / 2;
+                                            } else {
+                                                median = sortedValues[mid];
+                                            }
+                                        }
                                         let avg = values.reduce((sum, value) => {
                                             if (value != null) {
                                                 return sum == null ? 0 + value : sum + value;
@@ -208,9 +222,11 @@ class Brightsky extends utils.Adapter {
                                                 avg = null;
                                             }
                                         }
+                                        dailyData[`${k}_median`] = median;
                                         dailyData[k] = avg;
                                     } else {
                                         dailyData[k] = null;
+                                        dailyData[`${k}_median`] = null;
                                     }
                                 }
                                 break;
