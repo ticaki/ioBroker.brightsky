@@ -1,99 +1,113 @@
 {
-    "common": {
-        "name": "brightsky",
-        "version": "0.0.1",
-        "news": {},
-        "titleLang": {
-            "en": "Bright Sky",
-            "de": "Bright Sky",
-            "ru": "Bright Sky",
-            "pt": "Bright Sky",
-            "nl": "Bright Sky",
-            "fr": "Bright Sky",
-            "it": "Bright Sky",
-            "es": "Bright Sky",
-            "pl": "Bright Sky",
-            "uk": "Bright Sky",
-            "zh-cn": "Bright Sky"
-        },
-        "desc": {
-            "en": "Retrieve data from Bright Sky",
-            "de": "Daten vom Bright Sky abrufen",
-            "ru": "Получить данные с яркого неба",
-            "pt": "Recuperar dados do céu brilhante",
-            "nl": "Gegevens ophalen van Bright Sky",
-            "fr": "Récupérer les données de Bright Sky",
-            "it": "Recupera i dati dal cielo luminoso",
-            "es": "Recuperar datos de Bright Sky",
-            "pl": "Odzyskać dane z jasnego nieba",
-            "uk": "Отримати дані з яскравого неба",
-            "zh-cn": "从明亮的天空检索数据"
-        },
-        "authors": [
-            "ticaki <github@renopoint.de>"
-        ],
-        "keywords": [
-            "iobroker",
-            "weather",
-            "Bright Sky"
-        ],
-        "licenseInformation": {
-            "type": "free",
-            "license": "MIT"
-        },
-        "platform": "Javascript/Node.js",
-        "icon": "brightsky.png",
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ticaki/ioBroker.brightsky/main/admin/brightsky.png",
-        "readme": "https://github.com/ticaki/ioBroker.brightsky/blob/main/README.md",
-        "loglevel": "info",
-        "tier": 2,
-        "mode": "daemon",
-        "type": "weather",
-        "compact": true,
-        "connectionType": "cloud",
-        "dataSource": "poll",
-        "adminUI": {
-            "config": "json"
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=6.0.11"
-            }
-        ],
-        "globalDependencies": [
-            {
-                "admin": ">=7.6.17"
-            }
-        ]
+  "common": {
+    "name": "brightsky",
+    "version": "0.1.0",
+    "news": {
+      "0.1.0": {
+        "en": "initial release",
+        "de": "erstausstrahlung",
+        "ru": "первоначальное освобождение",
+        "pt": "libertação inicial",
+        "nl": "eerste release",
+        "fr": "libération initiale",
+        "it": "rilascio iniziale",
+        "es": "liberación inicial",
+        "pl": "początkowe zwolnienie",
+        "uk": "початковий реліз",
+        "zh-cn": "初步释放"
+      }
     },
-    "native": {
-        "position": "",
-        "pollInterval": 1,
-        "maxDistance": 50000
+    "titleLang": {
+      "en": "Bright Sky",
+      "de": "Bright Sky",
+      "ru": "Bright Sky",
+      "pt": "Bright Sky",
+      "nl": "Bright Sky",
+      "fr": "Bright Sky",
+      "it": "Bright Sky",
+      "es": "Bright Sky",
+      "pl": "Bright Sky",
+      "uk": "Bright Sky",
+      "zh-cn": "Bright Sky"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Device or service connected",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
+    "desc": {
+      "en": "Retrieve data from Bright Sky",
+      "de": "Daten vom Bright Sky abrufen",
+      "ru": "Получить данные с яркого неба",
+      "pt": "Recuperar dados do céu brilhante",
+      "nl": "Gegevens ophalen van Bright Sky",
+      "fr": "Récupérer les données de Bright Sky",
+      "it": "Recupera i dati dal cielo luminoso",
+      "es": "Recuperar datos de Bright Sky",
+      "pl": "Odzyskać dane z jasnego nieba",
+      "uk": "Отримати дані з яскравого неба",
+      "zh-cn": "从明亮的天空检索数据"
+    },
+    "authors": [
+      "ticaki <github@renopoint.de>"
+    ],
+    "keywords": [
+      "iobroker",
+      "weather",
+      "Bright Sky"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "icon": "brightsky.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ticaki/ioBroker.brightsky/main/admin/brightsky.png",
+    "readme": "https://github.com/ticaki/ioBroker.brightsky/blob/main/README.md",
+    "loglevel": "info",
+    "tier": 2,
+    "mode": "daemon",
+    "type": "weather",
+    "compact": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.17"
+      }
     ]
+  },
+  "native": {
+    "position": "",
+    "pollInterval": 1,
+    "maxDistance": 50000
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
