@@ -156,7 +156,6 @@ class Brightsky extends utils.Adapter {
                     for (const key of Object.keys(weatherArr.d[i])) {
                         const k = key as keyof BrightskyWeather;
                         if (k === 'solar') {
-                            Math.round(((weatherArr.d[i][k] as number) / 24) * 1000) / 1000;
                             continue;
                         }
                         if (typeof weatherArr.d[i][k] === 'number') {
