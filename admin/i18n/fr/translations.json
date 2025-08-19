@@ -10,5 +10,7 @@
     "createDaily": "Créer des données météorologiques quotidiennes",
     "createHourly": "Crée des aperçus horaires",
     "createCurrently": "Crée des données météorologiques actuelles",
-    "wmo_station": "ID de station WMO (facultatif, par défaut est vide)"
+    "wmo_station": "ID de station WMO (facultatif, par défaut est vide)",
+    "wmo_station_link": "Lien vers les informations de la station WMO",
+    "dwd_station_id": "ID de station DWD (facultatif, la valeur par défaut est vide)"
 }

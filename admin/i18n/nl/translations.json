@@ -10,5 +10,7 @@
     "createDaily": "Maak dagelijkse weergegevens",
     "createHourly": "Creëert uur overzichten",
     "createCurrently": "Creëert huidige weergegevens",
-    "wmo_station": "WMO Station ID (optioneel, standaard is leeg)"
+    "wmo_station": "WMO Station ID (optioneel, standaard is leeg)",
+    "wmo_station_link": "Link naar WMO -stationinformatie",
+    "dwd_station_id": "DWD Station ID (optioneel, standaard is leeg)"
 }

@@ -28,6 +28,7 @@ var import_definition = require("./lib/definition");
 class Brightsky extends utils.Adapter {
   library;
   unload = false;
+  posId = "";
   weatherTimeout = [];
   weatherArray = [];
   constructor(options = {}) {
@@ -63,6 +64,17 @@ class Brightsky extends utils.Adapter {
       this.log.warn(`Invalid WMO station ID. Using default value of "".`);
       this.config.wmo_station = "";
     }
+    if (this.config.dwd_station_id == void 0 || typeof this.config.dwd_station_id !== "string") {
+      this.log.warn(`Invalid DWD station ID. Using default value of "".`);
+      this.config.dwd_station_id = "";
+    }
+    if (this.config.wmo_station !== "" && this.config.dwd_station_id !== "") {
+      this.log.warn(
+        "Both WMO station ID and DWD station ID are set. Using DWD station ID for location identification."
+      );
+      this.config.wmo_station = "";
+    }
+    this.posId = this.config.dwd_station_id ? `dwd_station_id=${this.config.dwd_station_id}` : this.config.wmo_station == "" ? `lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&` : `wmo_station_id=${this.config.wmo_station}`;
     if (!this.config.position || typeof this.config.position !== "string" || !this.config.position.split(",").every((coord) => !isNaN(parseFloat(coord)))) {
       this.log.error("Position is not set in the adapter configuration. Please set it in the adapter settings.");
       return;
@@ -128,7 +140,7 @@ class Brightsky extends utils.Adapter {
     ).toISOString();
     try {
       const result = await import_axios.default.get(
-        `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
+        `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
       this.log.debug(
         `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
@@ -333,7 +345,7 @@ class Brightsky extends utils.Adapter {
     const endTime = new Date((/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.hours, 0, 0, 0)).toISOString();
     try {
       const result = await import_axios.default.get(
-        `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}${this.config.wmo_station != "" ? `&wmo_station_id=${this.config.wmo_station}` : ""}`
+        `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
       if (result.data) {
         this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
@@ -363,7 +375,7 @@ class Brightsky extends utils.Adapter {
   async weatherCurrentlyUpdate() {
     try {
       const result = await import_axios.default.get(
-        `https://api.brightsky.dev/current_weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}`
+        `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`
       );
       if (result.data) {
         this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);

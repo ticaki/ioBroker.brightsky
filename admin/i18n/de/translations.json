@@ -8,5 +8,7 @@
     "createDaily": "Erstellt Tagesübersichten (nach 5:00 und 18:00 Uhr)",
     "createHourly": "Erstellt stündliche Übersichten",
     "createCurrently": "Erstellt aktuelle Wetterdatenübersicht",
-    "wmo_station": "WMO Station ID (optional, Default ist leer)"
+    "wmo_station": "WMO Station ID (optional, Default ist leer)",
+    "wmo_station_link": "Link zu WMO Stationsinformationen",
+    "dwd_station_id": "DWD Station ID (optional, Default ist leer)"
 }

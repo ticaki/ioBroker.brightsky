@@ -58,10 +58,35 @@
             "lg": 4,
             "xl": 4
         },
+        "staticLink1": {
+                    "type": "staticLink",
+                    "text": "wmo_station_link",
+                    "href": "https://opendata.dwd.de/climate_environment/CDC/help/stations_list_CLIMAT_data.txt",
+                    "icon": "info",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
         "wmo_station": {
             "type": "text",
             "label": "wmo_station",
-            "disabled": "!data.createHourly",
+            "disabled": "!data.createHourly || data.dwd_station_id",
+            "default": "",
+            "step": 1,
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        }, 
+        "dwd_station_id": {
+            "type": "text",
+            "label": "dwd_station_id",
+            "disabled": "data.wmo_station",
             "default": "",
             "step": 1,
             "newLine": true,

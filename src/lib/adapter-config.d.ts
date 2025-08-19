@@ -29,6 +29,7 @@ declare global {
             createHourly: boolean;
             createDaily: boolean;
             wmo_station: string;
+            dwd_station_id: string;
         }
     }
 }
