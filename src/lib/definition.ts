@@ -1004,35 +1004,35 @@ export const Defaults = {
 
 // ...existing code...
 export type BrightskyDailyData = BrightskyWeather & {
-    precipitation_min: number;
-    precipitation_max: number;
-    wind_speed_min: number;
-    wind_speed_max: number;
-    temperature_min: number;
-    temperature_max: number;
+    precipitation_min: number | null;
+    precipitation_max: number | null;
+    wind_speed_min: number | null;
+    wind_speed_max: number | null;
+    temperature_min: number | null;
+    temperature_max: number | null;
 };
 
 // Gemeinsame Typen für Wetterdaten
 export type BrightskyWeather = {
     timestamp: string;
     source_id: number;
-    precipitation: number;
-    pressure_msl: number;
-    sunshine: number;
-    temperature: number;
-    wind_direction: number;
-    wind_speed: number;
-    cloud_cover: number;
-    dew_point: number;
+    precipitation: number | null;
+    pressure_msl: number | null;
+    sunshine: number | null;
+    temperature: number | null;
+    wind_direction: number | null;
+    wind_speed: number | null;
+    cloud_cover: number | null;
+    dew_point: number | null;
     relative_humidity: number | null;
-    visibility: number;
+    visibility: number | null;
     wind_gust_direction: number | null;
-    wind_gust_speed: number;
-    condition: string;
-    precipitation_probability: number;
+    wind_gust_speed: number | null;
+    condition: string | null;
+    precipitation_probability: number | null;
     precipitation_probability_6h: number | null;
-    solar: number;
-    icon: string;
+    solar: number | null;
+    icon: string | null;
 };
 
 // Typ für ein einzelnes Source-Objekt in testdata.sources

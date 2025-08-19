@@ -110,18 +110,8 @@ class Brightsky extends utils.Adapter {
         if (result.data) {
             this.log.debug(`Daily weather data fetched successfully: ${JSON.stringify(result.data)}`);
             if (result.data.weather && Array.isArray(result.data.weather)) {
-                const weatherArr: {
-                    d: BrightskyWeather[];
-                    min: BrightskyWeather[];
-                    max: BrightskyWeather[];
-                    result: BrightskyDailyData[];
-                } = {
-                    d: [],
-                    min: [],
-                    max: [],
-                    result: [],
-                };
-
+                const weatherArr: Record<string, (string | number | null)[]>[] = [];
+                const resultArr: Partial<BrightskyDailyData>[] = [];
                 const currentDay = Math.floor(new Date().getTime() / (24 * 60 * 60 * 1000)); // Current day in milliseconds
                 for (const item of result.data.weather as BrightskyWeather[]) {
                     if (!item) {
@@ -129,42 +119,126 @@ class Brightsky extends utils.Adapter {
                     }
                     const dataDay = Math.floor(new Date(item.timestamp).getTime() / (24 * 60 * 60 * 1000));
                     const day = dataDay - currentDay;
-                    if (weatherArr.d[day] === undefined) {
-                        weatherArr.d[day] = JSON.parse(JSON.stringify(item));
-                        weatherArr.min[day] = JSON.parse(JSON.stringify(item));
-                        weatherArr.max[day] = JSON.parse(JSON.stringify(item));
-                    } else {
-                        for (const key of Object.keys(item)) {
-                            const k = key as keyof BrightskyWeather;
-                            const value = item[k];
-                            if (value !== null && value !== undefined && typeof value === 'number') {
-                                if (typeof weatherArr.min[day][k] === 'number' && value < weatherArr.min[day][k]) {
-                                    (weatherArr.min[day][k] as number) = value;
-                                }
-                                if (typeof weatherArr.max[day][k] === 'number' && value > weatherArr.max[day][k]) {
-                                    (weatherArr.max[day][k] as number) = value;
-                                }
-                                const t = weatherArr.d[day][k];
-                                if (typeof t === 'number') {
-                                    (weatherArr.d[day][k] as number) = t + value;
+                    if (weatherArr[day] === undefined) {
+                        weatherArr[day] = {};
+                    }
+                    for (const key of Object.keys(item)) {
+                        if (weatherArr[day][key] === undefined) {
+                            weatherArr[day][key] = [];
+                        }
+                        const k = key as keyof BrightskyWeather;
+                        weatherArr[day][key].push(item[k] ?? null);
+                    }
+                }
+                for (let i = 0; i < weatherArr.length; i++) {
+                    const dailyData: Partial<BrightskyDailyData> = {};
+                    this.log.debug(`Processing daily data for day ${i}: ${JSON.stringify(weatherArr[i])}`);
+                    for (const key of Object.keys(weatherArr[i])) {
+                        const k = key as keyof BrightskyWeather;
+                        switch (k) {
+                            case 'precipitation':
+                            case 'wind_gust_speed':
+                            case 'precipitation_probability':
+                            case 'precipitation_probability_6h':
+                            case 'wind_speed': {
+                                const values = weatherArr[i][k] as (number | null)[];
+                                if (values && values.length > 0) {
+                                    for (let j = 0; j < values.length; j++) {
+                                        if (values[j] === null) {
+                                            values[j] = 0; // Set null values to 0
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
-                }
-                for (let i = 0; i < weatherArr.d.length; i++) {
-                    for (const key of Object.keys(weatherArr.d[i])) {
-                        const k = key as keyof BrightskyWeather;
-                        if (k === 'solar') {
-                            continue;
-                        }
-                        if (typeof weatherArr.d[i][k] === 'number') {
-                            (weatherArr.d[i][k] as number) =
-                                Math.round(((weatherArr.d[i][k] as number) / 24) * 10) / 10;
+                        switch (k) {
+                            case 'timestamp': {
+                                dailyData.timestamp = weatherArr[i].timestamp[0] as string;
+                                break;
+                            }
+                            case 'source_id': {
+                                dailyData.source_id = weatherArr[i].source_id[0] as number;
+                                break;
+                            }
+                            case 'precipitation':
+                            case 'wind_speed':
+                            case 'temperature': {
+                                const values = weatherArr[i][k] as (number | null)[];
+                                if (values && values.length > 0) {
+                                    const min = Math.min(...(values.filter(v => v !== null) as number[]));
+                                    const max = Math.max(...(values.filter(v => v !== null) as number[]));
+
+                                    dailyData[`${k}_min`] = min !== Infinity ? min : null;
+                                    dailyData[`${k}_max`] = max !== -Infinity ? max : null;
+                                } else {
+                                    dailyData[`${k}_min`] = null;
+                                    dailyData[`${k}_max`] = null;
+                                }
+                            }
+                            // eslint-disable-next-line no-fallthrough
+                            case 'sunshine':
+                            case 'wind_direction':
+                            case 'cloud_cover':
+                            case 'dew_point':
+                            case 'relative_humidity':
+                            case 'visibility':
+                            case 'wind_gust_direction':
+                            case 'wind_gust_speed':
+                            case 'precipitation_probability':
+                            case 'precipitation_probability_6h':
+                            case 'solar': {
+                                const values = weatherArr[i][k] as (number | null)[];
+                                if (values && values.length > 0) {
+                                    if (values && values.length > 0) {
+                                        let avg = values.reduce((sum, value) => {
+                                            if (value != null) {
+                                                return sum == null ? 0 + value : sum + value;
+                                            }
+                                            return sum;
+                                        }, 0);
+                                        if (avg != null) {
+                                            if (values.filter(v => v !== null).length > 12) {
+                                                avg =
+                                                    Math.round((avg / values.filter(v => v !== null).length) * 10) / 10;
+                                            } else {
+                                                avg = null;
+                                            }
+                                        }
+                                        dailyData[k] = avg;
+                                    } else {
+                                        dailyData[k] = null;
+                                    }
+                                }
+                                break;
+                            }
+                            case 'icon':
+                            case 'condition': {
+                                const tempArr: { value: string | number; count: number }[] = [];
+                                for (const value of weatherArr[i][k]) {
+                                    if (value) {
+                                        const index = tempArr.findIndex(el => el.value === value);
+                                        if (index !== -1) {
+                                            tempArr[index].count++;
+                                        } else {
+                                            tempArr.push({ value, count: 1 });
+                                        }
+                                    }
+                                }
+                                tempArr.sort((a, b) => b.count - a.count);
+                                if (tempArr.length > 0) {
+                                    if (k === 'icon') {
+                                        tempArr[0].value = (tempArr[0].value as string).replace('-night', '-day');
+                                    }
+                                    dailyData[k] = tempArr[0].value as string;
+                                } else {
+                                    dailyData[k] = null;
+                                }
+                                break;
+                            }
                         }
                     }
 
-                    const dailyData: BrightskyDailyData = {
+                    /*const dailyData: Partial<BrightskyDailyData> = {
                         ...weatherArr.d[i],
                         precipitation_min: weatherArr.min[i].precipitation,
                         precipitation_max: weatherArr.max[i].precipitation,
@@ -172,17 +246,11 @@ class Brightsky extends utils.Adapter {
                         wind_speed_max: weatherArr.max[i].wind_speed,
                         temperature_min: weatherArr.min[i].temperature,
                         temperature_max: weatherArr.max[i].temperature,
-                    };
-                    weatherArr.result.push(dailyData);
+                    };*/
+                    resultArr.push(dailyData);
                 }
 
-                await this.library.writeFromJson(
-                    'daily.r',
-                    'weather.daily',
-                    genericStateObjects,
-                    weatherArr.result,
-                    true,
-                );
+                await this.library.writeFromJson('daily.r', 'weather.daily', genericStateObjects, resultArr, true);
 
                 await this.setState('info.connection', true, true);
             }
