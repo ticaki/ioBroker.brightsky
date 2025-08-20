@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "news": {
+      "0.2.1": {
+        "en": "Startup log entry fixed.",
+        "de": "Start-Log-Eintrag behoben.",
+        "ru": "Запись журнала запуска фиксирована.",
+        "pt": "Entrada de registo inicial corrigida.",
+        "nl": "Opstart log entry gerepareerd.",
+        "fr": "Entrée de journal de démarrage corrigée.",
+        "it": "Entrata del registro di avvio fissa.",
+        "es": "Entrada de inicio fijada.",
+        "pl": "Wpis do rejestru startowego naprawiony.",
+        "uk": "Зареєструвати запис входу в систему.",
+        "zh-cn": "启动日志输入已固定 ."
+      },
       "0.2.0": {
         "en": "DWD station ID added\nWMO station ID added\nDeactivation of data options added",
         "de": "DWD Station ID hinzugefügt\nWMO Station ID hinzugefügt\nDeaktivierung von Datenoptionen hinzugefügt",

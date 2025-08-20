@@ -19,7 +19,7 @@ Retrieve weather data from Bright Sky. The data used comes from weather stations
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.2.1 (2025-08-20)
 * (ticaki) Startup log entry fixed.
 
 ### 0.2.0 (2025-08-20)
