@@ -5,7 +5,7 @@
     "Hours-to-display": "Hours to display",
     "maxDistance": "Maximum distance to the weather station",    
     "pollIntervalCurrently": "Query Interval for current weather (in minutes)",
-    "createDaily": "Creates daily overviews (after 5:00 and 18:00)",
+    "createDaily": "Creates daily overviews (after 0:00, 5:00 and 18:00)",
     "createHourly": "Creates hourly overviews",
     "createCurrently": "Creates current weather data",
     "wmo_station": "WMO station ID (optional, default is empty)",

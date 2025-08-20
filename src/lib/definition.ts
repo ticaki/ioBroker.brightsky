@@ -586,6 +586,30 @@ export const genericStateObjects: {
                 native: {},
             },
             ...hourly,
+            sunrise: {
+                _id: 'sunrise',
+                type: 'state',
+                common: {
+                    name: 'Sunrise',
+                    type: 'number',
+                    role: 'date',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            sunset: {
+                _id: 'sunset',
+                type: 'state',
+                common: {
+                    name: 'Sunset',
+                    type: 'number',
+                    role: 'date',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
             solar: {
                 _id: 'solar',
                 type: 'state',
@@ -1222,6 +1246,8 @@ export type BrightskyDailyData = BrightskyWeather & {
     precipitation_probability_median: number | null;
     precipitation_probability_6h_median: number | null;
     solar_median: number | null;
+    sunset?: number | null;
+    sunrise?: number | null;
 };
 
 // Gemeinsame Typen für Wetterdaten

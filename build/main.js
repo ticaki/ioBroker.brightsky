@@ -25,6 +25,7 @@ var utils = __toESM(require("@iobroker/adapter-core"));
 var import_axios = __toESM(require("axios"));
 var import_library = require("./lib/library");
 var import_definition = require("./lib/definition");
+var suncalc = __toESM(require("suncalc"));
 import_axios.default.defaults.timeout = 15e3;
 class Brightsky extends utils.Adapter {
   library;
@@ -125,6 +126,8 @@ class Brightsky extends utils.Adapter {
     let loopTime = 1e5;
     if ((/* @__PURE__ */ new Date()).getHours() >= 5 && (/* @__PURE__ */ new Date()).getHours() < 18) {
       loopTime = (/* @__PURE__ */ new Date()).setHours(18, 0, 0, 0) + 3e4 + Math.ceil(Math.random() * 5e3);
+    } else if ((/* @__PURE__ */ new Date()).getHours() >= 18) {
+      loopTime = (/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0) + 3e4 + Math.ceil(Math.random() * 6e4);
     } else {
       loopTime = (/* @__PURE__ */ new Date()).setHours(5, 0, 0, 0) + 3e4 + Math.ceil(Math.random() * 5e3);
     }
@@ -311,6 +314,13 @@ class Brightsky extends utils.Adapter {
                 }
               }
             }
+            const times = suncalc.getTimes(
+              new Date(dailyData.timestamp),
+              parseFloat(this.config.position.split(",")[0]),
+              parseFloat(this.config.position.split(",")[1])
+            );
+            dailyData.sunset = times.sunset.getTime();
+            dailyData.sunrise = times.sunrise.getTime();
             resultArr.push(dailyData);
           }
           await this.library.writeFromJson("daily.r", "weather.daily", import_definition.genericStateObjects, resultArr, true);

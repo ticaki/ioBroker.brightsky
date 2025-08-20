@@ -8,6 +8,7 @@ import * as utils from '@iobroker/adapter-core';
 import axios from 'axios';
 import { Library } from './lib/library';
 import { genericStateObjects, type BrightskyDailyData, type BrightskyWeather } from './lib/definition';
+import * as suncalc from 'suncalc';
 
 axios.defaults.timeout = 15000; // Set a default timeout of 10 seconds for all axios requests
 
@@ -133,6 +134,8 @@ class Brightsky extends utils.Adapter {
         let loopTime = 100000;
         if (new Date().getHours() >= 5 && new Date().getHours() < 18) {
             loopTime = new Date().setHours(18, 0, 0, 0) + 30000 + Math.ceil(Math.random() * 5000);
+        } else if (new Date().getHours() >= 18) {
+            loopTime = new Date().setHours(0, 0, 0, 0) + 30000 + Math.ceil(Math.random() * 60000);
         } else {
             loopTime = new Date().setHours(5, 0, 0, 0) + 30000 + Math.ceil(Math.random() * 5000);
         }
@@ -335,6 +338,13 @@ class Brightsky extends utils.Adapter {
                         temperature_min: weatherArr.min[i].temperature,
                         temperature_max: weatherArr.max[i].temperature,
                     };*/
+                        const times = suncalc.getTimes(
+                            new Date(dailyData.timestamp as string),
+                            parseFloat(this.config.position.split(',')[0]),
+                            parseFloat(this.config.position.split(',')[1]),
+                        );
+                        dailyData.sunset = times.sunset.getTime();
+                        dailyData.sunrise = times.sunrise.getTime();
                         resultArr.push(dailyData);
                     }
 

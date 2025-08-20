@@ -582,6 +582,30 @@ const genericStateObjects = {
         native: {}
       },
       ...hourly,
+      sunrise: {
+        _id: "sunrise",
+        type: "state",
+        common: {
+          name: "Sunrise",
+          type: "number",
+          role: "date",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      sunset: {
+        _id: "sunset",
+        type: "state",
+        common: {
+          name: "Sunset",
+          type: "number",
+          role: "date",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
       solar: {
         _id: "solar",
         type: "state",
