@@ -9,6 +9,8 @@ import axios from 'axios';
 import { Library } from './lib/library';
 import { genericStateObjects, type BrightskyDailyData, type BrightskyWeather } from './lib/definition';
 
+axios.defaults.timeout = 15000; // Set a default timeout of 10 seconds for all axios requests
+
 // Load your modules here, e.g.:
 // import * as fs from "fs";
 

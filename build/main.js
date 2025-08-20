@@ -25,6 +25,7 @@ var utils = __toESM(require("@iobroker/adapter-core"));
 var import_axios = __toESM(require("axios"));
 var import_library = require("./lib/library");
 var import_definition = require("./lib/definition");
+import_axios.default.defaults.timeout = 15e3;
 class Brightsky extends utils.Adapter {
   library;
   unload = false;
