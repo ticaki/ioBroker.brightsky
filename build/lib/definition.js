@@ -582,6 +582,32 @@ const genericStateObjects = {
         native: {}
       },
       ...hourly,
+      sunshine: {
+        _id: "sunshine",
+        type: "state",
+        common: {
+          name: "Sunshine (daily total)",
+          type: "number",
+          role: "value",
+          read: true,
+          write: false,
+          unit: "min"
+        },
+        native: {}
+      },
+      precipitation: {
+        _id: "precipitation",
+        type: "state",
+        common: {
+          name: "Precipitation (dayly total)",
+          type: "number",
+          role: "value",
+          read: true,
+          write: false,
+          unit: "mm"
+        },
+        native: {}
+      },
       sunrise: {
         _id: "sunrise",
         type: "state",
@@ -610,12 +636,12 @@ const genericStateObjects = {
         _id: "solar",
         type: "state",
         common: {
-          name: "Solar Radiation",
+          name: "Solar Radiation (daily total)",
           type: "number",
           role: "value.power",
           read: true,
           write: false,
-          unit: "kW/m\xB2"
+          unit: "kWh/m\xB2"
         },
         native: {}
       },
@@ -623,7 +649,7 @@ const genericStateObjects = {
         _id: "solar_max",
         type: "state",
         common: {
-          name: "Solar Max",
+          name: "Solar Max (per hour)",
           type: "number",
           role: "value.power",
           read: true,
