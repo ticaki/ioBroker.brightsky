@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "news": {
+      "0.2.0": {
+        "en": "DWD station ID added\nWMO station ID added\nDeactivation of data options added",
+        "de": "DWD Station ID hinzugefügt\nWMO Station ID hinzugefügt\nDeaktivierung von Datenoptionen hinzugefügt",
+        "ru": "ID станции DWD\nДобавлен ID станции ВМО\nДобавлена деактивация опций данных",
+        "pt": "ID da estação DWD adicionado\nID da estação WMO adicionado\nDesativação das opções de dados adicionadas",
+        "nl": "DWD-station-ID toegevoegd\nWMO-station-ID toegevoegd\nDeactivering van toegevoegde gegevensopties",
+        "fr": "ID de station DWD ajouté\nID de station de l'OMM ajouté\nDésactivation des options de données ajoutées",
+        "it": "DWD station ID aggiunto\nID stazione WMO aggiunto\nDisattivazione delle opzioni di dati aggiunti",
+        "es": "DWD station ID added\nWMO station ID added\nDesactivación de las opciones de datos agregadas",
+        "pl": "Dodano identyfikator stacji DWD\nDodano identyfikator stacji WMO\nDezaktywacja dodanych opcji danych",
+        "uk": "ДВД станція ID додано\nКод станції WMO додано\nДодана деактивація параметрів даних",
+        "zh-cn": "增加了DWD站身份证\n增加了气象组织站名\n添加的数据选项的停用"
+      },
       "0.1.1": {
         "en": "Reduce required Nodej's version to 20",
         "de": "Reduzieren Sie die erforderliche Nodej-Version auf 20",
