@@ -13,5 +13,6 @@
     "wmo_station": "ID stazione WMO (facoltativo, il valore predefinito è vuoto)",
     "wmo_station_link": "Link alle informazioni sulla stazione WMO",
     "dwd_station_id": "ID stazione DWD (facoltativo, il valore predefinito è vuoto)",
-    "dwd_station_id_link": "Link alle informazioni sulla stazione DWD"
+    "dwd_station_id_link": "Link alle informazioni sulla stazione DWD",
+    "statictext1": "Se qualcosa viene inserito in una delle opzioni della stazione, questo sovrascrive le informazioni LAT, LON e Distanza. È possibile inserire un elenco separato da virgole senza spazi. Le liste delle stazioni non sono complete, in particolare con DWD, c'è un numero enorme di stazioni che possono essere trovate tramite intersearch (entrambe le 5 cifre di ID davanti con 0)."
 }

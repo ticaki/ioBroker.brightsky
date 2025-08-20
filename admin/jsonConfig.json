@@ -59,6 +59,16 @@
             "lg": 4,
             "xl": 4
         },
+        "statictext1": {
+            "type": "staticText",
+            "text": "statictext1",
+            "newLine": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
         "staticLink1": {
                     "type": "staticLink",
                     "text": "wmo_station_link",

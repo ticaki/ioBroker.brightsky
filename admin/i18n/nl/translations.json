@@ -13,5 +13,6 @@
     "wmo_station": "WMO Station ID (optioneel, standaard is leeg)",
     "wmo_station_link": "Link naar WMO -stationinformatie",
     "dwd_station_id": "DWD Station ID (optioneel, standaard is leeg)",
-    "dwd_station_id_link": "Link naar DWD -stationinformatie"
+    "dwd_station_id_link": "Link naar DWD -stationinformatie",
+    "statictext1": "Als er iets wordt ingevoerd in een van de stationsopties, overschrijft dit de LAT-, LON- en afstandsinformatie. U kunt een door komma gescheiden lijst zonder spaties invoeren. De stationlijsten zijn niet voltooid, vooral met DWD is er een groot aantal stations die kunnen worden gevonden via InterSearch (beide ID's 5 cijfers vooraan met 0)."
 }

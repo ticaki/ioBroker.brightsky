@@ -13,5 +13,6 @@
     "wmo_station": "ID da estação WMO (opcional, o padrão está vazio)",
     "wmo_station_link": "Link para informações da estação WMO",
     "dwd_station_id": "ID da estação DWD (opcional, o padrão está vazio)",
-    "dwd_station_id_link": "Link to DWD station information"
+    "dwd_station_id_link": "Link to DWD station information",
+    "statictext1": "Se algo for inserido em uma das opções da estação, isso substitui as informações LAT, LON e Distance. Você pode inserir uma lista separada por vírgula sem espaços. As listas da estação não estão completas, especialmente com o DWD, há um grande número de estações que podem ser encontradas via Intersearch (ambos os 5 dígitos de ID na frente com 0)."
 }

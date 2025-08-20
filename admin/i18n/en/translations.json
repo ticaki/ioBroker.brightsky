@@ -11,5 +11,6 @@
     "wmo_station": "WMO station ID (optional, default is empty)",
     "wmo_station_link": "Link to WMO station information",
     "dwd_station_id": "DWD station ID (optional, default is empty)",
-    "dwd_station_id_link": "Link to DWD station information"
+    "dwd_station_id_link": "Link to DWD station information",
+    "statictext1": "If something is entered in one of the station options, this overwrites the lat,lon and distance information. You can enter a comma-separated list without spaces. The station lists are not complete, especially with dwd there are a large number of stations that can be found via the Internet search (both ID's are 5 digits with 0 at the beginning if necessary)."
 }
