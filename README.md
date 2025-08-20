@@ -19,6 +19,9 @@ Retrieve weather data from Bright Sky. The data used comes from weather stations
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (ticaki) Startup log entry fixed.
+
 ### 0.2.0 (2025-08-20)
 * (ticaki) DWD station ID added
 * (ticaki) WMO station ID added
