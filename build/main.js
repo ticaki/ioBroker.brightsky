@@ -111,7 +111,10 @@ class Brightsky extends utils.Adapter {
       await this.weatherDailyLoop();
     }
     this.log.info(
-      `Adapter ${this.namespace} is now ready. Weather data will be updated every ${this.config.pollIntervalCurrently} minutes for current weather and every ${this.config.pollInterval} hours for hourly weather. ${this.config.createDaily ? "Daily weather data will also be created." : "Daily weather data creation is disabled."}`
+      `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : "Currently data disabled"} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours` : "Hourly data disabled"} - ${this.config.createDaily ? "Daily data enabled." : "Daily data disabled"}, Max distance: ${this.config.maxDistance} meters.`
+    );
+    this.log.info(
+      `Using ${this.config.dwd_station_id ? `WMO Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`
     );
   }
   async weatherDailyLoop() {
