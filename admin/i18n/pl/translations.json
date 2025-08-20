@@ -1,18 +1,16 @@
 {
-    "brightsky adapter settings": "Ustawienia adaptera dla brightsky",
-    "option1": "opcja 1",
-    "option2": "opcja2",
+    "brightsky adapter settings": "Ustawienia adaptera dla Brightsky",
     "position": "Pozycja",
-    "pollInterval": "Interwał zapytania (co godzinę w godzinach)",
+    "pollInterval": "Przegląd interwałów zapytania (co godzinę w godzinach)",
     "Hours-to-display": "Godziny do wyświetlenia",
     "maxDistance": "Maksymalna odległość do stacji pogodowej",
     "pollIntervalCurrently": "Interwał zapytania dla aktualnej pogody (w minutach)",
-    "createDaily": "Twórz codzienne dane pogodowe",
+    "createDaily": "Tworzy codzienne przegląd (po 5:00 i 18:00)",
     "createHourly": "Tworzy przegląd godzin",
     "createCurrently": "Tworzy aktualne dane pogodowe",
     "wmo_station": "Identyfikator stacji WMO (opcjonalnie, domyślnie jest pusty)",
     "wmo_station_link": "Link do informacji o stacji WMO",
     "dwd_station_id": "Identyfikator stacji DWD (opcjonalnie, domyślnie jest pusty)",
     "dwd_station_id_link": "Link do informacji o stacji DWD",
-    "statictext1": "Jeśli coś zostanie wprowadzone w jednej z opcji stacji, zastępuje to informacje Lat, Lon i odległość. Możesz wprowadzić listę rozdzieloną przecinkami bez przestrzeni. Listy stacji nie są kompletne, szczególnie w przypadku DWD istnieje ogromna liczba stacji, które można znaleźć za pomocą Intersearch (oba 5 cyfr z przodu z 0)."
+    "statictext1": "Jeśli coś zostanie wprowadzone w jednej z opcji stacji, zastępuje to informacje Lat, Lon i odległość. Możesz wprowadzić listę oddzieloną przecinkami bez przestrzeni (identyfikatory to 5 cyfr dodawania 0 na początku, jeśli to konieczne)."
 }

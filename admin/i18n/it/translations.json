@@ -1,18 +1,16 @@
 {
-    "brightsky adapter settings": "Impostazioni dell'adattatore per brightsky",
-    "option1": "opzione1",
-    "option2": "opzione2",
+    "brightsky adapter settings": "Impostazioni dell'adattatore per Brightsky",
     "position": "Posizione",
-    "pollInterval": "Intervallo di query (ogni ora all'ora)",
+    "pollInterval": "Panoramica dell'intervallo di query di ore (ogni ora all'ora)",
     "Hours-to-display": "Ore da visualizzare",
     "maxDistance": "Distanza massima dalla stazione meteorologica",
     "pollIntervalCurrently": "Intervallo di query per il tempo attuale (in minuti)",
-    "createDaily": "Crea dati meteorologici quotidiani",
+    "createDaily": "Crea panoramiche quotidiane (dopo le 5:00 e le 18:00)",
     "createHourly": "Crea panoramiche orarie",
     "createCurrently": "Crea dati meteorologici attuali",
     "wmo_station": "ID stazione WMO (facoltativo, il valore predefinito è vuoto)",
     "wmo_station_link": "Link alle informazioni sulla stazione WMO",
     "dwd_station_id": "ID stazione DWD (facoltativo, il valore predefinito è vuoto)",
     "dwd_station_id_link": "Link alle informazioni sulla stazione DWD",
-    "statictext1": "Se qualcosa viene inserito in una delle opzioni della stazione, questo sovrascrive le informazioni LAT, LON e Distanza. È possibile inserire un elenco separato da virgole senza spazi. Le liste delle stazioni non sono complete, in particolare con DWD, c'è un numero enorme di stazioni che possono essere trovate tramite intersearch (entrambe le 5 cifre di ID davanti con 0)."
+    "statictext1": "Se qualcosa viene inserito in una delle opzioni della stazione, questo sovrascrive le informazioni LAT, LON e Distanza. È possibile inserire un elenco separato da virgola senza spazi (gli ID sono 5 cifre aggiungendo 0 all'inizio, se necessario)."
 }

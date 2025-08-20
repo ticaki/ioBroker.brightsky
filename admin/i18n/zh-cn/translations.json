@@ -1,18 +1,16 @@
 {
-    "brightsky adapter settings": "brightsky的适配器设置",
-    "option1": "选项1",
-    "option2": "选项2",
+    "brightsky adapter settings": "Brightsky的适配器设置",
     "position": "位置",
-    "pollInterval": "查询间隔（小时每小时）",
+    "pollInterval": "查询间隔概述小时（每小时每小时）",
     "Hours-to-display": "显示的小时",
     "maxDistance": "气象站的最大距离",
     "pollIntervalCurrently": "查询当前天气的间隔（几分钟内）",
-    "createDaily": "创建每日天气数据",
+    "createDaily": "创建每日概述（5:00和18:00之后）",
     "createHourly": "创建每小时的概述",
     "createCurrently": "创建当前的天气数据",
     "wmo_station": "WMO站ID（可选，默认为空）",
     "wmo_station_link": "链接到WMO站信息",
     "dwd_station_id": "DWD站ID（可选，默认为空）",
     "dwd_station_id_link": "链接到DWD站信息",
-    "statictext1": "如果在其中一个车站选项中输入了某些内容，则将覆盖LAT，LON和距离信息。您可以在没有空格的情况下输入逗号分隔的列表。该站点列表尚未完成，尤其是使用DWD，可以通过InterSearch找到大量车站（两位ID的5位数字均在0中为0）。"
+    "statictext1": "如果在其中一个车站选项中输入了某些内容，则将覆盖LAT，LON和距离信息。您可以在没有空格的情况下输入逗号分隔的列表（如果必要时，ID是5位数字添加0）。"
 }
