@@ -139,6 +139,10 @@ export class Library extends BaseClass {
                 if (objectDefinition.type !== 'state' || expandTree) {
                     let a = 0;
                     for (const k of data) {
+                        if (k === undefined) {
+                            ++a;
+                            continue;
+                        }
                         const objectDefinition2 = objNode
                             ? await this.getObjectDefFromJson(
                                   `${`${objNode.split('.').slice(0, -1).join('.')}`}`,
