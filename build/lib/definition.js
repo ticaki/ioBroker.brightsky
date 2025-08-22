@@ -597,7 +597,7 @@ const genericStateObjects = {
         _id: "precipitation",
         type: "state",
         common: {
-          name: "Precipitation (dayly total)",
+          name: "Precipitation (daily total)",
           type: "number",
           role: "value.precipitation.forecast.0",
           read: true,
@@ -612,7 +612,7 @@ const genericStateObjects = {
         common: {
           name: "Sunrise",
           type: "number",
-          role: "date",
+          role: "date.sunrise",
           read: true,
           write: false
         },
@@ -624,7 +624,7 @@ const genericStateObjects = {
         common: {
           name: "Sunset",
           type: "number",
-          role: "date",
+          role: "date.sunset",
           read: true,
           write: false
         },
