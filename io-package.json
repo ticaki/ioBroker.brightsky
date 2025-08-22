@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "news": {
+      "0.2.2": {
+        "en": "Sunrise and sunset times added to the daily overview.",
+        "de": "Sonnenaufgang und Sonnenuntergang in der Tagesübersicht.",
+        "ru": "Время восхода и заката добавлено к ежедневному обзору.",
+        "pt": "O nascer do sol e o pôr do sol somaram-se ao panorama diário.",
+        "nl": "Zonsopgang en zonsondergang tijden toegevoegd aan het dagelijkse overzicht.",
+        "fr": "Les heures du lever et du coucher du soleil s'ajoutent à l'aperçu quotidien.",
+        "it": "Tempi di alba e tramonto aggiunti alla panoramica giornaliera.",
+        "es": "Tiempos de amanecer y puesta de sol añadidos a la visión general diaria.",
+        "pl": "Czas wschodu słońca i zachodu słońca dodawany do codziennego przeglądu.",
+        "uk": "Сонце і час заходу додано до щоденного огляду.",
+        "zh-cn": "日出和日落时间加进了每日概览."
+      },
       "0.2.1": {
         "en": "Startup log entry fixed.",
         "de": "Start-Log-Eintrag behoben.",
