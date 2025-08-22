@@ -72,7 +72,7 @@
         "staticLink1": {
                     "type": "staticLink",
                     "text": "wmo_station_link",
-                    "href": "https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html;jsessionid=231BE50F3D470686B0E431B7515D514B.live21062?view=nasPublication&nn=16102",
+                    "href": "https://opendata.dwd.de/climate_environment/CDC/help/stations_list_CLIMAT_data.txt",
                     "icon": "info",
                     "newLine": true,
                     "xs": 12,
@@ -96,7 +96,7 @@
         "staticLink2": {
                     "type": "staticLink",
                     "text": "dwd_station_id_link",
-                    "href": "https://www.dwd.de/DE/leistungen/klimadatendeutschland/stationsuebersicht.html",
+                    "href": "https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html;jsessionid=231BE50F3D470686B0E431B7515D514B.live21062?view=nasPublication&nn=16102",
                     "icon": "info",
                     "newLine": true,
                     "xs": 12,
