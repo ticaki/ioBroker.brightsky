@@ -1068,6 +1068,18 @@ const genericStateObjects = {
         },
         native: {}
       },
+      wind_bearing_text: {
+        _id: "",
+        type: "state",
+        common: {
+          name: "Wind Bearing Text",
+          type: "string",
+          role: "weather.direction.wind",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
       source_id: {
         _id: "source_id",
         type: "state",

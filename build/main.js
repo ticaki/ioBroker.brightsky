@@ -387,6 +387,7 @@ class Brightsky extends utils.Adapter {
     }
   }
   async weatherCurrentlyUpdate() {
+    var _a;
     try {
       const result = await import_axios.default.get(
         `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`
@@ -394,6 +395,9 @@ class Brightsky extends utils.Adapter {
       if (result.data) {
         this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
         if (result.data.weather) {
+          result.data.weather.wind_bearing_text = this.getWindBearingText(
+            (_a = result.data.weather.wind_direction_10) != null ? _a : void 0
+          );
           await this.library.writeFromJson(
             "current",
             "weather.current",
@@ -415,6 +419,31 @@ class Brightsky extends utils.Adapter {
       await this.setState("info.connection", false, true);
       this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
     }
+  }
+  getWindBearingText(windBearing) {
+    if (windBearing === void 0) {
+      return "";
+    }
+    const directions = [
+      "N",
+      "NNE",
+      "NE",
+      "ENE",
+      "E",
+      "ESE",
+      "SE",
+      "SSE",
+      "S",
+      "SSW",
+      "SW",
+      "WSW",
+      "W",
+      "WNW",
+      "NW",
+      "NNW"
+    ];
+    const index = Math.round(windBearing % 360 / 22.5) % 16;
+    return directions[index];
   }
   onUnload(callback) {
     this.unload = true;

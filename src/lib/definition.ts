@@ -1075,6 +1075,18 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
+            wind_bearing_text: {
+                _id: '',
+                type: 'state',
+                common: {
+                    name: 'Wind Bearing Text',
+                    type: 'string',
+                    role: 'weather.direction.wind',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
             source_id: {
                 _id: 'source_id',
                 type: 'state',
@@ -1350,7 +1362,7 @@ export type BrightskyCurrently = {
     dew_point: number;
 
     pressure_msl: number;
-
+    wind_bearing_text?: string;
     wind_direction_10: number;
     wind_direction_30: number;
     wind_direction_60: number;

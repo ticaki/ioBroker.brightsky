@@ -436,6 +436,9 @@ class Brightsky extends utils.Adapter {
             if (result.data) {
                 this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
                 if (result.data.weather) {
+                    result.data.weather.wind_bearing_text = this.getWindBearingText(
+                        result.data.weather.wind_direction_10 ?? undefined,
+                    );
                     await this.library.writeFromJson(
                         'current',
                         'weather.current',
@@ -457,6 +460,31 @@ class Brightsky extends utils.Adapter {
             await this.setState('info.connection', false, true);
             this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
         }
+    }
+    private getWindBearingText(windBearing: number | undefined): string {
+        if (windBearing === undefined) {
+            return '';
+        }
+        const directions = [
+            'N',
+            'NNE',
+            'NE',
+            'ENE',
+            'E',
+            'ESE',
+            'SE',
+            'SSE',
+            'S',
+            'SSW',
+            'SW',
+            'WSW',
+            'W',
+            'WNW',
+            'NW',
+            'NNW',
+        ];
+        const index = Math.round((windBearing % 360) / 22.5) % 16;
+        return directions[index];
     }
 
     private onUnload(callback: () => void): void {
