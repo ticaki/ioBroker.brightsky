@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "news": {
+      "0.2.3": {
+        "en": "wind bearing text added\nupdate deps",
+        "de": "windlager text hinzugefügt\nupdate deps",
+        "ru": "ветровой подшипник текст\nобновление deps",
+        "pt": "texto de rolamento de vento adicionado\natualizar deps",
+        "nl": "windlager tekst toegevoegd\nupdate deps",
+        "fr": "texte de roulement à vent ajouté\nmettre à jour les deps",
+        "it": "testo del cuscinetto del vento aggiunto\naggiornamento dep",
+        "es": "texto añadido\nactualización de los deps",
+        "pl": "dodany tekst nośnika wiatru\naktualizacje deps",
+        "uk": "оболонка тексту додано\nоновлення deps",
+        "zh-cn": "添加风向标文字\n更新代码"
+      },
       "0.2.2": {
         "en": "Sunrise and sunset times added to the daily overview.",
         "de": "Sonnenaufgang und Sonnenuntergang in der Tagesübersicht.",
