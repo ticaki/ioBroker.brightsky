@@ -83,6 +83,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (ticaki) update deps
+
 ### 0.2.2 (2025-08-22)
 * (ticaki) Sunrise and sunset times added to the daily overview.
 
