@@ -1221,7 +1221,7 @@ export const genericStateObjects: {
                 common: {
                     name: 'Weather Icon',
                     type: 'string',
-                    role: 'text',
+                    role: 'weather.icon.name',
                     read: true,
                     write: false,
                 },
