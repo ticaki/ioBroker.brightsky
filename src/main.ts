@@ -413,6 +413,11 @@ class Brightsky extends utils.Adapter {
                         result.data.weather,
                         true,
                     );
+                    await this.library.writedp(
+                        'hourly.sources',
+                        undefined,
+                        genericStateObjects.weather.sources._channel,
+                    );
                     await this.library.writeFromJson(
                         'hourly.sources.r',
                         'weather.sources',
@@ -445,6 +450,11 @@ class Brightsky extends utils.Adapter {
                         genericStateObjects,
                         result.data.weather,
                         true,
+                    );
+                    await this.library.writedp(
+                        'current.sources',
+                        undefined,
+                        genericStateObjects.weather.sources._channel,
                     );
                     await this.library.writeFromJson(
                         'current.sources.r',

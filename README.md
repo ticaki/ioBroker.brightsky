@@ -83,6 +83,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (ticaki) Create all folders
+
 ### 0.2.3 (2025-08-27)
 * (ticaki) wind bearing text added
 * (ticaki) update deps
