@@ -83,7 +83,7 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.2.4 (2025-08-28)
 * (ticaki) Create all folders
 
 ### 0.2.3 (2025-08-27)

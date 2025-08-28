@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.2.3",
+    "version": "0.2.4",
     "news": {
+      "0.2.4": {
+        "en": "Create all folders",
+        "de": "Alle Ordner erstellen",
+        "ru": "Создаем все папки",
+        "pt": "Criar todas as pastas",
+        "nl": "Alle mappen aanmaken",
+        "fr": "Créer tous les dossiers",
+        "it": "Crea tutte le cartelle",
+        "es": "Crear todas las carpetas",
+        "pl": "Utwórz wszystkie foldery",
+        "uk": "Створіть всі папки",
+        "zh-cn": "创建全部文件夹"
+      },
       "0.2.3": {
         "en": "wind bearing text added\nupdate deps",
         "de": "windlager text hinzugefügt\nupdate deps",
