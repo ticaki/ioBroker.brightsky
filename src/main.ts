@@ -324,7 +324,7 @@ class Brightsky extends utils.Adapter {
                                     } else {
                                         dailyData[k] = null;
                                     }
-                                    dailyData['icon_special'] = this.pickDailyWeatherIcon({
+                                    dailyData.icon_special = this.pickDailyWeatherIcon({
                                         condition: weatherArr[i].condition as (string | null | undefined)[],
                                         wind_speed: weatherArr[i].wind_speed as (number | null | undefined)[],
                                         precipitation: weatherArr[i].precipitation as (number | null | undefined)[],
@@ -520,35 +520,41 @@ class Brightsky extends utils.Adapter {
      * @returns Weather icon string (MDI icon name, day variant only)
      */
     pickDailyWeatherIcon(bucket: {
-        condition: (string | null | undefined | null)[];
-        wind_speed: (number | null | undefined| null)[];
-        precipitation?: (number | null | undefined| null)[];
-        cloud_cover?: (number | null | undefined| null)[];
+        condition: (string | null | undefined)[];
+        wind_speed: (number | null | undefined)[];
+        precipitation?: (number | null | undefined)[];
+        cloud_cover?: (number | null | undefined)[];
     }): string {
         // --- inline helpers ---
-        const avg = (arr: (number | null | undefined)[]) => {
+        const avg = (arr: (number | null | undefined)[]): number => {
             const xs = arr.filter((v): v is number => v != null);
             return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
         };
-        const maxN = (arr: (number | null | undefined)[]) => {
+        const maxN = (arr: (number | null | undefined)[]): number => {
             const xs = arr.filter((v): v is number => v != null);
             return xs.length ? Math.max(...xs) : 0;
         };
-        const count = (arr: (string | null | undefined)[], labels: string[]) =>
+        const count = (arr: (string | null | undefined)[], labels: string[]): number =>
             arr.filter(v => v != null && labels.includes(v)).length;
 
         // --- thresholds ---
-        const WIND_ORKAN = 33; // m/s
-        const WIND_VERY = 17; // m/s
+        const WIND_ORKAN = 33; // m/s (≈ Orkanstärke)
+        const WIND_STORM = 17; // m/s (Sturm/very windy)
 
         const FRACTION_THUNDER_PARTLY = 0.1;
         const FRACTION_THUNDER_SOLID = 0.35;
-        const FRACTION_RAIN_PARTLY = 0.2;
         const FRACTION_RAIN_SOLID = 0.5;
+        const FRACTION_RAIN_LIGHT = 0.2;
 
         const hours = bucket.condition.length || 24;
 
-        // --- 1. Thunderstorms (highest priority) ---
+        // 1) ORKAN (höchste Priorität)
+        const maxWind = maxN(bucket.wind_speed);
+        if (maxWind >= WIND_ORKAN) {
+            return 'weather-tornado';
+        }
+
+        // 2) GEWITTER
         const thunderCount = count(bucket.condition, ['thunderstorm']);
         if (thunderCount / hours >= FRACTION_THUNDER_SOLID) {
             return 'weather-lightning';
@@ -557,22 +563,18 @@ class Brightsky extends utils.Adapter {
             return 'weather-partly-lightning';
         }
 
-        // --- 2. Hail (special severe) ---
+        // 3) STURM (sehr windig)
+        if (maxWind >= WIND_STORM) {
+            return 'weather-windy';
+        }
+
+        // 4) HAGEL
         const hailCount = count(bucket.condition, ['hail']);
         if (hailCount > 0) {
             return 'weather-hail';
         }
 
-        // --- 3. Rain ---
-        const rainCount = count(bucket.condition, ['rain', 'sleet', 'drizzle']);
-        if (rainCount / hours >= FRACTION_RAIN_SOLID) {
-            return 'weather-pouring';
-        }
-        if (rainCount / hours >= FRACTION_RAIN_PARTLY) {
-            return 'weather-rainy';
-        }
-
-        // --- 4. Snow ---
+        // 5) SCHNEE
         const snowCount = count(bucket.condition, ['snow']);
         if (snowCount / hours >= 0.3) {
             return 'weather-snowy-heavy';
@@ -581,22 +583,24 @@ class Brightsky extends utils.Adapter {
             return 'weather-snowy';
         }
 
-        // --- 5. Fog / mist ---
+        // 6) SCHWERER REGEN
+        const rainCount = count(bucket.condition, ['rain', 'sleet', 'drizzle']);
+        if (rainCount / hours >= FRACTION_RAIN_SOLID) {
+            return 'weather-pouring';
+        }
+
+        // 7) NEBEL
         const fogCount = count(bucket.condition, ['fog']);
         if (fogCount / hours > 0.2) {
             return 'weather-fog';
         }
 
-        // --- 6. Wind ---
-        const maxWind = maxN(bucket.wind_speed);
-        if (maxWind >= WIND_ORKAN) {
-            return 'weather-tornado';
-        }
-        if (maxWind >= WIND_VERY) {
-            return 'weather-windy';
+        // 8) LEICHTER REGEN
+        if (rainCount / hours >= FRACTION_RAIN_LIGHT) {
+            return 'weather-rainy';
         }
 
-        // --- 7. Clouds vs. Sun ---
+        // 9) Bewölkung vs. Sonne
         const avgClouds = bucket.cloud_cover ? avg(bucket.cloud_cover) : 0;
         if (avgClouds > 80) {
             return 'weather-cloudy';
@@ -605,7 +609,7 @@ class Brightsky extends utils.Adapter {
             return 'weather-partly-cloudy';
         }
 
-        // --- default: sunny ---
+        // Default
         return 'weather-sunny';
     }
 }

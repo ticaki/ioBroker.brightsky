@@ -309,7 +309,7 @@ class Brightsky extends utils.Adapter {
                   } else {
                     dailyData[k] = null;
                   }
-                  dailyData["icon_special"] = this.pickDailyWeatherIcon({
+                  dailyData.icon_special = this.pickDailyWeatherIcon({
                     condition: weatherArr[i].condition,
                     wind_speed: weatherArr[i].wind_speed,
                     precipitation: weatherArr[i].precipitation,
@@ -495,12 +495,16 @@ class Brightsky extends utils.Adapter {
     };
     const count = (arr, labels) => arr.filter((v) => v != null && labels.includes(v)).length;
     const WIND_ORKAN = 33;
-    const WIND_VERY = 17;
+    const WIND_STORM = 17;
     const FRACTION_THUNDER_PARTLY = 0.1;
     const FRACTION_THUNDER_SOLID = 0.35;
-    const FRACTION_RAIN_PARTLY = 0.2;
     const FRACTION_RAIN_SOLID = 0.5;
+    const FRACTION_RAIN_LIGHT = 0.2;
     const hours = bucket.condition.length || 24;
+    const maxWind = maxN(bucket.wind_speed);
+    if (maxWind >= WIND_ORKAN) {
+      return "weather-tornado";
+    }
     const thunderCount = count(bucket.condition, ["thunderstorm"]);
     if (thunderCount / hours >= FRACTION_THUNDER_SOLID) {
       return "weather-lightning";
@@ -508,16 +512,12 @@ class Brightsky extends utils.Adapter {
     if (thunderCount / hours >= FRACTION_THUNDER_PARTLY) {
       return "weather-partly-lightning";
     }
+    if (maxWind >= WIND_STORM) {
+      return "weather-windy";
+    }
     const hailCount = count(bucket.condition, ["hail"]);
     if (hailCount > 0) {
       return "weather-hail";
-    }
-    const rainCount = count(bucket.condition, ["rain", "sleet", "drizzle"]);
-    if (rainCount / hours >= FRACTION_RAIN_SOLID) {
-      return "weather-pouring";
-    }
-    if (rainCount / hours >= FRACTION_RAIN_PARTLY) {
-      return "weather-rainy";
     }
     const snowCount = count(bucket.condition, ["snow"]);
     if (snowCount / hours >= 0.3) {
@@ -526,16 +526,16 @@ class Brightsky extends utils.Adapter {
     if (snowCount > 0) {
       return "weather-snowy";
     }
+    const rainCount = count(bucket.condition, ["rain", "sleet", "drizzle"]);
+    if (rainCount / hours >= FRACTION_RAIN_SOLID) {
+      return "weather-pouring";
+    }
     const fogCount = count(bucket.condition, ["fog"]);
     if (fogCount / hours > 0.2) {
       return "weather-fog";
     }
-    const maxWind = maxN(bucket.wind_speed);
-    if (maxWind >= WIND_ORKAN) {
-      return "weather-tornado";
-    }
-    if (maxWind >= WIND_VERY) {
-      return "weather-windy";
+    if (rainCount / hours >= FRACTION_RAIN_LIGHT) {
+      return "weather-rainy";
     }
     const avgClouds = bucket.cloud_cover ? avg(bucket.cloud_cover) : 0;
     if (avgClouds > 80) {
