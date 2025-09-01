@@ -7,6 +7,7 @@
 import * as utils from '@iobroker/adapter-core';
 import axios from 'axios';
 import { Library } from './lib/library';
+import type { BrightskyHourly } from './lib/definition';
 import { genericStateObjects, type BrightskyDailyData, type BrightskyWeather } from './lib/definition';
 import * as suncalc from 'suncalc';
 
@@ -21,7 +22,6 @@ class Brightsky extends utils.Adapter {
     posId: string = '';
     weatherTimeout: (ioBroker.Timeout | null | undefined)[] = [];
 
-    weatherArray: any[] = [];
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
@@ -154,7 +154,7 @@ class Brightsky extends utils.Adapter {
             new Date(new Date().setHours(23, 59, 59, 999)).setDate(new Date().getDate() + 7),
         ).toISOString();
         try {
-            const result = await axios.get(
+            const result: { data: BrightskyHourly } = await axios.get(
                 `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
             this.log.debug(
@@ -324,6 +324,12 @@ class Brightsky extends utils.Adapter {
                                     } else {
                                         dailyData[k] = null;
                                     }
+                                    dailyData['icon_special'] = this.pickDailyWeatherIcon({
+                                        condition: weatherArr[i].condition as (string | null | undefined)[],
+                                        wind_speed: weatherArr[i].wind_speed as (number | null | undefined)[],
+                                        precipitation: weatherArr[i].precipitation as (number | null | undefined)[],
+                                        cloud_cover: weatherArr[i].cloud_cover as (number | null | undefined)[],
+                                    });
                                     break;
                                 }
                             }
@@ -396,16 +402,6 @@ class Brightsky extends utils.Adapter {
             if (result.data) {
                 this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
                 if (result.data.weather && Array.isArray(result.data.weather)) {
-                    /*for (const item in result.data.weather) {
-                        const index = this.weatherArray.findIndex(
-                            el => el.timestamp === result.data.weather[item].timestamp,
-                        );
-                        if (index !== -1) {
-                            this.weatherArray[index] = result.data.weather[item];
-                        } else {
-                            this.weatherArray.push(result.data.weather[item]);
-                        }
-                    }*/
                     await this.library.writeFromJson(
                         'hourly.r',
                         'weather.hourly',
@@ -511,6 +507,106 @@ class Brightsky extends utils.Adapter {
         } catch {
             callback();
         }
+    }
+    /**
+     * Pick best fitting weather icon (MDI day variant only) for one aggregated daily bucket.
+     * Works directly on hourly values (conditions, wind, precipitation, etc.).
+     *
+     * @param bucket Aggregated hourly data for one day
+     * @param bucket.condition
+     * @param bucket.wind_speed
+     * @param bucket.precipitation
+     * @param bucket.cloud_cover
+     * @returns Weather icon string (MDI icon name, day variant only)
+     */
+    pickDailyWeatherIcon(bucket: {
+        condition: (string | null | undefined | null)[];
+        wind_speed: (number | null | undefined| null)[];
+        precipitation?: (number | null | undefined| null)[];
+        cloud_cover?: (number | null | undefined| null)[];
+    }): string {
+        // --- inline helpers ---
+        const avg = (arr: (number | null | undefined)[]) => {
+            const xs = arr.filter((v): v is number => v != null);
+            return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+        };
+        const maxN = (arr: (number | null | undefined)[]) => {
+            const xs = arr.filter((v): v is number => v != null);
+            return xs.length ? Math.max(...xs) : 0;
+        };
+        const count = (arr: (string | null | undefined)[], labels: string[]) =>
+            arr.filter(v => v != null && labels.includes(v)).length;
+
+        // --- thresholds ---
+        const WIND_ORKAN = 33; // m/s
+        const WIND_VERY = 17; // m/s
+
+        const FRACTION_THUNDER_PARTLY = 0.1;
+        const FRACTION_THUNDER_SOLID = 0.35;
+        const FRACTION_RAIN_PARTLY = 0.2;
+        const FRACTION_RAIN_SOLID = 0.5;
+
+        const hours = bucket.condition.length || 24;
+
+        // --- 1. Thunderstorms (highest priority) ---
+        const thunderCount = count(bucket.condition, ['thunderstorm']);
+        if (thunderCount / hours >= FRACTION_THUNDER_SOLID) {
+            return 'weather-lightning';
+        }
+        if (thunderCount / hours >= FRACTION_THUNDER_PARTLY) {
+            return 'weather-partly-lightning';
+        }
+
+        // --- 2. Hail (special severe) ---
+        const hailCount = count(bucket.condition, ['hail']);
+        if (hailCount > 0) {
+            return 'weather-hail';
+        }
+
+        // --- 3. Rain ---
+        const rainCount = count(bucket.condition, ['rain', 'sleet', 'drizzle']);
+        if (rainCount / hours >= FRACTION_RAIN_SOLID) {
+            return 'weather-pouring';
+        }
+        if (rainCount / hours >= FRACTION_RAIN_PARTLY) {
+            return 'weather-rainy';
+        }
+
+        // --- 4. Snow ---
+        const snowCount = count(bucket.condition, ['snow']);
+        if (snowCount / hours >= 0.3) {
+            return 'weather-snowy-heavy';
+        }
+        if (snowCount > 0) {
+            return 'weather-snowy';
+        }
+
+        // --- 5. Fog / mist ---
+        const fogCount = count(bucket.condition, ['fog']);
+        if (fogCount / hours > 0.2) {
+            return 'weather-fog';
+        }
+
+        // --- 6. Wind ---
+        const maxWind = maxN(bucket.wind_speed);
+        if (maxWind >= WIND_ORKAN) {
+            return 'weather-tornado';
+        }
+        if (maxWind >= WIND_VERY) {
+            return 'weather-windy';
+        }
+
+        // --- 7. Clouds vs. Sun ---
+        const avgClouds = bucket.cloud_cover ? avg(bucket.cloud_cover) : 0;
+        if (avgClouds > 80) {
+            return 'weather-cloudy';
+        }
+        if (avgClouds > 40) {
+            return 'weather-partly-cloudy';
+        }
+
+        // --- default: sunny ---
+        return 'weather-sunny';
     }
 }
 
