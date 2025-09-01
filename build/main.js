@@ -494,8 +494,8 @@ class Brightsky extends utils.Adapter {
       return xs.length ? Math.max(...xs) : 0;
     };
     const count = (arr, labels) => arr.filter((v) => v != null && labels.includes(v)).length;
-    const WIND_ORKAN = 33;
-    const WIND_STORM = 17;
+    const WIND_ORKAN = 118.8;
+    const WIND_STORM = 61.2;
     const FRACTION_THUNDER_PARTLY = 0.1;
     const FRACTION_THUNDER_SOLID = 0.35;
     const FRACTION_RAIN_SOLID = 0.5;

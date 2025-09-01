@@ -538,8 +538,8 @@ class Brightsky extends utils.Adapter {
             arr.filter(v => v != null && labels.includes(v)).length;
 
         // --- thresholds ---
-        const WIND_ORKAN = 33; // m/s (≈ Orkanstärke)
-        const WIND_STORM = 17; // m/s (Sturm/very windy)
+        const WIND_ORKAN = 118.8; // km/h (≈ Orkanstärke)
+        const WIND_STORM = 61.2; // km/h (Sturm/very windy)
 
         const FRACTION_THUNDER_PARTLY = 0.1;
         const FRACTION_THUNDER_SOLID = 0.35;
