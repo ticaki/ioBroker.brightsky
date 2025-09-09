@@ -691,7 +691,7 @@ const genericStateObjects = {
           role: "value.power",
           read: true,
           write: false,
-          unit: "kW/m\xB2"
+          unit: "kWh"
         },
         native: {}
       },
@@ -704,7 +704,7 @@ const genericStateObjects = {
           role: "value.power",
           read: true,
           write: false,
-          unit: "kW/m\xB2"
+          unit: "kWh"
         },
         native: {}
       },
