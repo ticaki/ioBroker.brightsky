@@ -224,13 +224,56 @@ class Brightsky extends utils.Adapter {
 
                                         if (k !== 'solar') {
                                             dailyData[`${k}_min`] = min !== Infinity ? min : null;
+                                        } else {
+                                            if (
+                                                this.config.position.split(',').length === 2 &&
+                                                this.config.panels.length > 0
+                                            ) {
+                                                dailyData.solar_estimate = values.reduce((sum, value, index) => {
+                                                    if (typeof sum !== 'number') {
+                                                        sum = 0; // Initialize sum to 0 if it's not a number
+                                                    }
+                                                    if (value != null && typeof value === 'number') {
+                                                        const newValue = estimatePVEnergyForHour(
+                                                            value,
+                                                            new Date(weatherArr[i].timestamp[index] as string),
+                                                            {
+                                                                lat: parseFloat(this.config.position.split(',')[0]),
+                                                                lon: parseFloat(this.config.position.split(',')[1]),
+                                                            },
+                                                            this.config.panels,
+                                                        );
+
+                                                        return sum + newValue;
+                                                    }
+                                                    return sum;
+                                                });
+                                                dailyData.solar_estimate = dailyData.solar_estimate
+                                                    ? Math.round(dailyData.solar_estimate * 1000) / 1000
+                                                    : dailyData.solar_estimate;
+                                            }
+                                            if (new Date().getHours() === 5) {
+                                                dailyData.solar_forHomoran = values.reduce((sum, value) => {
+                                                    if (typeof sum !== 'number') {
+                                                        sum = 0; // Initialize sum to 0 if it's not a number
+                                                    }
+                                                    if (value != null && typeof value === 'number') {
+                                                        return sum + value;
+                                                    }
+                                                    return sum;
+                                                });
+                                                if (dailyData.solar_estimate != null) {
+                                                    dailyData.solar_estimateForHomoran = dailyData.solar_estimate;
+                                                }
+                                            }
+
+                                            dailyData[`${k}_max`] = null;
                                         }
                                         dailyData[`${k}_max`] = max !== -Infinity ? max : null;
                                     } else {
                                         if (k !== 'solar') {
                                             dailyData[`${k}_min`] = null;
                                         }
-                                        dailyData[`${k}_max`] = null;
                                     }
                                 }
                                 // eslint-disable-next-line no-fallthrough
@@ -612,6 +655,100 @@ class Brightsky extends utils.Adapter {
         // Default
         return 'weather-sunny';
     }
+}
+
+type Panel = {
+    /** Azimut des Panels in Grad, 0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen */
+    azimuth: number;
+    /** Neigung in Grad, 0 = horizontal, 90 = senkrecht */
+    tilt: number;
+    /** Fläche in m² */
+    area: number;
+    /** Wirkungsgrad 0..1 */
+    efficiency: number;
+};
+
+type Coords = { lat: number; lon: number };
+
+/**
+ * Schätzt die erzeugte elektrische Energie (Wh) für die kommende Stunde.
+ *
+ * @param valueWhPerM2 GHI für die Stunde (Wh/m²) auf horizontaler Ebene
+ * @param time Zeitstempel dieser Stunde (Date | number | string)
+ * @param coords { lat, lon }
+ * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
+ * @returns Wh (elektrisch) für alle Panels zusammen
+ */
+export function estimatePVEnergyForHour(
+    valueWhPerM2: number,
+    time: Date | number | string,
+    coords: Coords,
+    panels: Panel[],
+): number {
+    // ===== Helpers (funktion-lokal) =====
+    const toRad = (d: number): number => (d * Math.PI) / 180;
+    const clamp01 = (x: number): number => Math.min(1, Math.max(0, x));
+    const normEff = (pct: number): number => clamp01(pct / 100); // 0..100% → 0..1
+
+    // Konstanten (einfaches, robustes Modell)
+    const ALBEDO = 0.2; // Bodenreflexionsfaktor
+
+    // Sonnenstand holen
+    const date = time instanceof Date ? time : new Date(time);
+    const pos = suncalc.getPosition(date, coords.lat, coords.lon);
+    const sunEl = pos.altitude; // Elevation in rad
+    // SunCalc-Azimut: 0 = Süd, +West; auf 0=N, 90=E normieren:
+    const sunAzDeg = ((pos.azimuth * 180) / Math.PI + 180 + 360) % 360;
+    const sunAz = toRad(sunAzDeg);
+
+    if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
+        return 0;
+    }
+
+    // Grobe Aufteilung in Direkt/Diffus aus Elevation (ohne externe Daten):
+    const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
+    const diffuseFraction = 1 - beamFraction;
+
+    let totalWh = 0;
+
+    for (const p of panels) {
+        const eff = normEff(p.efficiency);
+        if (eff <= 0 || p.area <= 0) {
+            continue;
+        }
+
+        const tilt = toRad(p.tilt);
+        const az = toRad(((p.azimuth % 360) + 360) % 360);
+
+        // Modulnormalen-Vektor
+        const nx = Math.sin(tilt) * Math.sin(az);
+        const ny = Math.sin(tilt) * Math.cos(az);
+        const nz = Math.cos(tilt);
+
+        // Sonnenvektor
+        const sx = Math.cos(sunEl) * Math.sin(sunAz);
+        const sy = Math.cos(sunEl) * Math.cos(sunAz);
+        const sz = Math.sin(sunEl);
+
+        // Einfallswinkel
+        const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
+
+        // Direktanteil von horizontal → Modulfläche
+        const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
+
+        // Diffus isotrop + Bodenreflexion
+        const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
+        const groundRefGain = (ALBEDO * (1 - Math.cos(tilt))) / 2;
+
+        // POA-Energie (Wh/m²) auf dem Modul für die Stunde
+        const poaWhPerM2 = valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
+
+        // Elektrische Energie
+        const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
+        totalWh += elecWh;
+    }
+
+    return totalWh;
 }
 
 if (require.main !== module) {

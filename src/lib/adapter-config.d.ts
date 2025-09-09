@@ -30,6 +30,13 @@ declare global {
             createDaily: boolean;
             wmo_station: string;
             dwd_station_id: string;
+
+            panels: Array<{
+                azimuth: number;
+                tilt: number;
+                area: number;
+                efficiency: number;
+            }>;
         }
     }
 }

@@ -5,6 +5,10 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
@@ -21,6 +25,12 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var main_exports = {};
+__export(main_exports, {
+  estimatePVEnergyForHour: () => estimatePVEnergyForHour
+});
+module.exports = __toCommonJS(main_exports);
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_axios = __toESM(require("axios"));
 var import_library = require("./lib/library");
@@ -214,13 +224,49 @@ class Brightsky extends utils.Adapter {
                     const max = Math.max(...values.filter((v) => v !== null));
                     if (k !== "solar") {
                       dailyData[`${k}_min`] = min !== Infinity ? min : null;
+                    } else {
+                      if (this.config.position.split(",").length === 2 && this.config.panels.length > 0) {
+                        dailyData.solar_estimate = values.reduce((sum, value, index) => {
+                          if (typeof sum !== "number") {
+                            sum = 0;
+                          }
+                          if (value != null && typeof value === "number") {
+                            const newValue = estimatePVEnergyForHour(
+                              value,
+                              new Date(weatherArr[i].timestamp[index]),
+                              {
+                                lat: parseFloat(this.config.position.split(",")[0]),
+                                lon: parseFloat(this.config.position.split(",")[1])
+                              },
+                              this.config.panels
+                            );
+                            return sum + newValue;
+                          }
+                          return sum;
+                        });
+                        dailyData.solar_estimate = dailyData.solar_estimate ? Math.round(dailyData.solar_estimate * 1e3) / 1e3 : dailyData.solar_estimate;
+                      }
+                      if ((/* @__PURE__ */ new Date()).getHours() === 5) {
+                        dailyData.solar_forHomoran = values.reduce((sum, value) => {
+                          if (typeof sum !== "number") {
+                            sum = 0;
+                          }
+                          if (value != null && typeof value === "number") {
+                            return sum + value;
+                          }
+                          return sum;
+                        });
+                        if (dailyData.solar_estimate != null) {
+                          dailyData.solar_estimateForHomoran = dailyData.solar_estimate;
+                        }
+                      }
+                      dailyData[`${k}_max`] = null;
                     }
                     dailyData[`${k}_max`] = max !== -Infinity ? max : null;
                   } else {
                     if (k !== "solar") {
                       dailyData[`${k}_min`] = null;
                     }
-                    dailyData[`${k}_max`] = null;
                   }
                 }
                 // eslint-disable-next-line no-fallthrough
@@ -547,9 +593,52 @@ class Brightsky extends utils.Adapter {
     return "weather-sunny";
   }
 }
+function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
+  const toRad = (d) => d * Math.PI / 180;
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const normEff = (pct) => clamp01(pct / 100);
+  const ALBEDO = 0.2;
+  const date = time instanceof Date ? time : new Date(time);
+  const pos = suncalc.getPosition(date, coords.lat, coords.lon);
+  const sunEl = pos.altitude;
+  const sunAzDeg = (pos.azimuth * 180 / Math.PI + 180 + 360) % 360;
+  const sunAz = toRad(sunAzDeg);
+  if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
+    return 0;
+  }
+  const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
+  const diffuseFraction = 1 - beamFraction;
+  let totalWh = 0;
+  for (const p of panels) {
+    const eff = normEff(p.efficiency);
+    if (eff <= 0 || p.area <= 0) {
+      continue;
+    }
+    const tilt = toRad(p.tilt);
+    const az = toRad((p.azimuth % 360 + 360) % 360);
+    const nx = Math.sin(tilt) * Math.sin(az);
+    const ny = Math.sin(tilt) * Math.cos(az);
+    const nz = Math.cos(tilt);
+    const sx = Math.cos(sunEl) * Math.sin(sunAz);
+    const sy = Math.cos(sunEl) * Math.cos(sunAz);
+    const sz = Math.sin(sunEl);
+    const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
+    const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
+    const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
+    const groundRefGain = ALBEDO * (1 - Math.cos(tilt)) / 2;
+    const poaWhPerM2 = valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
+    const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
+    totalWh += elecWh;
+  }
+  return totalWh;
+}
 if (require.main !== module) {
   module.exports = (options) => new Brightsky(options);
 } else {
   (() => new Brightsky())();
 }
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  estimatePVEnergyForHour
+});
 //# sourceMappingURL=main.js.map
