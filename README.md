@@ -83,7 +83,7 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.3.1 (2025-09-15)
 - (ticaki) Fixed data evaluation crash when no panels are defined  
 - (ticaki) state name fixed
 
