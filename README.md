@@ -86,6 +86,7 @@ The data is as follows Provided:
 ### **WORK IN PROGRESS**
 - (ticaki) Added experimental datapoint for solar energy estimation (daily and hourly)  
 - (ticaki) Wind bearing text is now translated into ioBroker system language  
+- (ticaki) Added new datapoint for MDI icons support  
 
 ### 0.2.4 (2025-08-28)
 * (ticaki) Create all folders
