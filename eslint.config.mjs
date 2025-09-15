@@ -34,6 +34,15 @@ export default [
             "@typescript-eslint/require-await": "off",
             "no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/no-unnecessary-type-assertion": "off",
+            '@typescript-eslint/consistent-type-imports': [ 'error', {
+                prefer: 'type-imports',
+                fixStyle: 'separate-type-imports',
+            } ],
+            'no-duplicate-imports': [ 'error', {
+                includeExports: false,
+                allowSeparateTypeImports: true, // <- wichtig
+            } ],
+            'import/no-duplicates': 'off',
         },
     },
 

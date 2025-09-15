@@ -902,6 +902,30 @@ const genericStateObjects = {
           unit: "\xB0C"
         },
         native: {}
+      },
+      icon_special: {
+        _id: "icon_special",
+        type: "state",
+        common: {
+          name: "Special Weather Icon",
+          type: "string",
+          role: "weather.icon.name",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      icon: {
+        _id: "icon",
+        type: "state",
+        common: {
+          name: "Weather Icon",
+          type: "string",
+          role: "weather.icon.name",
+          read: true,
+          write: false
+        },
+        native: {}
       }
     },
     sources: {

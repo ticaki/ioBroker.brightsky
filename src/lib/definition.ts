@@ -910,6 +910,30 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
+            icon_special: {
+                _id: 'icon_special',
+                type: 'state',
+                common: {
+                    name: 'Special Weather Icon',
+                    type: 'string',
+                    role: 'weather.icon.name',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            icon: {
+                _id: 'icon',
+                type: 'state',
+                common: {
+                    name: 'Weather Icon',
+                    type: 'string',
+                    role: 'weather.icon.name',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
         },
         sources: {
             _channel: {
@@ -1286,6 +1310,7 @@ export type BrightskyDailyData = BrightskyWeather & {
     solar_median: number | null;
     sunset?: number | null;
     sunrise?: number | null;
+    icon_special?: string | null;
 };
 
 // Gemeinsame Typen für Wetterdaten
@@ -1327,7 +1352,7 @@ export type BrightskySource = {
 };
 
 // Typ für das gesamte testdata-Objekt
-export type BrightskyTestdata = {
+export type BrightskyHourly = {
     weather: BrightskyWeather[];
     sources: BrightskySource[];
 };

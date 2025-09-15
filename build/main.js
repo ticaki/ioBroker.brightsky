@@ -32,7 +32,6 @@ class Brightsky extends utils.Adapter {
   unload = false;
   posId = "";
   weatherTimeout = [];
-  weatherArray = [];
   constructor(options = {}) {
     super({
       ...options,
@@ -310,6 +309,12 @@ class Brightsky extends utils.Adapter {
                   } else {
                     dailyData[k] = null;
                   }
+                  dailyData.icon_special = this.pickDailyWeatherIcon({
+                    condition: weatherArr[i].condition,
+                    wind_speed: weatherArr[i].wind_speed,
+                    precipitation: weatherArr[i].precipitation,
+                    cloud_cover: weatherArr[i].cloud_cover
+                  });
                   break;
                 }
               }
@@ -467,6 +472,79 @@ class Brightsky extends utils.Adapter {
     } catch {
       callback();
     }
+  }
+  /**
+   * Pick best fitting weather icon (MDI day variant only) for one aggregated daily bucket.
+   * Works directly on hourly values (conditions, wind, precipitation, etc.).
+   *
+   * @param bucket Aggregated hourly data for one day
+   * @param bucket.condition
+   * @param bucket.wind_speed
+   * @param bucket.precipitation
+   * @param bucket.cloud_cover
+   * @returns Weather icon string (MDI icon name, day variant only)
+   */
+  pickDailyWeatherIcon(bucket) {
+    const avg = (arr) => {
+      const xs = arr.filter((v) => v != null);
+      return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+    };
+    const maxN = (arr) => {
+      const xs = arr.filter((v) => v != null);
+      return xs.length ? Math.max(...xs) : 0;
+    };
+    const count = (arr, labels) => arr.filter((v) => v != null && labels.includes(v)).length;
+    const WIND_ORKAN = 118.8;
+    const WIND_STORM = 61.2;
+    const FRACTION_THUNDER_PARTLY = 0.1;
+    const FRACTION_THUNDER_SOLID = 0.35;
+    const FRACTION_RAIN_SOLID = 0.5;
+    const FRACTION_RAIN_LIGHT = 0.2;
+    const hours = bucket.condition.length || 24;
+    const maxWind = maxN(bucket.wind_speed);
+    if (maxWind >= WIND_ORKAN) {
+      return "weather-tornado";
+    }
+    const thunderCount = count(bucket.condition, ["thunderstorm"]);
+    if (thunderCount / hours >= FRACTION_THUNDER_SOLID) {
+      return "weather-lightning";
+    }
+    if (thunderCount / hours >= FRACTION_THUNDER_PARTLY) {
+      return "weather-partly-lightning";
+    }
+    if (maxWind >= WIND_STORM) {
+      return "weather-windy";
+    }
+    const hailCount = count(bucket.condition, ["hail"]);
+    if (hailCount > 0) {
+      return "weather-hail";
+    }
+    const snowCount = count(bucket.condition, ["snow"]);
+    if (snowCount / hours >= 0.3) {
+      return "weather-snowy-heavy";
+    }
+    if (snowCount > 0) {
+      return "weather-snowy";
+    }
+    const rainCount = count(bucket.condition, ["rain", "sleet", "drizzle"]);
+    if (rainCount / hours >= FRACTION_RAIN_SOLID) {
+      return "weather-pouring";
+    }
+    const fogCount = count(bucket.condition, ["fog"]);
+    if (fogCount / hours > 0.2) {
+      return "weather-fog";
+    }
+    if (rainCount / hours >= FRACTION_RAIN_LIGHT) {
+      return "weather-rainy";
+    }
+    const avgClouds = bucket.cloud_cover ? avg(bucket.cloud_cover) : 0;
+    if (avgClouds > 80) {
+      return "weather-cloudy";
+    }
+    if (avgClouds > 40) {
+      return "weather-partly-cloudy";
+    }
+    return "weather-sunny";
   }
 }
 if (require.main !== module) {
