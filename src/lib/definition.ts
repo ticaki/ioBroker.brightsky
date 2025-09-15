@@ -999,6 +999,106 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
+            day: {
+                _channel: {
+                    _id: 'day',
+                    type: 'folder',
+                    common: {
+                        name: 'Day',
+                    },
+                    native: {},
+                },
+                ...hourly,
+                sunshine: {
+                    _id: 'sunshine',
+                    type: 'state',
+                    common: {
+                        name: 'Sunshine (day total)',
+                        type: 'number',
+                        role: 'value',
+                        read: true,
+                        write: false,
+                        unit: 'min',
+                    },
+                    native: {},
+                },
+                precipitation: {
+                    _id: 'precipitation',
+                    type: 'state',
+                    common: {
+                        name: 'Precipitation (day total)',
+                        type: 'number',
+                        role: 'value.precipitation.forecast.0',
+                        read: true,
+                        write: false,
+                        unit: 'mm',
+                    },
+                    native: {},
+                },
+                solar: {
+                    _id: 'solar',
+                    type: 'state',
+                    common: {
+                        name: 'Solar Radiation (day total)',
+                        type: 'number',
+                        role: 'value.power',
+                        read: true,
+                        write: false,
+                        unit: 'kWh/m²',
+                    },
+                    native: {},
+                },
+            },
+            night: {
+                _channel: {
+                    _id: 'night',
+                    type: 'folder',
+                    common: {
+                        name: 'Night',
+                    },
+                    native: {},
+                },
+                ...hourly,
+                sunshine: {
+                    _id: 'sunshine',
+                    type: 'state',
+                    common: {
+                        name: 'Sunshine (night total)',
+                        type: 'number',
+                        role: 'value',
+                        read: true,
+                        write: false,
+                        unit: 'min',
+                    },
+                    native: {},
+                },
+                precipitation: {
+                    _id: 'precipitation',
+                    type: 'state',
+                    common: {
+                        name: 'Precipitation (night total)',
+                        type: 'number',
+                        role: 'value.precipitation.forecast.0',
+                        read: true,
+                        write: false,
+                        unit: 'mm',
+                    },
+                    native: {},
+                },
+                solar: {
+                    _id: 'solar',
+                    type: 'state',
+                    common: {
+                        name: 'Solar Radiation (night total)',
+                        type: 'number',
+                        role: 'value.power',
+                        read: true,
+                        write: false,
+                        unit: 'kWh/m²',
+                    },
+                    native: {},
+                },
+            },
         },
         sources: {
             _channel: {
@@ -1378,6 +1478,32 @@ export type BrightskyDailyData = BrightskyWeather & {
     solar_estimateForHomoran?: number | null;
     sunset?: number | null;
     sunrise?: number | null;
+    icon_special?: string | null;
+    day?: Partial<BrightskyDayNightData>;
+    night?: Partial<BrightskyDayNightData>;
+};
+
+export type BrightskyDayNightData = BrightskyWeather & {
+    precipitation_min?: number | null;
+    precipitation_max?: number | null;
+    wind_speed_min?: number | null;
+    wind_speed_max?: number | null;
+    temperature_min?: number | null;
+    temperature_max?: number | null;
+    solar_max?: number | null;
+    pressure_msl_median?: number | null;
+    temperature_median?: number | null;
+    wind_direction_median?: number | null;
+    wind_speed_median?: number | null;
+    cloud_cover_median?: number | null;
+    dew_point_median?: number | null;
+    relative_humidity_median?: number | null;
+    visibility_median?: number | null;
+    wind_gust_direction_median?: number | null;
+    wind_gust_speed_median?: number | null;
+    precipitation_probability_median?: number | null;
+    precipitation_probability_6h_median?: number | null;
+    solar_median?: number | null;
     icon_special?: string | null;
 };
 
