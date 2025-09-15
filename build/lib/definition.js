@@ -354,6 +354,18 @@ const hourly = {
     },
     native: {}
   },
+  wind_bearing_text: {
+    _id: "",
+    type: "state",
+    common: {
+      name: "Wind Bearing Text",
+      type: "string",
+      role: "weather.direction.wind",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
   wind_speed: {
     _id: "wind_speed",
     type: "state",
@@ -493,6 +505,19 @@ const hourly = {
       read: true,
       write: false,
       unit: "kWh/m\xB2"
+    },
+    native: {}
+  },
+  solar_estimate: {
+    _id: "solar_estimate",
+    type: "state",
+    common: {
+      name: "Solar Estimate (daily total)",
+      type: "number",
+      role: "value.power",
+      read: true,
+      write: false,
+      unit: "kWh"
     },
     native: {}
   },
@@ -666,6 +691,45 @@ const genericStateObjects = {
           read: true,
           write: false,
           unit: "kWh/m\xB2"
+        },
+        native: {}
+      },
+      solar_forHomoran: {
+        _id: "solar_forHomoran",
+        type: "state",
+        common: {
+          name: "Solar for Homoran (daily total)",
+          type: "number",
+          role: "value.power",
+          read: true,
+          write: false,
+          unit: "kWh/m\xB2"
+        },
+        native: {}
+      },
+      solar_estimate: {
+        _id: "solar_estimate",
+        type: "state",
+        common: {
+          name: "Solar Estimate (daily total)",
+          type: "number",
+          role: "value.power",
+          read: true,
+          write: false,
+          unit: "kWh"
+        },
+        native: {}
+      },
+      solar_estimateForHomoran: {
+        _id: "solar_estimateForHomoran",
+        type: "state",
+        common: {
+          name: "Solar Estimate for Homoran (daily total)",
+          type: "number",
+          role: "value.power",
+          read: true,
+          write: false,
+          unit: "kWh"
         },
         native: {}
       },

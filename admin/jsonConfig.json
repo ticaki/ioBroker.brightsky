@@ -1,75 +1,79 @@
 {
     "i18n": true,
-    "type": "panel",
+    "type": "tabs",
     "items": {
-        "position": {
-            "type": "coordinates",
-            "label": "position",
-            "disabled": "data.dwd_station_id || data.wmo_station",
-            "autoInit": true,
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "maxDistance": {
-            "type": "number",
-            "label": "maxDistance",
-            "default": 50000,
-            "min": 1000,
-            "step": 1,
-            "unit": "m",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },       
-        "pollIntervalCurrently": {
-            "type": "number",
-            "label": "pollIntervalCurrently",
-            "default": 60,
-            "min": 10,
-            "step": 1,
-            "unit": "minutes",
-            "disabled": "!data.createCurrently",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "pollInterval": {
-            "type": "number",
-            "label": "pollInterval",
-            "default": 1,
-            "min": 1,
-            "max": 24,
-            "step": 1,
-            "unit": "hours",
-            "disabled": "!data.createHourly",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "statictext1": {
-            "type": "staticText",
-            "text": "statictext1",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "staticLink1": {
+        "general": {
+            "type": "panel",
+            "label": "General",
+            "items": {
+                "position": {
+                    "type": "coordinates",
+                    "label": "position",
+                    "disabled": "data.dwd_station_id || data.wmo_station",
+                    "autoInit": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "maxDistance": {
+                    "type": "number",
+                    "label": "maxDistance",
+                    "default": 50000,
+                    "min": 1000,
+                    "step": 1,
+                    "unit": "m",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "pollIntervalCurrently": {
+                    "type": "number",
+                    "label": "pollIntervalCurrently",
+                    "default": 60,
+                    "min": 10,
+                    "step": 1,
+                    "unit": "minutes",
+                    "disabled": "!data.createCurrently",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "pollInterval": {
+                    "type": "number",
+                    "label": "pollInterval",
+                    "default": 1,
+                    "min": 1,
+                    "max": 24,
+                    "step": 1,
+                    "unit": "hours",
+                    "disabled": "!data.createHourly",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "statictext1": {
+                    "type": "staticText",
+                    "text": "statictext1",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "staticLink1": {
                     "type": "staticLink",
                     "text": "wmo_station_link",
                     "href": "https://opendata.dwd.de/climate_environment/CDC/help/stations_list_CLIMAT_data.txt",
@@ -81,19 +85,19 @@
                     "lg": 4,
                     "xl": 4
                 },
-        "wmo_station": {
-            "type": "text",
-            "label": "wmo_station",
-            "disabled": "data.dwd_station_id",
-            "default": "",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        }, 
-        "staticLink2": {
+                "wmo_station": {
+                    "type": "text",
+                    "label": "wmo_station",
+                    "disabled": "data.dwd_station_id",
+                    "default": "",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "staticLink2": {
                     "type": "staticLink",
                     "text": "dwd_station_id_link",
                     "href": "https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html;jsessionid=231BE50F3D470686B0E431B7515D514B.live21062?view=nasPublication&nn=16102",
@@ -105,65 +109,123 @@
                     "lg": 4,
                     "xl": 4
                 },
-        "dwd_station_id": {
-            "type": "text",
-            "label": "dwd_station_id",
-            "disabled": "data.wmo_station",
-            "default": "",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        }, 
-        "hours": {
-            "type": "number",
-            "label": "Hours-to-display",
-            "default": 12,
-            "min": 0,
-            "max": 48,
-            "disabled": "!data.createHourly",
-            "unit": "hours",
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
+                "dwd_station_id": {
+                    "type": "text",
+                    "label": "dwd_station_id",
+                    "disabled": "data.wmo_station",
+                    "default": "",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "hours": {
+                    "type": "number",
+                    "label": "Hours-to-display",
+                    "default": 12,
+                    "min": 0,
+                    "max": 48,
+                    "disabled": "!data.createHourly",
+                    "unit": "hours",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "createCurrently": {
+                    "type": "checkbox",
+                    "label": "createCurrently",
+                    "default": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "createHourly": {
+                    "type": "checkbox",
+                    "label": "createHourly",
+                    "default": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "createDaily": {
+                    "type": "checkbox",
+                    "label": "createDaily",
+                    "default": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                }
+            }
         },
-        "createCurrently": {
-            "type": "checkbox",
-            "label": "createCurrently",
-            "default": true,
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "createHourly": {
-            "type": "checkbox",
-            "label": "createHourly",
-            "default": true,
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        },
-        "createDaily": {
-            "type": "checkbox",
-            "label": "createDaily",
-            "default": true,
-            "newLine": true,
-            "xs": 12,
-            "sm": 12,
-            "md": 6,
-            "lg": 4,
-            "xl": 4
-        }     
+        "advanced": {
+            "type": "panel",
+            "label": "Advanced",
+            "items": {
+                "panels": {
+                    "type": "table",
+                    "label": "overviewOfPanels",
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "items": [
+                        {
+                            "attr": "azimuth",
+                            "type": "number",
+                            "label": "azimuth",
+                            "default": 180,
+                            "min": 0,
+                            "max": 360,
+                            "step": 1,
+                            "unit": "°"
+                        },
+                        {
+                            "attr": "tilt",
+                            "type": "number",
+                            "label": "tilt",
+                            "default": 30,
+                            "min": 0,
+                            "max": 90,
+                            "step": 1,
+                            "unit": "°"
+                        },
+                         {
+                            "attr": "area",
+                            "type": "number",
+                            "label": "area",
+                            "default": 0,
+                            "min": 0.1,
+                            "step": 0.1,
+                            "unit": "m²"
+                        },
+                        {
+                            "attr": "efficiency",
+                            "type": "number",
+                            "label": "efficiency",
+                            "default": 85,
+                            "min": 0.1,
+                            "max": 100,
+                            "step": 0.1,
+                            "unit": "%"
+                        }
+                    ]
+                }
+            }
+        }
     }
 }

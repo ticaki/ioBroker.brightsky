@@ -84,6 +84,9 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (ticaki) Added experimental datapoint for solar energy estimation (daily and hourly)  
+- (ticaki) Wind bearing text is now translated into ioBroker system language  
+- (ticaki) Added new datapoint for MDI icons support  
 - (ticaki) Add day and night objects in addition to daily objects fixes [#11](https://github.com/ticaki/ioBroker.brightsky/issues/11)
 - (ticaki) Enhanced day and night support with dedicated day/night icons  
 
