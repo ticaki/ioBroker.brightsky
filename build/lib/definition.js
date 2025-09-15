@@ -512,7 +512,7 @@ const hourly = {
     _id: "solar_estimate",
     type: "state",
     common: {
-      name: "Solar Estimate (daily total)",
+      name: "Solar Estimate (hourly total)",
       type: "number",
       role: "value.power",
       read: true,

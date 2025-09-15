@@ -83,6 +83,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) state name fixed
+
 ### 0.3.0 (2025-09-15)
 - (ticaki) Added experimental datapoint for solar energy estimation (daily and hourly)  
 - (ticaki) Wind bearing text is now translated into ioBroker system language  
