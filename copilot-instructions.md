@@ -35,8 +35,9 @@ This adapter must conform to the [ioBroker adapter development documentation](ht
  * @param stationInfo Station information for fallback handling
  */
 private async processWeatherData(weatherData: BrightskyWeather, stationInfo: StationInfo): Promise<void> {
-    // Convert solar radiation from kWh/m² to W/m² for better usability
-    const solarRadiation = weatherData.solar_60 * 1000;
+    // Convert solar radiation from kWh/m² (energy over 1 hour) to average W/m² (power)
+    // W/m² = (kWh/m²) * 1000 / hours; here, hours = 1 for solar_60
+    const solarRadiation = weatherData.solar_60 * 1000 / 1;
 }
 ```
 
