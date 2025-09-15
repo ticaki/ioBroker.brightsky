@@ -266,8 +266,6 @@ class Brightsky extends utils.Adapter {
                                                     dailyData.solar_estimateForHomoran = dailyData.solar_estimate;
                                                 }
                                             }
-
-                                            dailyData[`${k}_max`] = null;
                                         }
                                         dailyData[`${k}_max`] = max !== -Infinity ? max : null;
                                     } else {
@@ -711,7 +709,7 @@ function estimatePVEnergyForHour(
                 : typeof time === 'number'
                   ? new Date(time + i * 15 * 60000)
                   : new Date(new Date(time).getTime() + i * 15 * 60000);
-        const quarterHourValue = estimatePvEnergiy(valueWhPerM2 / 4, quarterHourTime, coords, panels) / 4;
+        const quarterHourValue = estimatePvEnergy(valueWhPerM2 / 4, quarterHourTime, coords, panels) / 4;
         if (i === 0) {
             valueWhPerM2 = quarterHourValue;
         } else {
@@ -720,12 +718,7 @@ function estimatePVEnergyForHour(
     }
     return valueWhPerM2;
 }
-function estimatePvEnergiy(
-    valueWhPerM2: number,
-    time: Date | number | string,
-    coords: Coords,
-    panels: Panel[],
-): number {
+function estimatePvEnergy(valueWhPerM2: number, time: Date | number | string, coords: Coords, panels: Panel[]): number {
     // ===== Helpers (funktion-lokal) =====
     const toRad = (d: number): number => (d * Math.PI) / 180;
     const clamp01 = (x: number): number => Math.min(1, Math.max(0, x));

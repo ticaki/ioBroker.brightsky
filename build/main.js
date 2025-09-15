@@ -250,7 +250,6 @@ class Brightsky extends utils.Adapter {
                           dailyData.solar_estimateForHomoran = dailyData.solar_estimate;
                         }
                       }
-                      dailyData[`${k}_max`] = null;
                     }
                     dailyData[`${k}_max`] = max !== -Infinity ? max : null;
                   } else {
@@ -605,7 +604,7 @@ class Brightsky extends utils.Adapter {
 function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
   for (let i = 0; i < 4; i++) {
     const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
-    const quarterHourValue = estimatePvEnergiy(valueWhPerM2 / 4, quarterHourTime, coords, panels) / 4;
+    const quarterHourValue = estimatePvEnergy(valueWhPerM2 / 4, quarterHourTime, coords, panels) / 4;
     if (i === 0) {
       valueWhPerM2 = quarterHourValue;
     } else {
@@ -614,7 +613,7 @@ function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
   }
   return valueWhPerM2;
 }
-function estimatePvEnergiy(valueWhPerM2, time, coords, panels) {
+function estimatePvEnergy(valueWhPerM2, time, coords, panels) {
   const toRad = (d) => d * Math.PI / 180;
   const clamp01 = (x) => Math.min(1, Math.max(0, x));
   const normEff = (pct) => clamp01(pct / 100);
