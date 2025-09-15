@@ -4,11 +4,9 @@
   "eslint.enable": true,
   "eslint.format.enable": true,
 
-  // Empfohlen: Flat Config nutzen, falls dein Projekt schon eslint.config.js hat
   "eslint.useFlatConfig": true,
   "eslint.useESLintClass": "always",
 
-  // WICHTIG: diese beiden dürfen NICHT in codeActionsOnSave stehen
   "eslint.validate": ["javascript", "typescript", "typescriptreact", "vue", "json"],
   "eslint.workingDirectories": [
     { "mode": "auto" }
