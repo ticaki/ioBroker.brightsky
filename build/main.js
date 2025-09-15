@@ -5,10 +5,6 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
     for (let key of __getOwnPropNames(from))
@@ -25,12 +21,6 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var main_exports = {};
-__export(main_exports, {
-  estimatePVEnergyForHour: () => estimatePVEnergyForHour
-});
-module.exports = __toCommonJS(main_exports);
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_axios = __toESM(require("axios"));
 var import_library = require("./lib/library");
@@ -406,6 +396,7 @@ class Brightsky extends utils.Adapter {
     }, loopTime - Date.now());
   }
   async weatherHourlyUpdate() {
+    var _a, _b;
     const startTime = new Date((/* @__PURE__ */ new Date()).setMinutes(0, 0, 0)).toISOString();
     const endTime = new Date((/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.hours, 0, 0, 0)).toISOString();
     try {
@@ -415,6 +406,24 @@ class Brightsky extends utils.Adapter {
       if (result.data) {
         this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
         if (result.data.weather && Array.isArray(result.data.weather)) {
+          for (const item of result.data.weather) {
+            if (!item) {
+              continue;
+            }
+            item.wind_bearing_text = this.getWindBearingText((_a = item.wind_direction) != null ? _a : void 0);
+            item.solar_estimate = estimatePVEnergyForHour(
+              (_b = item.solar) != null ? _b : 0,
+              item.timestamp,
+              {
+                lat: parseFloat(this.config.position.split(",")[0]),
+                lon: parseFloat(this.config.position.split(",")[1])
+              },
+              this.config.panels
+            );
+            if (item.solar_estimate) {
+              item.solar_estimate = Math.round(item.solar_estimate * 1e3) / 1e3;
+            }
+          }
           await this.library.writeFromJson(
             "hourly.r",
             "weather.hourly",
@@ -504,7 +513,7 @@ class Brightsky extends utils.Adapter {
       "NNW"
     ];
     const index = Math.round(windBearing % 360 / 22.5) % 16;
-    return directions[index];
+    return this.library.getTranslation(directions[index]);
   }
   onUnload(callback) {
     this.unload = true;
@@ -594,6 +603,18 @@ class Brightsky extends utils.Adapter {
   }
 }
 function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
+  for (let i = 0; i < 4; i++) {
+    const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
+    const quarterHourValue = estimatePvEnergiy(valueWhPerM2 / 4, quarterHourTime, coords, panels) / 4;
+    if (i === 0) {
+      valueWhPerM2 = quarterHourValue;
+    } else {
+      valueWhPerM2 += quarterHourValue;
+    }
+  }
+  return valueWhPerM2;
+}
+function estimatePvEnergiy(valueWhPerM2, time, coords, panels) {
   const toRad = (d) => d * Math.PI / 180;
   const clamp01 = (x) => Math.min(1, Math.max(0, x));
   const normEff = (pct) => clamp01(pct / 100);
@@ -637,8 +658,4 @@ if (require.main !== module) {
 } else {
   (() => new Brightsky())();
 }
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  estimatePVEnergyForHour
-});
 //# sourceMappingURL=main.js.map

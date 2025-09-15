@@ -348,6 +348,18 @@ const hourly: ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject> =
         },
         native: {},
     },
+    wind_bearing_text: {
+        _id: '',
+        type: 'state',
+        common: {
+            name: 'Wind Bearing Text',
+            type: 'string',
+            role: 'weather.direction.wind',
+            read: true,
+            write: false,
+        },
+        native: {},
+    },
     wind_speed: {
         _id: 'wind_speed',
         type: 'state',
@@ -487,6 +499,19 @@ const hourly: ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject> =
             read: true,
             write: false,
             unit: 'kWh/m²',
+        },
+        native: {},
+    },
+    solar_estimate: {
+        _id: 'solar_estimate',
+        type: 'state',
+        common: {
+            name: 'Solar Estimate (daily total)',
+            type: 'number',
+            role: 'value.power',
+            read: true,
+            write: false,
+            unit: 'kWh',
         },
         native: {},
     },
@@ -1365,6 +1390,7 @@ export type BrightskyWeather = {
     sunshine: number | null;
     temperature: number | null;
     wind_direction: number | null;
+    wind_bearing_text?: string;
     wind_speed: number | null;
     cloud_cover: number | null;
     dew_point: number | null;
@@ -1376,6 +1402,8 @@ export type BrightskyWeather = {
     precipitation_probability: number | null;
     precipitation_probability_6h: number | null;
     solar: number | null;
+    solar_estimate?: number | null;
+
     icon: string | null;
 };
 

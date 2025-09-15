@@ -444,7 +444,26 @@ class Brightsky extends utils.Adapter {
             );
             if (result.data) {
                 this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
+
                 if (result.data.weather && Array.isArray(result.data.weather)) {
+                    for (const item of result.data.weather as BrightskyWeather[]) {
+                        if (!item) {
+                            continue; // Skip if item is null or undefined
+                        }
+                        item.wind_bearing_text = this.getWindBearingText(item.wind_direction ?? undefined);
+                        item.solar_estimate = estimatePVEnergyForHour(
+                            item.solar ?? 0,
+                            item.timestamp,
+                            {
+                                lat: parseFloat(this.config.position.split(',')[0]),
+                                lon: parseFloat(this.config.position.split(',')[1]),
+                            },
+                            this.config.panels,
+                        );
+                        if (item.solar_estimate) {
+                            item.solar_estimate = Math.round(item.solar_estimate * 1000) / 1000;
+                        }
+                    }
                     await this.library.writeFromJson(
                         'hourly.r',
                         'weather.hourly',
@@ -533,7 +552,7 @@ class Brightsky extends utils.Adapter {
             'NNW',
         ];
         const index = Math.round((windBearing % 360) / 22.5) % 16;
-        return directions[index];
+        return this.library.getTranslation(directions[index]);
     }
 
     private onUnload(callback: () => void): void {
@@ -679,7 +698,29 @@ type Coords = { lat: number; lon: number };
  * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
  * @returns Wh (elektrisch) für alle Panels zusammen
  */
-export function estimatePVEnergyForHour(
+function estimatePVEnergyForHour(
+    valueWhPerM2: number,
+    time: Date | number | string,
+    coords: Coords,
+    panels: Panel[],
+): number {
+    for (let i = 0; i < 4; i++) {
+        const quarterHourTime =
+            time instanceof Date
+                ? new Date(time.getTime() + i * 15 * 60000)
+                : typeof time === 'number'
+                  ? new Date(time + i * 15 * 60000)
+                  : new Date(new Date(time).getTime() + i * 15 * 60000);
+        const quarterHourValue = estimatePvEnergiy(valueWhPerM2 / 4, quarterHourTime, coords, panels) / 4;
+        if (i === 0) {
+            valueWhPerM2 = quarterHourValue;
+        } else {
+            valueWhPerM2 += quarterHourValue;
+        }
+    }
+    return valueWhPerM2;
+}
+function estimatePvEnergiy(
     valueWhPerM2: number,
     time: Date | number | string,
     coords: Coords,
