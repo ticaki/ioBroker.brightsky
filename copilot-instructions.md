@@ -193,7 +193,7 @@ try {
     const response = await axios.get(apiUrl, { timeout: 15000 });
     // Process response
 } catch (error) {
-    this.log.error(`BrightSky API request failed: ${error.message}`);
+    this.log.error(`BrightSky API request failed: ${error instanceof Error ? error.message : String(error)}`);
     await this.setState('info.connection', false, true);
 }
 ```
