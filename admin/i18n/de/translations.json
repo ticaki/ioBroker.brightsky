@@ -30,7 +30,7 @@
     "NW": "NW",
     "NNW": "NNW",
     "overviewOfPanels": "Übersicht deiner Solarpanels",
-    "azimuth": "Azimut (0-360°)",
+    "azimuth": "Azimut (0-360°) 0=N",
     "tilt": "Neigung (0-90°)",
     "efficiency": "Effizienz (0-1)",
     "area": "Fläche (m²)"

@@ -84,6 +84,7 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (ticaki) Fixed data evaluation crash when no panels are defined  
 - (ticaki) state name fixed
 
 ### 0.3.0 (2025-09-15)
