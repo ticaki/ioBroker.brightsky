@@ -83,6 +83,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Added new datapoint for MDI icons support  
+
 ### 0.2.4 (2025-08-28)
 * (ticaki) Create all folders
 
