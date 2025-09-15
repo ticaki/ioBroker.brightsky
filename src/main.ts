@@ -770,39 +770,36 @@ class Brightsky extends utils.Adapter {
                 case 'precipitation_probability_6h': {
                     const values = weatherValues[k] as (number | null)[];
                     if (values && values.length > 0) {
-                        if (values && values.length > 0) {
-                            let median: number | null = null;
-                            if (values.filter(v => v !== null).length > 0) {
-                                const sortedValues = values
-                                    .filter(v => v !== null)
-                                    .sort((a, b) => (a as number) - (b as number));
-                                const mid = Math.floor(sortedValues.length / 2);
-                                if (sortedValues.length % 2 === 0) {
-                                    median = ((sortedValues[mid - 1] as number) + (sortedValues[mid] as number)) / 2;
-                                } else {
-                                    median = sortedValues[mid] as number;
-                                }
+                        let median: number | null = null;
+                        if (values.filter(v => v !== null).length > 0) {
+                            const sortedValues = values
+                                .filter(v => v !== null)
+                                .sort((a, b) => (a as number) - (b as number));
+                            const mid = Math.floor(sortedValues.length / 2);
+                            if (sortedValues.length % 2 === 0) {
+                                median = ((sortedValues[mid - 1] as number) + (sortedValues[mid] as number)) / 2;
+                            } else {
+                                median = sortedValues[mid] as number;
                             }
-                            let avg = values.reduce((sum, value) => {
-                                if (value != null) {
-                                    return sum == null ? 0 + (value as number) : (sum as number) + (value as number);
-                                }
-                                return sum;
-                            }, 0);
-                            if (avg != null) {
-                                if (values.filter(v => v !== null).length > 2) {
-                                    avg =
-                                        Math.round(((avg as number) / values.filter(v => v !== null).length) * 10) / 10;
-                                } else {
-                                    avg = null;
-                                }
-                            }
-                            (result as any)[`${k}_median`] = median;
-                            result[k] = avg as number;
-                        } else {
-                            result[k] = null;
-                            (result as any)[`${k}_median`] = null;
                         }
+                        let avg = values.reduce((sum, value) => {
+                            if (value != null) {
+                                return sum == null ? 0 + (value as number) : (sum as number) + (value as number);
+                            }
+                            return sum;
+                        }, 0);
+                        if (avg != null) {
+                            if (values.filter(v => v !== null).length > 2) {
+                                avg = Math.round(((avg as number) / values.filter(v => v !== null).length) * 10) / 10;
+                            } else {
+                                avg = null;
+                            }
+                        }
+                        (result as any)[`${k}_median`] = median;
+                        result[k] = avg as number;
+                    } else {
+                        result[k] = null;
+                        (result as any)[`${k}_median`] = null;
                     }
                     break;
                 }

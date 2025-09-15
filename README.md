@@ -83,7 +83,7 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 0.2.5 (2025-08-29)
+### **WORK IN PROGRESS**
 * (ticaki) Add day and night objects in addition to daily objects
 
 ### 0.2.4 (2025-08-28)

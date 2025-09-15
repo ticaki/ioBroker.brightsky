@@ -326,7 +326,11 @@ class Brightsky extends utils.Adapter {
             );
             dailyData.sunset = times.sunset.getTime();
             dailyData.sunrise = times.sunrise.getTime();
-            const { dayData, nightData } = this.calculateDayNightData(weatherArr[i], times.sunrise, times.sunset);
+            const { dayData, nightData } = this.calculateDayNightData(
+              weatherArr[i],
+              times.sunrise,
+              times.sunset
+            );
             dailyData.day = dayData;
             dailyData.night = nightData;
             resultArr.push(dailyData);
@@ -481,10 +485,10 @@ class Brightsky extends utils.Adapter {
    * Works directly on hourly values (conditions, wind, precipitation, etc.).
    *
    * @param bucket Aggregated hourly data for one day
-   * @param bucket.condition
-   * @param bucket.wind_speed
-   * @param bucket.precipitation
-   * @param bucket.cloud_cover
+   * @param bucket.condition Hourly condition values
+   * @param bucket.wind_speed Hourly wind speed values
+   * @param bucket.precipitation Hourly precipitation values
+   * @param bucket.cloud_cover Hourly cloud cover values
    * @returns Weather icon string (MDI icon name, day variant only)
    */
   pickDailyWeatherIcon(bucket) {
@@ -566,7 +570,9 @@ class Brightsky extends utils.Adapter {
     }
     const timestamps = dayWeatherArr.timestamp;
     for (let i = 0; i < timestamps.length; i++) {
-      if (!timestamps[i]) continue;
+      if (!timestamps[i]) {
+        continue;
+      }
       const hourTime = new Date(timestamps[i]);
       const isDayTime = hourTime >= sunrise && hourTime <= sunset;
       for (const key of Object.keys(dayWeatherArr)) {
@@ -667,36 +673,34 @@ class Brightsky extends utils.Adapter {
         case "precipitation_probability_6h": {
           const values = weatherValues[k];
           if (values && values.length > 0) {
-            if (values && values.length > 0) {
-              let median = null;
-              if (values.filter((v) => v !== null).length > 0) {
-                const sortedValues = values.filter((v) => v !== null).sort((a, b) => a - b);
-                const mid = Math.floor(sortedValues.length / 2);
-                if (sortedValues.length % 2 === 0) {
-                  median = (sortedValues[mid - 1] + sortedValues[mid]) / 2;
-                } else {
-                  median = sortedValues[mid];
-                }
+            let median = null;
+            if (values.filter((v) => v !== null).length > 0) {
+              const sortedValues = values.filter((v) => v !== null).sort((a, b) => a - b);
+              const mid = Math.floor(sortedValues.length / 2);
+              if (sortedValues.length % 2 === 0) {
+                median = (sortedValues[mid - 1] + sortedValues[mid]) / 2;
+              } else {
+                median = sortedValues[mid];
               }
-              let avg = values.reduce((sum, value) => {
-                if (value != null) {
-                  return sum == null ? 0 + value : sum + value;
-                }
-                return sum;
-              }, 0);
-              if (avg != null) {
-                if (values.filter((v) => v !== null).length > 2) {
-                  avg = Math.round(avg / values.filter((v) => v !== null).length * 10) / 10;
-                } else {
-                  avg = null;
-                }
-              }
-              result[`${k}_median`] = median;
-              result[k] = avg;
-            } else {
-              result[k] = null;
-              result[`${k}_median`] = null;
             }
+            let avg = values.reduce((sum, value) => {
+              if (value != null) {
+                return sum == null ? 0 + value : sum + value;
+              }
+              return sum;
+            }, 0);
+            if (avg != null) {
+              if (values.filter((v) => v !== null).length > 2) {
+                avg = Math.round(avg / values.filter((v) => v !== null).length * 10) / 10;
+              } else {
+                avg = null;
+              }
+            }
+            result[`${k}_median`] = median;
+            result[k] = avg;
+          } else {
+            result[k] = null;
+            result[`${k}_median`] = null;
           }
           break;
         }
