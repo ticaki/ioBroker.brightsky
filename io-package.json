@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.2.5",
+    "version": "0.3.0",
     "news": {
+      "0.3.0": {
+        "en": "Added experimental datapoint for solar energy estimation (daily and hourly); Wind bearing text translated into ioBroker system language; Added new datapoint for MDI icons support; Add day and night objects in addition to daily objects; Enhanced day and night support with dedicated day/night icons",
+        "de": "Experimentellen Datenpunkt für Solarenergie-Schätzung (täglich und stündlich) hinzugefügt; Windrichtungs-Text wird in die ioBroker-Systemsprache übersetzt; Neuen Datenpunkt für MDI-Icons hinzugefügt; Tag- und Nacht-Objekte zusätzlich zu täglichen Objekten hinzugefügt; Verbesserte Tag-/Nacht-Unterstützung mit eigenen Tag-/Nacht-Icons",
+        "ru": "Добавлен экспериментальный датапоинт для оценки солнечной энергии (ежедневно и ежечасно); Текст направления ветра переведен на системный язык ioBroker; Добавлен новый датапоинт для поддержки MDI-иконок; Добавлены дневные и ночные объекты в дополнение к ежедневным; Улучшена поддержка дня и ночи с выделенными иконками дня/ночи",
+        "pt": "Adicionado ponto de dados experimental para estimativa de energia solar (diária e horária); Texto da direção do vento traduzido para o idioma do sistema ioBroker; Adicionado novo ponto de dados para suporte a ícones MDI; Adicionados objetos de dia e noite além de objetos diários; Suporte de dia e noite aprimorado com ícones dedicados de dia/noite",
+        "nl": "Experimenteel datapunt toegevoegd voor zonne-energie schatting (dagelijks en elk uur); Windrichtingtekst vertaald naar de ioBroker-systeemtaal; Nieuw datapunt toegevoegd voor MDI-iconen ondersteuning; Dag- en nachtobjecten toegevoegd naast dagelijkse objecten; Verbeterde dag- en nachtondersteuning met speciale dag/nacht-iconen",
+        "fr": "Ajout d'un point de données expérimental pour l'estimation de l'énergie solaire (quotidienne et horaire); Texte de direction du vent traduit dans la langue du système ioBroker; Nouveau point de données ajouté pour le support des icônes MDI; Ajout d'objets de jour et de nuit en plus des objets quotidiens; Prise en charge améliorée du jour et de la nuit avec des icônes dédiées",
+        "it": "Aggiunto datapoint sperimentale per la stima dell'energia solare (giornaliera e oraria); Testo della direzione del vento tradotto nella lingua di sistema di ioBroker; Aggiunto nuovo datapoint per il supporto delle icone MDI; Aggiunti oggetti giorno e notte oltre agli oggetti giornalieri; Supporto giorno/notte migliorato con icone dedicate",
+        "es": "Añadido punto de datos experimental para la estimación de energía solar (diaria y por hora); Texto de la dirección del viento traducido al idioma del sistema ioBroker; Añadido nuevo punto de datos para soporte de iconos MDI; Añadidos objetos de día y noche además de objetos diarios; Soporte de día y noche mejorado con iconos dedicados",
+        "pl": "Dodano eksperymentalny punkt danych do szacowania energii słonecznej (dziennie i godzinowo); Tekst kierunku wiatru przetłumaczony na język systemowy ioBroker; Dodano nowy punkt danych dla obsługi ikon MDI; Dodano obiekty dzienne i nocne oprócz obiektów codziennych; Ulepszono obsługę dnia i nocy z dedykowanymi ikonami dnia/nocy",
+        "uk": "Додано експериментальний датапоінт для оцінки сонячної енергії (щоденно та щогодини); Текст напрямку вітру перекладено мовою системи ioBroker; Додано новий датапоінт для підтримки іконок MDI; Додано денні та нічні об'єкти на додаток до щоденних; Покращена підтримка дня та ночі з окремими іконками дня/ночі",
+        "zh-cn": "新增用于太阳能估算（每日和每小时）的实验性数据点；风向文本翻译为 ioBroker 系统语言；新增支持 MDI 图标的数据点；除了每日对象外，还新增白天和夜间对象；改进了昼夜支持，提供专用的昼夜图标"
+      },
       "0.2.5": {
         "en": "Add day and night objects in addition to daily objects",
         "de": "Tag- und Nacht-Objekte zusätzlich zu täglich Objekten hinzufügen",
@@ -80,32 +93,6 @@
         "pl": "Dodano identyfikator stacji DWD\nDodano identyfikator stacji WMO\nDezaktywacja dodanych opcji danych",
         "uk": "ДВД станція ID додано\nКод станції WMO додано\nДодана деактивація параметрів даних",
         "zh-cn": "增加了DWD站身份证\n增加了气象组织站名\n添加的数据选项的停用"
-      },
-      "0.1.1": {
-        "en": "Reduce required Nodej's version to 20",
-        "de": "Reduzieren Sie die erforderliche Nodej-Version auf 20",
-        "ru": "Сокращение требуемой версии Nodej до 20",
-        "pt": "Reduza a versão necessária de Nodej para 20",
-        "nl": "Verminder de vereiste Nodej versie naar 20",
-        "fr": "Réduire la version requise de Nodej à 20",
-        "it": "Ridurre la versione di Nodej richiesta a 20",
-        "es": "Reducir la versión requerida de Nodej a 20",
-        "pl": "Zredukuj wymaganą wersję Nodeja do 20",
-        "uk": "Зменшити необхідну версію Nodej до 20",
-        "zh-cn": "将 Nodej 的版本减少到 20"
-      },
-      "0.1.0": {
-        "en": "initial release",
-        "de": "erstausstrahlung",
-        "ru": "первоначальное освобождение",
-        "pt": "libertação inicial",
-        "nl": "eerste release",
-        "fr": "libération initiale",
-        "it": "rilascio iniziale",
-        "es": "liberación inicial",
-        "pl": "początkowe zwolnienie",
-        "uk": "початковий реліз",
-        "zh-cn": "初步释放"
       }
     },
     "titleLang": {

@@ -83,12 +83,12 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.3.0 (2025-09-15)
 - (ticaki) Added experimental datapoint for solar energy estimation (daily and hourly)  
 - (ticaki) Wind bearing text is now translated into ioBroker system language  
 - (ticaki) Added new datapoint for MDI icons support  
 - (ticaki) Add day and night objects in addition to daily objects fixes [#11](https://github.com/ticaki/ioBroker.brightsky/issues/11)
-- (ticaki) Enhanced day and night support with dedicated day/night icons  
+- (ticaki) Enhanced day and night support with dedicated day/night icons
 
 ### 0.2.4 (2025-08-28)
 * (ticaki) Create all folders
