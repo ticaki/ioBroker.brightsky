@@ -489,9 +489,13 @@ class Brightsky extends utils.Adapter {
    * @param bucket.wind_speed Hourly wind speed values
    * @param bucket.precipitation Hourly precipitation values
    * @param bucket.cloud_cover Hourly cloud cover values
+   * @param bucket.day
    * @returns Weather icon string (MDI icon name, day variant only)
    */
   pickDailyWeatherIcon(bucket) {
+    if (bucket.day !== false) {
+      bucket.day = true;
+    }
     const avg = (arr) => {
       const xs = arr.filter((v) => v != null);
       return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
@@ -549,9 +553,15 @@ class Brightsky extends utils.Adapter {
       return "weather-cloudy";
     }
     if (avgClouds > 40) {
-      return "weather-partly-cloudy";
+      if (bucket.day) {
+        return "weather-partly-cloudy";
+      }
+      return "weather-night-partly-cloudy";
     }
-    return "weather-sunny";
+    if (bucket.day) {
+      return "weather-sunny";
+    }
+    return "weather-night";
   }
   /**
    * Calculate day and night aggregated data from hourly data based on sunrise/sunset times
@@ -564,6 +574,8 @@ class Brightsky extends utils.Adapter {
   calculateDayNightData(dayWeatherArr, sunrise, sunset) {
     const dayValues = {};
     const nightValues = {};
+    dayValues.day = true;
+    nightValues.day = false;
     for (const key of Object.keys(dayWeatherArr)) {
       dayValues[key] = [];
       nightValues[key] = [];
@@ -720,7 +732,9 @@ class Brightsky extends utils.Adapter {
           tempArr.sort((a, b) => b.count - a.count);
           if (tempArr.length > 0) {
             if (k === "icon") {
-              tempArr[0].value = tempArr[0].value.replace("-night", "-day");
+              if (weatherValues.day !== false) {
+                tempArr[0].value = tempArr[0].value.replace("-night", "-day");
+              }
             }
             result[k] = tempArr[0].value;
           } else {
@@ -730,7 +744,8 @@ class Brightsky extends utils.Adapter {
             condition: weatherValues.condition,
             wind_speed: weatherValues.wind_speed,
             precipitation: weatherValues.precipitation,
-            cloud_cover: weatherValues.cloud_cover
+            cloud_cover: weatherValues.cloud_cover,
+            day: weatherValues.day
           });
           break;
         }

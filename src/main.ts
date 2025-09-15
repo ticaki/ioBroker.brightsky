@@ -532,6 +532,7 @@ class Brightsky extends utils.Adapter {
      * @param bucket.wind_speed Hourly wind speed values
      * @param bucket.precipitation Hourly precipitation values
      * @param bucket.cloud_cover Hourly cloud cover values
+     * @param bucket.day
      * @returns Weather icon string (MDI icon name, day variant only)
      */
     pickDailyWeatherIcon(bucket: {
@@ -539,7 +540,11 @@ class Brightsky extends utils.Adapter {
         wind_speed: (number | null | undefined)[];
         precipitation?: (number | null | undefined)[];
         cloud_cover?: (number | null | undefined)[];
+        day?: boolean;
     }): string {
+        if (bucket.day !== false) {
+            bucket.day = true;
+        }
         // --- inline helpers ---
         const avg = (arr: (number | null | undefined)[]): number => {
             const xs = arr.filter((v): v is number => v != null);
@@ -621,11 +626,17 @@ class Brightsky extends utils.Adapter {
             return 'weather-cloudy';
         }
         if (avgClouds > 40) {
-            return 'weather-partly-cloudy';
+            if (bucket.day) {
+                return 'weather-partly-cloudy';
+            }
+            return 'weather-night-partly-cloudy';
         }
 
         // Default
-        return 'weather-sunny';
+        if (bucket.day) {
+            return 'weather-sunny';
+        }
+        return 'weather-night';
     }
 
     /**
@@ -641,8 +652,11 @@ class Brightsky extends utils.Adapter {
         sunrise: Date,
         sunset: Date,
     ): { dayData: Partial<BrightskyDayNightData>; nightData: Partial<BrightskyDayNightData> } {
-        const dayValues: Record<string, (string | number | null)[]> = {};
-        const nightValues: Record<string, (string | number | null)[]> = {};
+        const dayValues: Record<string, (string | number | null)[]> & { day?: boolean } = {};
+        const nightValues: Record<string, (string | number | null)[]> & { day?: boolean } = {};
+
+        dayValues.day = true;
+        nightValues.day = false;
 
         // Initialize arrays for each weather parameter
         for (const key of Object.keys(dayWeatherArr)) {
@@ -686,7 +700,7 @@ class Brightsky extends utils.Adapter {
      * @returns Processed weather data
      */
     private processAggregatedWeatherData(
-        weatherValues: Record<string, (string | number | null)[]>,
+        weatherValues: Record<string, (string | number | null)[]> & { day?: boolean },
     ): Partial<BrightskyDayNightData> {
         const result: Partial<BrightskyDayNightData> = {};
 
@@ -819,7 +833,9 @@ class Brightsky extends utils.Adapter {
                     tempArr.sort((a, b) => b.count - a.count);
                     if (tempArr.length > 0) {
                         if (k === 'icon') {
-                            tempArr[0].value = (tempArr[0].value as string).replace('-night', '-day');
+                            if (weatherValues.day !== false) {
+                                tempArr[0].value = (tempArr[0].value as string).replace('-night', '-day');
+                            }
                         }
                         result[k] = tempArr[0].value as string;
                     } else {
@@ -830,6 +846,7 @@ class Brightsky extends utils.Adapter {
                         wind_speed: weatherValues.wind_speed as (number | null | undefined)[],
                         precipitation: weatherValues.precipitation as (number | null | undefined)[],
                         cloud_cover: weatherValues.cloud_cover as (number | null | undefined)[],
+                        day: weatherValues.day,
                     });
                     break;
                 }
