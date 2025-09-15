@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "news": {
+      "0.2.5": {
+        "en": "Add day and night objects in addition to daily objects",
+        "de": "Tag- und Nacht-Objekte zusätzlich zu täglich Objekten hinzufügen",
+        "ru": "Добавить дневные и ночные объекты в дополнение к ежедневным объектам",
+        "pt": "Adicionar objetos diurnos e noturnos além de objetos diários",
+        "nl": "Dag- en nachtobjecten toevoegen naast dagelijkse objecten",
+        "fr": "Ajouter des objets de jour et de nuit en plus des objets quotidiens",
+        "it": "Aggiungi oggetti giorno e notte oltre agli oggetti giornalieri",
+        "es": "Añadir objetos de día y noche además de objetos diarios",
+        "pl": "Dodaj obiekty dzienne i nocne oprócz obiektów codziennych",
+        "uk": "Додати денні та нічні об'єкти на додаток до щоденних об'єктів",
+        "zh-cn": "除了每日对象外，还添加白天和夜间对象"
+      },
       "0.2.4": {
         "en": "Create all folders",
         "de": "Alle Ordner erstellen",

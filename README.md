@@ -83,6 +83,10 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Add day and night objects in addition to daily objects fixes [#11](https://github.com/ticaki/ioBroker.brightsky/issues/11)
+- (ticaki) Enhanced day and night support with dedicated day/night icons  
+
 ### 0.2.4 (2025-08-28)
 * (ticaki) Create all folders
 

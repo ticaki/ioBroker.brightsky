@@ -926,6 +926,106 @@ const genericStateObjects = {
           write: false
         },
         native: {}
+      },
+      day: {
+        _channel: {
+          _id: "day",
+          type: "folder",
+          common: {
+            name: "Day"
+          },
+          native: {}
+        },
+        ...hourly,
+        sunshine: {
+          _id: "sunshine",
+          type: "state",
+          common: {
+            name: "Sunshine (day total)",
+            type: "number",
+            role: "value",
+            read: true,
+            write: false,
+            unit: "min"
+          },
+          native: {}
+        },
+        precipitation: {
+          _id: "precipitation",
+          type: "state",
+          common: {
+            name: "Precipitation (day total)",
+            type: "number",
+            role: "value.precipitation.forecast.0",
+            read: true,
+            write: false,
+            unit: "mm"
+          },
+          native: {}
+        },
+        solar: {
+          _id: "solar",
+          type: "state",
+          common: {
+            name: "Solar Radiation (day total)",
+            type: "number",
+            role: "value.power",
+            read: true,
+            write: false,
+            unit: "kWh/m\xB2"
+          },
+          native: {}
+        }
+      },
+      night: {
+        _channel: {
+          _id: "night",
+          type: "folder",
+          common: {
+            name: "Night"
+          },
+          native: {}
+        },
+        ...hourly,
+        sunshine: {
+          _id: "sunshine",
+          type: "state",
+          common: {
+            name: "Sunshine (night total)",
+            type: "number",
+            role: "value",
+            read: true,
+            write: false,
+            unit: "min"
+          },
+          native: {}
+        },
+        precipitation: {
+          _id: "precipitation",
+          type: "state",
+          common: {
+            name: "Precipitation (night total)",
+            type: "number",
+            role: "value.precipitation.forecast.0",
+            read: true,
+            write: false,
+            unit: "mm"
+          },
+          native: {}
+        },
+        solar: {
+          _id: "solar",
+          type: "state",
+          common: {
+            name: "Solar Radiation (night total)",
+            type: "number",
+            role: "value.power",
+            read: true,
+            write: false,
+            unit: "kWh/m\xB2"
+          },
+          native: {}
+        }
       }
     },
     sources: {
