@@ -8,7 +8,12 @@ import * as utils from '@iobroker/adapter-core';
 import axios from 'axios';
 import { Library } from './lib/library';
 import type { BrightskyHourly } from './lib/definition';
-import { genericStateObjects, type BrightskyDailyData, type BrightskyDayNightData, type BrightskyWeather } from './lib/definition';
+import {
+    genericStateObjects,
+    type BrightskyDailyData,
+    type BrightskyDayNightData,
+    type BrightskyWeather,
+} from './lib/definition';
 import * as suncalc from 'suncalc';
 
 axios.defaults.timeout = 15000; // Set a default timeout of 10 seconds for all axios requests
@@ -353,7 +358,11 @@ class Brightsky extends utils.Adapter {
                         dailyData.sunrise = times.sunrise.getTime();
 
                         // Calculate day and night data
-                        const { dayData, nightData } = this.calculateDayNightData(weatherArr[i], times.sunrise, times.sunset);
+                        const { dayData, nightData } = this.calculateDayNightData(
+                            weatherArr[i],
+                            times.sunrise,
+                            times.sunset,
+                        );
                         dailyData.day = dayData;
                         dailyData.night = nightData;
 
@@ -519,10 +528,10 @@ class Brightsky extends utils.Adapter {
      * Works directly on hourly values (conditions, wind, precipitation, etc.).
      *
      * @param bucket Aggregated hourly data for one day
-     * @param bucket.condition
-     * @param bucket.wind_speed
-     * @param bucket.precipitation
-     * @param bucket.cloud_cover
+     * @param bucket.condition Hourly condition values
+     * @param bucket.wind_speed Hourly wind speed values
+     * @param bucket.precipitation Hourly precipitation values
+     * @param bucket.cloud_cover Hourly cloud cover values
      * @returns Weather icon string (MDI icon name, day variant only)
      */
     pickDailyWeatherIcon(bucket: {
@@ -628,27 +637,29 @@ class Brightsky extends utils.Adapter {
      * @returns Object containing aggregated day and night data
      */
     private calculateDayNightData(
-        dayWeatherArr: Record<string, (string | number | null)[]>, 
-        sunrise: Date, 
-        sunset: Date
+        dayWeatherArr: Record<string, (string | number | null)[]>,
+        sunrise: Date,
+        sunset: Date,
     ): { dayData: Partial<BrightskyDayNightData>; nightData: Partial<BrightskyDayNightData> } {
         const dayValues: Record<string, (string | number | null)[]> = {};
         const nightValues: Record<string, (string | number | null)[]> = {};
-        
+
         // Initialize arrays for each weather parameter
         for (const key of Object.keys(dayWeatherArr)) {
             dayValues[key] = [];
             nightValues[key] = [];
         }
-        
+
         // Separate hourly data into day and night based on sunrise/sunset
         const timestamps = dayWeatherArr.timestamp as string[];
         for (let i = 0; i < timestamps.length; i++) {
-            if (!timestamps[i]) continue;
-            
+            if (!timestamps[i]) {
+                continue;
+            }
+
             const hourTime = new Date(timestamps[i]);
             const isDayTime = hourTime >= sunrise && hourTime <= sunset;
-            
+
             for (const key of Object.keys(dayWeatherArr)) {
                 const value = dayWeatherArr[key][i];
                 if (isDayTime) {
@@ -658,28 +669,30 @@ class Brightsky extends utils.Adapter {
                 }
             }
         }
-        
+
         // Process day data
         const dayData = this.processAggregatedWeatherData(dayValues);
-        
+
         // Process night data
         const nightData = this.processAggregatedWeatherData(nightValues);
-        
+
         return { dayData, nightData };
     }
-    
+
     /**
      * Process aggregated weather data (common logic for both day and night)
      *
      * @param weatherValues Weather data arrays
      * @returns Processed weather data
      */
-    private processAggregatedWeatherData(weatherValues: Record<string, (string | number | null)[]>): Partial<BrightskyDayNightData> {
+    private processAggregatedWeatherData(
+        weatherValues: Record<string, (string | number | null)[]>,
+    ): Partial<BrightskyDayNightData> {
         const result: Partial<BrightskyDayNightData> = {};
-        
+
         for (const key of Object.keys(weatherValues)) {
             const k = key as keyof BrightskyWeather;
-            
+
             switch (k) {
                 case 'precipitation':
                 case 'wind_gust_speed':
@@ -696,7 +709,7 @@ class Brightsky extends utils.Adapter {
                     }
                 }
             }
-            
+
             switch (k) {
                 case 'timestamp': {
                     result.timestamp = weatherValues.timestamp[0] as string;
@@ -778,7 +791,8 @@ class Brightsky extends utils.Adapter {
                             }, 0);
                             if (avg != null) {
                                 if (values.filter(v => v !== null).length > 2) {
-                                    avg = Math.round((avg as number / values.filter(v => v !== null).length) * 10) / 10;
+                                    avg =
+                                        Math.round(((avg as number) / values.filter(v => v !== null).length) * 10) / 10;
                                 } else {
                                     avg = null;
                                 }
@@ -844,7 +858,7 @@ class Brightsky extends utils.Adapter {
                             return sum;
                         }, 0);
                         if (avg != null && values.filter(v => v !== null).length > 2) {
-                            avg = Math.round((avg as number / values.filter(v => v !== null).length) * 10) / 10;
+                            avg = Math.round(((avg as number) / values.filter(v => v !== null).length) * 10) / 10;
                         } else {
                             avg = null;
                         }
@@ -858,7 +872,7 @@ class Brightsky extends utils.Adapter {
                 }
             }
         }
-        
+
         return result;
     }
 }
