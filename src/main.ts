@@ -8,7 +8,7 @@ import * as utils from '@iobroker/adapter-core';
 import axios from 'axios';
 import { Library } from './lib/library';
 import type { BrightskyHourly } from './lib/definition';
-import { genericStateObjects, type BrightskyDailyData, type BrightskyWeather } from './lib/definition';
+import { genericStateObjects, type BrightskyDailyData, type BrightskyDayNightData, type BrightskyWeather } from './lib/definition';
 import * as suncalc from 'suncalc';
 
 axios.defaults.timeout = 15000; // Set a default timeout of 10 seconds for all axios requests
@@ -351,6 +351,12 @@ class Brightsky extends utils.Adapter {
                         );
                         dailyData.sunset = times.sunset.getTime();
                         dailyData.sunrise = times.sunrise.getTime();
+
+                        // Calculate day and night data
+                        const { dayData, nightData } = this.calculateDayNightData(weatherArr[i], times.sunrise, times.sunset);
+                        dailyData.day = dayData;
+                        dailyData.night = nightData;
+
                         resultArr.push(dailyData);
                     }
 
@@ -611,6 +617,249 @@ class Brightsky extends utils.Adapter {
 
         // Default
         return 'weather-sunny';
+    }
+
+    /**
+     * Calculate day and night aggregated data from hourly data based on sunrise/sunset times
+     *
+     * @param dayWeatherArr Hourly weather data for one day
+     * @param sunrise Sunrise time
+     * @param sunset Sunset time
+     * @returns Object containing aggregated day and night data
+     */
+    private calculateDayNightData(
+        dayWeatherArr: Record<string, (string | number | null)[]>, 
+        sunrise: Date, 
+        sunset: Date
+    ): { dayData: Partial<BrightskyDayNightData>; nightData: Partial<BrightskyDayNightData> } {
+        const dayValues: Record<string, (string | number | null)[]> = {};
+        const nightValues: Record<string, (string | number | null)[]> = {};
+        
+        // Initialize arrays for each weather parameter
+        for (const key of Object.keys(dayWeatherArr)) {
+            dayValues[key] = [];
+            nightValues[key] = [];
+        }
+        
+        // Separate hourly data into day and night based on sunrise/sunset
+        const timestamps = dayWeatherArr.timestamp as string[];
+        for (let i = 0; i < timestamps.length; i++) {
+            if (!timestamps[i]) continue;
+            
+            const hourTime = new Date(timestamps[i]);
+            const isDayTime = hourTime >= sunrise && hourTime <= sunset;
+            
+            for (const key of Object.keys(dayWeatherArr)) {
+                const value = dayWeatherArr[key][i];
+                if (isDayTime) {
+                    dayValues[key].push(value);
+                } else {
+                    nightValues[key].push(value);
+                }
+            }
+        }
+        
+        // Process day data
+        const dayData = this.processAggregatedWeatherData(dayValues);
+        
+        // Process night data
+        const nightData = this.processAggregatedWeatherData(nightValues);
+        
+        return { dayData, nightData };
+    }
+    
+    /**
+     * Process aggregated weather data (common logic for both day and night)
+     *
+     * @param weatherValues Weather data arrays
+     * @returns Processed weather data
+     */
+    private processAggregatedWeatherData(weatherValues: Record<string, (string | number | null)[]>): Partial<BrightskyDayNightData> {
+        const result: Partial<BrightskyDayNightData> = {};
+        
+        for (const key of Object.keys(weatherValues)) {
+            const k = key as keyof BrightskyWeather;
+            
+            switch (k) {
+                case 'precipitation':
+                case 'wind_gust_speed':
+                case 'precipitation_probability':
+                case 'precipitation_probability_6h':
+                case 'wind_speed': {
+                    const values = weatherValues[k] as (number | null)[];
+                    if (values && values.length > 0) {
+                        for (let j = 0; j < values.length; j++) {
+                            if (values[j] === null) {
+                                values[j] = 0; // Set null values to 0
+                            }
+                        }
+                    }
+                }
+            }
+            
+            switch (k) {
+                case 'timestamp': {
+                    result.timestamp = weatherValues.timestamp[0] as string;
+                    break;
+                }
+                case 'source_id': {
+                    result.source_id = weatherValues.source_id[0] as number;
+                    break;
+                }
+                case 'precipitation':
+                case 'wind_speed':
+                case 'solar':
+                case 'temperature': {
+                    const values = weatherValues[k] as (number | null)[];
+                    if (values && values.length > 0) {
+                        const min = Math.min(...(values.filter(v => v !== null) as number[]));
+                        const max = Math.max(...(values.filter(v => v !== null) as number[]));
+
+                        if (k !== 'solar') {
+                            (result as any)[`${k}_min`] = min !== Infinity ? min : null;
+                        }
+                        (result as any)[`${k}_max`] = max !== -Infinity ? max : null;
+                    } else {
+                        if (k !== 'solar') {
+                            (result as any)[`${k}_min`] = null;
+                        }
+                        (result as any)[`${k}_max`] = null;
+                    }
+                }
+                // eslint-disable-next-line no-fallthrough
+                case 'sunshine': {
+                    if (k === 'precipitation' || k === 'sunshine' || k === 'solar') {
+                        const t = weatherValues[k].reduce((sum, value) => {
+                            if (typeof sum !== 'number') {
+                                sum = 0; // Initialize sum to 0 if it's not a number
+                            }
+                            if (value != null && typeof value === 'number') {
+                                return sum + value;
+                            }
+                            return sum;
+                        }, 0);
+                        result[k] = null;
+                        if (t !== null && typeof t === 'number') {
+                            result[k] = k !== 'solar' ? Math.round(t * 10) / 10 : Math.round(t * 1000) / 1000;
+                        }
+                        break;
+                    }
+                }
+                // eslint-disable-next-line no-fallthrough
+                case 'wind_direction':
+                case 'cloud_cover':
+                case 'dew_point':
+                case 'relative_humidity':
+                case 'visibility':
+                case 'wind_gust_direction':
+                case 'wind_gust_speed':
+                case 'precipitation_probability':
+                case 'precipitation_probability_6h': {
+                    const values = weatherValues[k] as (number | null)[];
+                    if (values && values.length > 0) {
+                        if (values && values.length > 0) {
+                            let median: number | null = null;
+                            if (values.filter(v => v !== null).length > 0) {
+                                const sortedValues = values
+                                    .filter(v => v !== null)
+                                    .sort((a, b) => (a as number) - (b as number));
+                                const mid = Math.floor(sortedValues.length / 2);
+                                if (sortedValues.length % 2 === 0) {
+                                    median = ((sortedValues[mid - 1] as number) + (sortedValues[mid] as number)) / 2;
+                                } else {
+                                    median = sortedValues[mid] as number;
+                                }
+                            }
+                            let avg = values.reduce((sum, value) => {
+                                if (value != null) {
+                                    return sum == null ? 0 + (value as number) : (sum as number) + (value as number);
+                                }
+                                return sum;
+                            }, 0);
+                            if (avg != null) {
+                                if (values.filter(v => v !== null).length > 2) {
+                                    avg = Math.round((avg as number / values.filter(v => v !== null).length) * 10) / 10;
+                                } else {
+                                    avg = null;
+                                }
+                            }
+                            (result as any)[`${k}_median`] = median;
+                            result[k] = avg as number;
+                        } else {
+                            result[k] = null;
+                            (result as any)[`${k}_median`] = null;
+                        }
+                    }
+                    break;
+                }
+                case 'icon':
+                case 'condition': {
+                    const tempArr: { value: string | number; count: number }[] = [];
+                    for (const value of weatherValues[k]) {
+                        if (value) {
+                            const index = tempArr.findIndex(el => el.value === value);
+                            if (index !== -1) {
+                                tempArr[index].count++;
+                            } else {
+                                tempArr.push({ value, count: 1 });
+                            }
+                        }
+                    }
+                    tempArr.sort((a, b) => b.count - a.count);
+                    if (tempArr.length > 0) {
+                        if (k === 'icon') {
+                            tempArr[0].value = (tempArr[0].value as string).replace('-night', '-day');
+                        }
+                        result[k] = tempArr[0].value as string;
+                    } else {
+                        result[k] = null;
+                    }
+                    result.icon_special = this.pickDailyWeatherIcon({
+                        condition: weatherValues.condition as (string | null | undefined)[],
+                        wind_speed: weatherValues.wind_speed as (number | null | undefined)[],
+                        precipitation: weatherValues.precipitation as (number | null | undefined)[],
+                        cloud_cover: weatherValues.cloud_cover as (number | null | undefined)[],
+                    });
+                    break;
+                }
+                case 'pressure_msl': {
+                    const values = weatherValues[k] as (number | null)[];
+                    if (values && values.length > 0) {
+                        let median: number | null = null;
+                        if (values.filter(v => v !== null).length > 0) {
+                            const sortedValues = values
+                                .filter(v => v !== null)
+                                .sort((a, b) => (a as number) - (b as number));
+                            const mid = Math.floor(sortedValues.length / 2);
+                            if (sortedValues.length % 2 === 0) {
+                                median = ((sortedValues[mid - 1] as number) + (sortedValues[mid] as number)) / 2;
+                            } else {
+                                median = sortedValues[mid] as number;
+                            }
+                        }
+                        let avg = values.reduce((sum, value) => {
+                            if (value != null) {
+                                return sum == null ? 0 + (value as number) : (sum as number) + (value as number);
+                            }
+                            return sum;
+                        }, 0);
+                        if (avg != null && values.filter(v => v !== null).length > 2) {
+                            avg = Math.round((avg as number / values.filter(v => v !== null).length) * 10) / 10;
+                        } else {
+                            avg = null;
+                        }
+                        (result as any)[`${k}_median`] = median;
+                        result[k] = avg as number;
+                    } else {
+                        result[k] = null;
+                        (result as any)[`${k}_median`] = null;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        return result;
     }
 }
 
