@@ -32,5 +32,13 @@
     "azimuth": "Azymut (0-360 °)",
     "tilt": "Pochylenie (0-90 °)",
     "efficiency": "Wydajność (0-1)",
-    "area": "Obszar (m²)"
+    "area": "Obszar (m²)",
+    "Inverter1": "Falownik 1",
+    "Inverter2": "Falownik 2",
+    "Inverter3": "Falownik 3",
+    "Inverter4": "Falownik 4",
+    "wr1": "Falownik 1 maks. Power (KW)",
+    "wr2": "Falownik 2 maks. Power (KW)",
+    "wr3": "Falownik 3 maks. Power (KW)",
+    "wr4": "Falownik 4 maks. Power (KW)"
 }

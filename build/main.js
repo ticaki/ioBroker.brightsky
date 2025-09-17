@@ -32,6 +32,7 @@ class Brightsky extends utils.Adapter {
   unload = false;
   posId = "";
   weatherTimeout = [];
+  wrArray = [];
   constructor(options = {}) {
     super({
       ...options,
@@ -45,6 +46,7 @@ class Brightsky extends utils.Adapter {
    * Is called when databases are connected and adapter received configuration.
    */
   async onReady() {
+    var _a, _b, _c, _d;
     await this.setState("info.connection", false, true);
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
@@ -69,6 +71,10 @@ class Brightsky extends utils.Adapter {
       this.log.warn(`Invalid DWD station ID. Using default value of "".`);
       this.config.dwd_station_id = "";
     }
+    this.wrArray.push((_a = this.config.wr1) != null ? _a : 0);
+    this.wrArray.push((_b = this.config.wr2) != null ? _b : 0);
+    this.wrArray.push((_c = this.config.wr3) != null ? _c : 0);
+    this.wrArray.push((_d = this.config.wr4) != null ? _d : 0);
     if (this.config.wmo_station !== "" && this.config.dwd_station_id !== "") {
       this.log.warn(
         "Both WMO station ID and DWD station ID are set. Using DWD station ID for location identification."
@@ -225,7 +231,7 @@ class Brightsky extends utils.Adapter {
                             sum = 0;
                           }
                           if (value) {
-                            const newValue = estimatePVEnergyForHour(
+                            const newValue = this.estimatePVEnergyForHour(
                               value,
                               new Date(weatherArr[i].timestamp[index]),
                               {
@@ -423,7 +429,7 @@ class Brightsky extends utils.Adapter {
             item.solar_estimate = 0;
             item.wind_bearing_text = this.getWindBearingText((_a = item.wind_direction) != null ? _a : void 0);
             if (this.config.position.split(",").length === 2 && this.config.panels.length > 0 && item.solar) {
-              item.solar_estimate = estimatePVEnergyForHour(
+              item.solar_estimate = this.estimatePVEnergyForHour(
                 (_b = item.solar) != null ? _b : 0,
                 item.timestamp,
                 {
@@ -550,7 +556,7 @@ class Brightsky extends utils.Adapter {
    * @param bucket.wind_speed Hourly wind speed values
    * @param bucket.precipitation Hourly precipitation values
    * @param bucket.cloud_cover Hourly cloud cover values
-   * @param bucket.day
+   * @param bucket.day If false, night icons will be used; defaults to true
    * @returns Weather icon string (MDI icon name, day variant only)
    */
   pickDailyWeatherIcon(bucket) {
@@ -846,53 +852,72 @@ class Brightsky extends utils.Adapter {
     }
     return result;
   }
-}
-function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
-  let quarterHoursValueSum = 0;
-  for (let i = 0; i < 4; i++) {
-    const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
-    quarterHoursValueSum += estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels);
-  }
-  return quarterHoursValueSum / 4;
-}
-function estimatePvEnergy(valueWhPerM2, time, coords, panels) {
-  const toRad = (d) => d * Math.PI / 180;
-  const clamp01 = (x) => Math.min(1, Math.max(0, x));
-  const normEff = (pct) => clamp01(pct / 100);
-  const ALBEDO = 0.2;
-  const date = time instanceof Date ? time : new Date(time);
-  const pos = suncalc.getPosition(date, coords.lat, coords.lon);
-  const sunEl = pos.altitude;
-  const sunAzDeg = (pos.azimuth * 180 / Math.PI + 180 + 360) % 360;
-  const sunAz = toRad(sunAzDeg);
-  if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
-    return 0;
-  }
-  const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
-  const diffuseFraction = 1 - beamFraction;
-  let totalWh = 0;
-  for (const p of panels) {
-    const eff = normEff(p.efficiency);
-    if (eff <= 0 || p.area <= 0) {
-      continue;
+  /**
+   * Schätzt die erzeugte elektrische Energie (Wh) für die kommende Stunde.
+   *
+   * @param valueWhPerM2 GHI für die Stunde (Wh/m²) auf horizontaler Ebene
+   * @param time Zeitstempel dieser Stunde (Date | number | string)
+   * @param coords { lat, lon }
+   * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
+   * @returns Wh (elektrisch) für alle Panels zusammen
+   */
+  estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
+    let quarterHoursValueSum = 0;
+    for (let i = 0; i < 4; i++) {
+      const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
+      quarterHoursValueSum += this.estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels, this.wrArray);
     }
-    const tilt = toRad(p.tilt);
-    const az = toRad((p.azimuth % 360 + 360) % 360);
-    const nx = Math.sin(tilt) * Math.sin(az);
-    const ny = Math.sin(tilt) * Math.cos(az);
-    const nz = Math.cos(tilt);
-    const sx = Math.cos(sunEl) * Math.sin(sunAz);
-    const sy = Math.cos(sunEl) * Math.cos(sunAz);
-    const sz = Math.sin(sunEl);
-    const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
-    const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
-    const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
-    const groundRefGain = ALBEDO * (1 - Math.cos(tilt)) / 2;
-    const poaWhPerM2 = valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
-    const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
-    totalWh += elecWh;
+    return quarterHoursValueSum / 4;
   }
-  return totalWh;
+  estimatePvEnergy(valueWhPerM2, time, coords, panels, wrArray) {
+    var _a;
+    const toRad = (d) => d * Math.PI / 180;
+    const clamp01 = (x) => Math.min(1, Math.max(0, x));
+    const normEff = (pct) => clamp01(pct / 100);
+    const ALBEDO = 0.2;
+    const date = time instanceof Date ? time : new Date(time);
+    const pos = suncalc.getPosition(date, coords.lat, coords.lon);
+    const sunEl = pos.altitude;
+    const sunAzDeg = (pos.azimuth * 180 / Math.PI + 180 + 360) % 360;
+    const sunAz = toRad(sunAzDeg);
+    if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
+      return 0;
+    }
+    const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
+    const diffuseFraction = 1 - beamFraction;
+    let totalWh = 0;
+    for (let w = 0; w < wrArray.length && w < 4; w++) {
+      const maxPower = wrArray[w];
+      let totalGroupPower = 0;
+      for (const p of panels) {
+        p.wr = (_a = p.wr) != null ? _a : 0;
+        if (p.wr !== w) {
+          continue;
+        }
+        const eff = normEff(p.efficiency);
+        if (eff <= 0 || p.area <= 0) {
+          continue;
+        }
+        const tilt = toRad(p.tilt);
+        const az = toRad((p.azimuth % 360 + 360) % 360);
+        const nx = Math.sin(tilt) * Math.sin(az);
+        const ny = Math.sin(tilt) * Math.cos(az);
+        const nz = Math.cos(tilt);
+        const sx = Math.cos(sunEl) * Math.sin(sunAz);
+        const sy = Math.cos(sunEl) * Math.cos(sunAz);
+        const sz = Math.sin(sunEl);
+        const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
+        const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
+        const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
+        const groundRefGain = ALBEDO * (1 - Math.cos(tilt)) / 2;
+        const poaWhPerM2 = valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
+        const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
+        totalGroupPower += elecWh;
+      }
+      totalWh += maxPower > 0 ? Math.min(maxPower, totalGroupPower) : totalGroupPower;
+    }
+    return totalWh;
+  }
 }
 if (require.main !== module) {
   module.exports = (options) => new Brightsky(options);

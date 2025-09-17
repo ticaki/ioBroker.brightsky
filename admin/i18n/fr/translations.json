@@ -33,5 +33,13 @@
     "azimuth": "Azimut (0-360 °)",
     "tilt": "Inclinaison (0-90 °)",
     "efficiency": "Efficacité (0-1)",
-    "area": "Zone (m²)"
+    "area": "Zone (m²)",
+    "Inverter1": "Onduleur 1",
+    "Inverter2": "Onduleur 2",
+    "Inverter3": "Onduleur 3",
+    "Inverter4": "Onduleur 4",
+    "wr1": "Onduleur 1 max. Power (KW)",
+    "wr2": "Onduleur 2 max. Power (KW)",
+    "wr3": "Onduleur 3 max. Power (KW)",
+    "wr4": "Onduleur 4 max. Power (KW)"
 }

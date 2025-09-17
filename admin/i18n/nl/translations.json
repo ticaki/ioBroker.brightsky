@@ -35,5 +35,13 @@
     "azimuth": "Azimut (0-360 °)",
     "tilt": "Tilt (0-90 °)",
     "efficiency": "Efficiëntie (0-1)",
-    "area": "Gebied (m²)"
+    "area": "Gebied (m²)",
+    "Inverter1": "Omvormer 1",
+    "Inverter2": "Omvormer 2",
+    "Inverter3": "Omvormer 3",
+    "Inverter4": "Omvormer 4",
+    "wr1": "Omvormer 1 max. Power (kW)",
+    "wr2": "Omvormer 2 max. Power (kW)",
+    "wr3": "Omvormer 3 max. Power (kW)",
+    "wr4": "Omvormer 4 max. Power (kW)"
 }

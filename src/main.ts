@@ -2,6 +2,9 @@
  * Created with @iobroker/create-adapter v2.6.5
  */
 
+type Coords = { lat: number; lon: number };
+
+type Panel = ioBroker.AdapterConfig['panels'][0];
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
@@ -27,6 +30,7 @@ class Brightsky extends utils.Adapter {
     posId: string = '';
     weatherTimeout: (ioBroker.Timeout | null | undefined)[] = [];
 
+    wrArray: number[] = [];
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
@@ -68,6 +72,12 @@ class Brightsky extends utils.Adapter {
             this.log.warn(`Invalid DWD station ID. Using default value of "".`);
             this.config.dwd_station_id = ''; // Default to 0 if invalid
         }
+
+        this.wrArray.push(this.config.wr1 ?? 0);
+        this.wrArray.push(this.config.wr2 ?? 0);
+        this.wrArray.push(this.config.wr3 ?? 0);
+        this.wrArray.push(this.config.wr4 ?? 0);
+
         if (this.config.wmo_station !== '' && this.config.dwd_station_id !== '') {
             this.log.warn(
                 'Both WMO station ID and DWD station ID are set. Using DWD station ID for location identification.',
@@ -243,7 +253,7 @@ class Brightsky extends utils.Adapter {
                                                         sum = 0; // Initialize sum to 0 if it's not a number
                                                     }
                                                     if (value) {
-                                                        const newValue = estimatePVEnergyForHour(
+                                                        const newValue = this.estimatePVEnergyForHour(
                                                             value,
                                                             new Date(weatherArr[i].timestamp[index] as string),
                                                             {
@@ -474,7 +484,7 @@ class Brightsky extends utils.Adapter {
                             this.config.panels.length > 0 &&
                             item.solar
                         ) {
-                            item.solar_estimate = estimatePVEnergyForHour(
+                            item.solar_estimate = this.estimatePVEnergyForHour(
                                 item.solar ?? 0,
                                 item.timestamp,
                                 {
@@ -603,7 +613,7 @@ class Brightsky extends utils.Adapter {
      * @param bucket.wind_speed Hourly wind speed values
      * @param bucket.precipitation Hourly precipitation values
      * @param bucket.cloud_cover Hourly cloud cover values
-     * @param bucket.day
+     * @param bucket.day If false, night icons will be used; defaults to true
      * @returns Weather icon string (MDI icon name, day variant only)
      */
     pickDailyWeatherIcon(bucket: {
@@ -960,113 +970,117 @@ class Brightsky extends utils.Adapter {
 
         return result;
     }
-}
 
-type Panel = {
-    /** Azimut des Panels in Grad, 0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen */
-    azimuth: number;
-    /** Neigung in Grad, 0 = horizontal, 90 = senkrecht */
-    tilt: number;
-    /** Fläche in m² */
-    area: number;
-    /** Wirkungsgrad 0..1 */
-    efficiency: number;
-};
-
-type Coords = { lat: number; lon: number };
-
-/**
- * Schätzt die erzeugte elektrische Energie (Wh) für die kommende Stunde.
- *
- * @param valueWhPerM2 GHI für die Stunde (Wh/m²) auf horizontaler Ebene
- * @param time Zeitstempel dieser Stunde (Date | number | string)
- * @param coords { lat, lon }
- * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
- * @returns Wh (elektrisch) für alle Panels zusammen
- */
-function estimatePVEnergyForHour(
-    valueWhPerM2: number,
-    time: Date | number | string,
-    coords: Coords,
-    panels: Panel[],
-): number {
-    let quarterHoursValueSum = 0;
-    for (let i = 0; i < 4; i++) {
-        const quarterHourTime =
-            time instanceof Date
-                ? new Date(time.getTime() + i * 15 * 60000)
-                : typeof time === 'number'
-                  ? new Date(time + i * 15 * 60000)
-                  : new Date(new Date(time).getTime() + i * 15 * 60000);
-        quarterHoursValueSum += estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels);
+    /**
+     * Schätzt die erzeugte elektrische Energie (Wh) für die kommende Stunde.
+     *
+     * @param valueWhPerM2 GHI für die Stunde (Wh/m²) auf horizontaler Ebene
+     * @param time Zeitstempel dieser Stunde (Date | number | string)
+     * @param coords { lat, lon }
+     * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
+     * @returns Wh (elektrisch) für alle Panels zusammen
+     */
+    estimatePVEnergyForHour(
+        valueWhPerM2: number,
+        time: Date | number | string,
+        coords: Coords,
+        panels: Panel[],
+    ): number {
+        let quarterHoursValueSum = 0;
+        for (let i = 0; i < 4; i++) {
+            const quarterHourTime =
+                time instanceof Date
+                    ? new Date(time.getTime() + i * 15 * 60000)
+                    : typeof time === 'number'
+                      ? new Date(time + i * 15 * 60000)
+                      : new Date(new Date(time).getTime() + i * 15 * 60000);
+            quarterHoursValueSum += this.estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels, this.wrArray);
+        }
+        return quarterHoursValueSum / 4;
     }
-    return quarterHoursValueSum / 4;
-}
-function estimatePvEnergy(valueWhPerM2: number, time: Date | number | string, coords: Coords, panels: Panel[]): number {
-    // ===== Helpers (funktion-lokal) =====
-    const toRad = (d: number): number => (d * Math.PI) / 180;
-    const clamp01 = (x: number): number => Math.min(1, Math.max(0, x));
-    const normEff = (pct: number): number => clamp01(pct / 100); // 0..100% → 0..1
+    estimatePvEnergy(
+        valueWhPerM2: number,
+        time: Date | number | string,
+        coords: Coords,
+        panels: Panel[],
+        wrArray: number[],
+    ): number {
+        // ===== Helpers (funktion-lokal) =====
+        const toRad = (d: number): number => (d * Math.PI) / 180;
+        const clamp01 = (x: number): number => Math.min(1, Math.max(0, x));
+        const normEff = (pct: number): number => clamp01(pct / 100); // 0..100% → 0..1
 
-    // Konstanten (einfaches, robustes Modell)
-    const ALBEDO = 0.2; // Bodenreflexionsfaktor
+        // Konstanten (einfaches, robustes Modell)
+        const ALBEDO = 0.2; // Bodenreflexionsfaktor
 
-    // Sonnenstand holen
-    const date = time instanceof Date ? time : new Date(time);
-    const pos = suncalc.getPosition(date, coords.lat, coords.lon);
-    const sunEl = pos.altitude; // Elevation in rad
-    // SunCalc-Azimut: 0 = Süd, +West; auf 0=N, 90=E normieren:
-    const sunAzDeg = ((pos.azimuth * 180) / Math.PI + 180 + 360) % 360;
-    const sunAz = toRad(sunAzDeg);
+        // Sonnenstand holen
+        const date = time instanceof Date ? time : new Date(time);
+        const pos = suncalc.getPosition(date, coords.lat, coords.lon);
+        const sunEl = pos.altitude; // Elevation in rad
+        // SunCalc-Azimut: 0 = Süd, +West; auf 0=N, 90=E normieren:
+        const sunAzDeg = ((pos.azimuth * 180) / Math.PI + 180 + 360) % 360;
+        const sunAz = toRad(sunAzDeg);
 
-    if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
-        return 0;
-    }
-
-    // Grobe Aufteilung in Direkt/Diffus aus Elevation (ohne externe Daten):
-    const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
-    const diffuseFraction = 1 - beamFraction;
-
-    let totalWh = 0;
-
-    for (const p of panels) {
-        const eff = normEff(p.efficiency);
-        if (eff <= 0 || p.area <= 0) {
-            continue;
+        if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
+            return 0;
         }
 
-        const tilt = toRad(p.tilt);
-        const az = toRad(((p.azimuth % 360) + 360) % 360);
+        // Grobe Aufteilung in Direkt/Diffus aus Elevation (ohne externe Daten):
+        const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
+        const diffuseFraction = 1 - beamFraction;
 
-        // Modulnormalen-Vektor
-        const nx = Math.sin(tilt) * Math.sin(az);
-        const ny = Math.sin(tilt) * Math.cos(az);
-        const nz = Math.cos(tilt);
+        let totalWh = 0;
+        for (let w = 0; w < wrArray.length && w < 4; w++) {
+            const maxPower = wrArray[w]; // kWh
 
-        // Sonnenvektor
-        const sx = Math.cos(sunEl) * Math.sin(sunAz);
-        const sy = Math.cos(sunEl) * Math.cos(sunAz);
-        const sz = Math.sin(sunEl);
+            let totalGroupPower = 0;
 
-        // Einfallswinkel
-        const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
+            for (const p of panels) {
+                p.wr = p.wr ?? 0;
+                if (p.wr !== w) {
+                    continue;
+                }
+                const eff = normEff(p.efficiency);
+                if (eff <= 0 || p.area <= 0) {
+                    continue;
+                }
 
-        // Direktanteil von horizontal → Modulfläche
-        const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
+                const tilt = toRad(p.tilt);
+                const az = toRad(((p.azimuth % 360) + 360) % 360);
 
-        // Diffus isotrop + Bodenreflexion
-        const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
-        const groundRefGain = (ALBEDO * (1 - Math.cos(tilt))) / 2;
+                // Modulnormalen-Vektor
+                const nx = Math.sin(tilt) * Math.sin(az);
+                const ny = Math.sin(tilt) * Math.cos(az);
+                const nz = Math.cos(tilt);
 
-        // POA-Energie (Wh/m²) auf dem Modul für die Stunde
-        const poaWhPerM2 = valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
+                // Sonnenvektor
+                const sx = Math.cos(sunEl) * Math.sin(sunAz);
+                const sy = Math.cos(sunEl) * Math.cos(sunAz);
+                const sz = Math.sin(sunEl);
 
-        // Elektrische Energie
-        const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
-        totalWh += elecWh;
+                // Einfallswinkel
+                const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
+
+                // Direktanteil von horizontal → Modulfläche
+                const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
+
+                // Diffus isotrop + Bodenreflexion
+                const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
+                const groundRefGain = (ALBEDO * (1 - Math.cos(tilt))) / 2;
+
+                // POA-Energie (Wh/m²) auf dem Modul für die Stunde
+                const poaWhPerM2 =
+                    valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
+
+                // Elektrische Energie
+                const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
+                totalGroupPower += elecWh; // max. Wechselrichter-Leistung beachten
+            }
+            totalWh += maxPower > 0 ? Math.min(maxPower, totalGroupPower) : totalGroupPower;
+        }
+
+        return totalWh;
     }
-
-    return totalWh;
 }
 
 if (require.main !== module) {
