@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "news": {
+      "0.3.2": {
+        "en": "Solar estimation calculation revised",
+        "de": "Überarbeitete Berechnung der Solarabschätzung",
+        "ru": "Пересмотрен расчет оценки солнечной энергии",
+        "pt": "Cálculo de estimativa solar revisado",
+        "nl": "Herziene berekening van zonneschijnschatting",
+        "fr": "Calcul de l'estimation solaire révisé",
+        "it": "Calcolo della stima solare rivisto",
+        "es": "Cálculo de estimación solar revisado",
+        "pl": "Przeliczanie szacunkowe energii słonecznej poprawione",
+        "uk": "Перераховано розрахунок оцінки сонячного потенціалу",
+        "zh-cn": "太阳能估算计算已经修订"
+      },
       "0.3.1": {
         "en": "Fixed data evaluation crash when no panels are defined  \nstate name fixed",
         "de": "Behoben: Abbruch der Datenauswertung, wenn keine Panels definiert sind\nState common.name korrigiert",
@@ -28,19 +41,6 @@
         "pl": "Dodano eksperymentalny punkt danych do szacowania energii słonecznej (dziennie i godzinowo); Tekst kierunku wiatru przetłumaczony na język systemowy ioBroker; Dodano nowy punkt danych dla obsługi ikon MDI; Dodano obiekty dzienne i nocne oprócz obiektów codziennych; Ulepszono obsługę dnia i nocy z dedykowanymi ikonami dnia/nocy",
         "uk": "Додано експериментальний датапоінт для оцінки сонячної енергії (щоденно та щогодини); Текст напрямку вітру перекладено мовою системи ioBroker; Додано новий датапоінт для підтримки іконок MDI; Додано денні та нічні об'єкти на додаток до щоденних; Покращена підтримка дня та ночі з окремими іконками дня/ночі",
         "zh-cn": "新增用于太阳能估算（每日和每小时）的实验性数据点；风向文本翻译为 ioBroker 系统语言；新增支持 MDI 图标的数据点；除了每日对象外，还新增白天和夜间对象；改进了昼夜支持，提供专用的昼夜图标"
-      },
-      "0.2.5": {
-        "en": "Add day and night objects in addition to daily objects",
-        "de": "Tag- und Nacht-Objekte zusätzlich zu täglich Objekten hinzufügen",
-        "ru": "Добавить дневные и ночные объекты в дополнение к ежедневным объектам",
-        "pt": "Adicionar objetos diurnos e noturnos além de objetos diários",
-        "nl": "Dag- en nachtobjecten toevoegen naast dagelijkse objecten",
-        "fr": "Ajouter des objets de jour et de nuit en plus des objets quotidiens",
-        "it": "Aggiungi oggetti giorno e notte oltre agli oggetti giornalieri",
-        "es": "Añadir objetos de día y noche además de objetos diarios",
-        "pl": "Dodaj obiekty dzienne i nocne oprócz obiektów codziennych",
-        "uk": "Додати денні та нічні об'єкти на додаток до щоденних об'єктів",
-        "zh-cn": "除了每日对象外，还添加白天和夜间对象"
       },
       "0.2.4": {
         "en": "Create all folders",
