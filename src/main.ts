@@ -993,14 +993,14 @@ function estimatePVEnergyForHour(
                 : typeof time === 'number'
                   ? new Date(time + i * 15 * 60000)
                   : new Date(new Date(time).getTime() + i * 15 * 60000);
-        const quarterHourValue = estimatePvEnergy(valueWhPerM2 / 4, quarterHourTime, coords, panels);
+        const quarterHourValue = estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels);
         if (i === 0) {
             valueWhPerM2 = quarterHourValue;
         } else {
             valueWhPerM2 += quarterHourValue;
         }
     }
-    return valueWhPerM2;
+    return valueWhPerM2 / 4;
 }
 function estimatePvEnergy(valueWhPerM2: number, time: Date | number | string, coords: Coords, panels: Panel[]): number {
     // ===== Helpers (funktion-lokal) =====

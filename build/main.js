@@ -850,14 +850,14 @@ class Brightsky extends utils.Adapter {
 function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
   for (let i = 0; i < 4; i++) {
     const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
-    const quarterHourValue = estimatePvEnergy(valueWhPerM2 / 4, quarterHourTime, coords, panels);
+    const quarterHourValue = estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels);
     if (i === 0) {
       valueWhPerM2 = quarterHourValue;
     } else {
       valueWhPerM2 += quarterHourValue;
     }
   }
-  return valueWhPerM2;
+  return valueWhPerM2 / 4;
 }
 function estimatePvEnergy(valueWhPerM2, time, coords, panels) {
   const toRad = (d) => d * Math.PI / 180;
