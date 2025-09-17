@@ -218,6 +218,7 @@ class Brightsky extends utils.Adapter {
                     if (k !== "solar") {
                       dailyData[`${k}_min`] = min !== Infinity ? min : null;
                     } else {
+                      dailyData.solar_estimate = 0;
                       if (this.config.position.split(",").length === 2 && this.config.panels.length > 0) {
                         dailyData.solar_estimate = values.reduce((sum, value, index) => {
                           if (typeof sum !== "number") {
@@ -419,6 +420,7 @@ class Brightsky extends utils.Adapter {
             if (!item) {
               continue;
             }
+            item.solar_estimate = 0;
             item.wind_bearing_text = this.getWindBearingText((_a = item.wind_direction) != null ? _a : void 0);
             if (this.config.position.split(",").length === 2 && this.config.panels.length > 0) {
               item.solar_estimate = estimatePVEnergyForHour(
@@ -848,7 +850,7 @@ class Brightsky extends utils.Adapter {
 function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
   for (let i = 0; i < 4; i++) {
     const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
-    const quarterHourValue = estimatePvEnergy(valueWhPerM2 / 4, quarterHourTime, coords, panels) / 4;
+    const quarterHourValue = estimatePvEnergy(valueWhPerM2 / 4, quarterHourTime, coords, panels);
     if (i === 0) {
       valueWhPerM2 = quarterHourValue;
     } else {
