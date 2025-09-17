@@ -38,8 +38,8 @@
     "Inverter2": "Wechselrichter 2",
     "Inverter3": "Wechselrichter 3",
     "Inverter4": "Wechselrichter 4",
-    "wr1": "Wechselrichter 1 max. Macht (KW)",
-    "wr2": "Wechselrichter 2 Max. Macht (KW)",
-    "wr3": "Wechselrichter 3 Max. Macht (KW)",
-    "wr4": "Wechselrichter 4 Max. Macht (KW)"
+    "wr1": "Wechselrichter 1 max. Leistung (KW)",
+    "wr2": "Wechselrichter 2 Max. Leistung (KW)",
+    "wr3": "Wechselrichter 3 Max. Leistung (KW)",
+    "wr4": "Wechselrichter 4 Max. Leistung (KW)"
 }
