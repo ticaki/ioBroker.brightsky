@@ -218,12 +218,13 @@ class Brightsky extends utils.Adapter {
                     if (k !== "solar") {
                       dailyData[`${k}_min`] = min !== Infinity ? min : null;
                     } else {
+                      dailyData.solar_estimate = 0;
                       if (this.config.position.split(",").length === 2 && this.config.panels.length > 0) {
                         dailyData.solar_estimate = values.reduce((sum, value, index) => {
                           if (typeof sum !== "number") {
                             sum = 0;
                           }
-                          if (value != null && typeof value === "number") {
+                          if (value) {
                             const newValue = estimatePVEnergyForHour(
                               value,
                               new Date(weatherArr[i].timestamp[index]),
@@ -419,8 +420,9 @@ class Brightsky extends utils.Adapter {
             if (!item) {
               continue;
             }
+            item.solar_estimate = 0;
             item.wind_bearing_text = this.getWindBearingText((_a = item.wind_direction) != null ? _a : void 0);
-            if (this.config.position.split(",").length === 2 && this.config.panels.length > 0) {
+            if (this.config.position.split(",").length === 2 && this.config.panels.length > 0 && item.solar) {
               item.solar_estimate = estimatePVEnergyForHour(
                 (_b = item.solar) != null ? _b : 0,
                 item.timestamp,
@@ -846,16 +848,12 @@ class Brightsky extends utils.Adapter {
   }
 }
 function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
+  let quarterHoursValueSum = 0;
   for (let i = 0; i < 4; i++) {
     const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
-    const quarterHourValue = estimatePvEnergy(valueWhPerM2 / 4, quarterHourTime, coords, panels) / 4;
-    if (i === 0) {
-      valueWhPerM2 = quarterHourValue;
-    } else {
-      valueWhPerM2 += quarterHourValue;
-    }
+    quarterHoursValueSum += estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels);
   }
-  return valueWhPerM2;
+  return quarterHoursValueSum / 4;
 }
 function estimatePvEnergy(valueWhPerM2, time, coords, panels) {
   const toRad = (d) => d * Math.PI / 180;
