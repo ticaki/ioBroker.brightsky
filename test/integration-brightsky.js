@@ -90,15 +90,17 @@ tests.integration(path.join(__dirname, '..'), {
                             }
 
                             // Get all states to see what was created
-                            harness.states.getStates('brightsky.0.*', (err, allStates) => {
+                            // First get the state IDs that match the pattern
+                            harness.dbConnection.getStateIDs('brightsky.0.*').then(stateIds => {
+                                if (stateIds && stateIds.length > 0) {
+                                    harness.states.getStates(stateIds, (err, allStates) => {
                                 if (err) {
                                     console.error('❌ Error getting states:', err);
                                     resolve();
                                     return;
                                 }
 
-                                const stateKeys = Object.keys(allStates || {});
-                                const stateCount = stateKeys.length;
+                                const stateCount = stateIds.length;
                                 
                                 console.log(`📊 Found ${stateCount} total states created by adapter`);
 
@@ -107,13 +109,13 @@ tests.integration(path.join(__dirname, '..'), {
                                     
                                     // Show sample of created states
                                     console.log('📋 Sample states created:');
-                                    stateKeys.slice(0, 10).forEach(key => {
-                                        const state = allStates[key];
-                                        console.log(`   ${key}: ${state.val}`);
+                                    stateIds.slice(0, 10).forEach((stateId, index) => {
+                                        const state = allStates[index];
+                                        console.log(`   ${stateId}: ${state && state.val !== undefined ? state.val : 'undefined'}`);
                                     });
 
                                     // Check for specific weather states
-                                    const weatherStates = stateKeys.filter(key => 
+                                    const weatherStates = stateIds.filter(key => 
                                         key.includes('temperature') || 
                                         key.includes('condition') || 
                                         key.includes('cloud_cover') ||
@@ -122,31 +124,33 @@ tests.integration(path.join(__dirname, '..'), {
 
                                     if (weatherStates.length > 0) {
                                         console.log(`✅ Found ${weatherStates.length} weather-specific datapoints:`);
-                                        weatherStates.slice(0, 5).forEach(key => {
-                                            console.log(`   📊 ${key}: ${allStates[key].val}`);
+                                        weatherStates.slice(0, 5).forEach(stateId => {
+                                            const index = stateIds.indexOf(stateId);
+                                            const state = allStates[index];
+                                            console.log(`   📊 ${stateId}: ${state && state.val !== undefined ? state.val : 'undefined'}`);
                                         });
                                     }
 
                                     // Check for current weather states
-                                    const currentStates = stateKeys.filter(key => key.includes('current'));
+                                    const currentStates = stateIds.filter(key => key.includes('current'));
                                     if (currentStates.length > 0) {
                                         console.log(`✅ Found ${currentStates.length} current weather datapoints`);
                                     }
 
                                     // Check for hourly weather states
-                                    const hourlyStates = stateKeys.filter(key => key.includes('hourly'));
+                                    const hourlyStates = stateIds.filter(key => key.includes('hourly'));
                                     if (hourlyStates.length > 0) {
                                         console.log(`✅ Found ${hourlyStates.length} hourly weather datapoints`);
                                     }
 
                                     // Check for daily weather states
-                                    const dailyStates = stateKeys.filter(key => key.includes('daily'));
+                                    const dailyStates = stateIds.filter(key => key.includes('daily'));
                                     if (dailyStates.length > 0) {
                                         console.log(`✅ Found ${dailyStates.length} daily weather datapoints`);
                                     }
 
                                     // Check for source information
-                                    const sourceStates = stateKeys.filter(key => key.includes('sources'));
+                                    const sourceStates = stateIds.filter(key => key.includes('sources'));
                                     if (sourceStates.length > 0) {
                                         console.log(`✅ Found ${sourceStates.length} weather source datapoints`);
                                     }
@@ -169,6 +173,14 @@ tests.integration(path.join(__dirname, '..'), {
                                     console.log('❌ No states created by adapter');
                                 }
 
+                                resolve();
+                            });
+                            } else {
+                                console.log('❌ No states found with pattern brightsky.0.*');
+                                resolve();
+                            }
+                            }).catch(err => {
+                                console.error('❌ Error getting state IDs:', err);
                                 resolve();
                             });
                         });
