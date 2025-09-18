@@ -242,6 +242,8 @@ npm run test         # All tests
 
 **IMPORTANT**: Use the official `@iobroker/testing` framework for all integration tests. This is the ONLY correct way to test ioBroker adapters.
 
+**Official Documentation**: https://github.com/ioBroker/testing
+
 ##### Framework Structure
 Integration tests MUST follow this exact pattern:
 
