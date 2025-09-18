@@ -83,6 +83,10 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) update current at sunrise and sunset (unless custom interval is too large)
+- (ticaki) added inverter limiting
+
 ### 0.3.2 (2025-09-17)
 - (ticaki) Solar estimation calculation revised
 

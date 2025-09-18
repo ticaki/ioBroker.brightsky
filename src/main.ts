@@ -10,7 +10,7 @@ type Panel = ioBroker.AdapterConfig['panels'][0];
 import * as utils from '@iobroker/adapter-core';
 import axios from 'axios';
 import { Library } from './lib/library';
-import type { BrightskyHourly } from './lib/definition';
+import type { BrightskyCurrently, BrightskyHourly } from './lib/definition';
 import {
     genericStateObjects,
     type BrightskyDailyData,
@@ -387,7 +387,6 @@ class Brightsky extends utils.Adapter {
                                     dailyData.icon_special = this.pickDailyWeatherIcon({
                                         condition: weatherArr[i].condition as (string | null | undefined)[],
                                         wind_speed: weatherArr[i].wind_speed as (number | null | undefined)[],
-                                        precipitation: weatherArr[i].precipitation as (number | null | undefined)[],
                                         cloud_cover: weatherArr[i].cloud_cover as (number | null | undefined)[],
                                     });
                                     break;
@@ -441,12 +440,21 @@ class Brightsky extends utils.Adapter {
         }
         await this.weatherCurrentlyUpdate();
 
-        this.weatherTimeout[0] = this.setTimeout(
-            () => {
-                void this.weatherCurrentlyLoop();
-            },
-            this.config.pollIntervalCurrently * 60000 + Math.ceil(Math.random() * 8000),
-        );
+        let nextInterval = this.config.pollIntervalCurrently * 60000 + Math.ceil(Math.random() * 8000);
+
+        const coords = this.config.position.split(',').map(parseFloat);
+        const { sunrise, sunset } = suncalc.getTimes(new Date(), coords[0], coords[1]);
+
+        const now = Date.now();
+        const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
+
+        if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
+            nextInterval = testTime.getTime() - now + 30000 + Math.ceil(Math.random() * 5000);
+        }
+
+        this.weatherTimeout[0] = this.setTimeout(() => {
+            void this.weatherCurrentlyLoop();
+        }, nextInterval);
     }
 
     async weatherHourlyLoop(): Promise<void> {
@@ -533,16 +541,21 @@ class Brightsky extends utils.Adapter {
             if (result.data) {
                 this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
                 if (result.data.weather) {
-                    result.data.weather.wind_bearing_text = this.getWindBearingText(
-                        result.data.weather.wind_direction_10 ?? undefined,
-                    );
-                    await this.library.writeFromJson(
-                        'current',
-                        'weather.current',
-                        genericStateObjects,
-                        result.data.weather,
-                        true,
-                    );
+                    const weather = result.data.weather as BrightskyCurrently;
+                    weather.wind_bearing_text = this.getWindBearingText(weather.wind_direction_10 ?? undefined);
+
+                    const coords = this.config.position.split(',').map(parseFloat);
+                    const { sunrise, sunset } = suncalc.getTimes(new Date(), coords[0], coords[1]);
+                    const now = new Date();
+                    const isDayTime = now >= sunrise && now <= sunset;
+
+                    weather.icon_special = this.pickDailyWeatherIcon({
+                        condition: [weather.condition],
+                        wind_speed: [weather.wind_speed_10],
+                        cloud_cover: [weather.cloud_cover],
+                        day: isDayTime,
+                    });
+                    await this.library.writeFromJson('current', 'weather.current', genericStateObjects, weather, true);
                     await this.library.writedp(
                         'current.sources',
                         undefined,
@@ -611,7 +624,6 @@ class Brightsky extends utils.Adapter {
      * @param bucket Aggregated hourly data for one day
      * @param bucket.condition Hourly condition values
      * @param bucket.wind_speed Hourly wind speed values
-     * @param bucket.precipitation Hourly precipitation values
      * @param bucket.cloud_cover Hourly cloud cover values
      * @param bucket.day If false, night icons will be used; defaults to true
      * @returns Weather icon string (MDI icon name, day variant only)
@@ -619,7 +631,6 @@ class Brightsky extends utils.Adapter {
     pickDailyWeatherIcon(bucket: {
         condition: (string | null | undefined)[];
         wind_speed: (number | null | undefined)[];
-        precipitation?: (number | null | undefined)[];
         cloud_cover?: (number | null | undefined)[];
         day?: boolean;
     }): string {
@@ -925,7 +936,6 @@ class Brightsky extends utils.Adapter {
                     result.icon_special = this.pickDailyWeatherIcon({
                         condition: weatherValues.condition as (string | null | undefined)[],
                         wind_speed: weatherValues.wind_speed as (number | null | undefined)[],
-                        precipitation: weatherValues.precipitation as (number | null | undefined)[],
                         cloud_cover: weatherValues.cloud_cover as (number | null | undefined)[],
                         day: weatherValues.day,
                     });

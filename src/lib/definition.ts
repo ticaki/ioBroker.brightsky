@@ -914,7 +914,7 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         _id: 'icon_special',
         type: 'state',
         common: {
-            name: 'Special Weather Icon',
+            name: 'Weather Icon(mdi)',
             type: 'string',
             role: 'weather.icon.name',
             read: true,
@@ -1289,6 +1289,18 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
+            icon_special: {
+                _id: 'icon_special',
+                type: 'state',
+                common: {
+                    name: 'Weather Icon(mdi)',
+                    type: 'string',
+                    role: 'weather.icon.name',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
             wind_bearing_text: {
                 _id: '',
                 type: 'state',
@@ -1583,7 +1595,7 @@ export type BrightskyHourly = {
 
 export type BrightskyCurrentlyFallback = {
     cloud_cover: number;
-    condition: number;
+    condition: string;
     solar_10: number;
     solar_30: number;
     solar_60: number;
@@ -1616,7 +1628,7 @@ export type BrightskyCurrently = {
     wind_speed_10: number;
     wind_speed_30: number;
     wind_speed_60: number;
-
+    icon_special?: string;
     temperature: number;
     fallback_source_ids: BrightskyCurrentlyFallback;
     icon: string;
