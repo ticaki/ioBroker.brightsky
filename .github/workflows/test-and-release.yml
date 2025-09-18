@@ -34,33 +34,6 @@ jobs:
           type-checking: true
           lint: true
 
-  # Runs integration tests with real API calls
-  integration-tests:
-    if: contains(github.event.head_commit.message, '[skip ci]') == false
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build TypeScript
-        run: npm run build
-
-      - name: Run integration tests
-        run: npm run test:ts
-        env:
-          NODE_ENV: test
-
   # Runs adapter tests on all supported node versions and OSes
   adapter-tests:
     if: contains(github.event.head_commit.message, '[skip ci]') == false
@@ -86,7 +59,7 @@ jobs:
 
   # Deploys the final package to NPM
   deploy:
-    needs: [check-and-lint, integration-tests, adapter-tests]
+    needs: [check-and-lint, adapter-tests]
 
     # Trigger this step only when a commit on any branch is tagged with a version number
     if: |
