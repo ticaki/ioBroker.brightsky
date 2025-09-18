@@ -32,6 +32,7 @@ class Brightsky extends utils.Adapter {
   unload = false;
   posId = "";
   weatherTimeout = [];
+  groupArray = [];
   wrArray = [];
   constructor(options = {}) {
     super({
@@ -46,7 +47,7 @@ class Brightsky extends utils.Adapter {
    * Is called when databases are connected and adapter received configuration.
    */
   async onReady() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     await this.setState("info.connection", false, true);
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
@@ -75,6 +76,17 @@ class Brightsky extends utils.Adapter {
     this.wrArray.push((_b = this.config.wr2) != null ? _b : 0);
     this.wrArray.push((_c = this.config.wr3) != null ? _c : 0);
     this.wrArray.push((_d = this.config.wr4) != null ? _d : 0);
+    this.wrArray.forEach(() => {
+      this.groupArray.push([]);
+    });
+    if (this.config.panels) {
+      for (const p of this.config.panels) {
+        const wr = ((_e = p.wr) != null ? _e : 0) | 0;
+        if (wr >= 0 && wr < this.wrArray.length) {
+          this.groupArray[wr].push(p);
+        }
+      }
+    }
     if (this.config.wmo_station !== "" && this.config.dwd_station_id !== "") {
       this.log.warn(
         "Both WMO station ID and DWD station ID are set. Using DWD station ID for location identification."
@@ -891,10 +903,10 @@ class Brightsky extends utils.Adapter {
     const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
     const diffuseFraction = 1 - beamFraction;
     let totalWh = 0;
-    for (let w = 0; w < wrArray.length && w < 4; w++) {
+    for (let w = 0; w < this.wrArray.length; w++) {
       const maxPower = wrArray[w];
       let totalGroupPower = 0;
-      for (const p of panels) {
+      for (const p of this.groupArray[w]) {
         p.wr = (_a = p.wr) != null ? _a : 0;
         if (p.wr !== w) {
           continue;

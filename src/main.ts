@@ -30,6 +30,7 @@ class Brightsky extends utils.Adapter {
     posId: string = '';
     weatherTimeout: (ioBroker.Timeout | null | undefined)[] = [];
 
+    groupArray: Panel[][] = [];
     wrArray: number[] = [];
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -77,6 +78,17 @@ class Brightsky extends utils.Adapter {
         this.wrArray.push(this.config.wr2 ?? 0);
         this.wrArray.push(this.config.wr3 ?? 0);
         this.wrArray.push(this.config.wr4 ?? 0);
+        this.wrArray.forEach(() => {
+            this.groupArray.push([]);
+        });
+        if (this.config.panels) {
+            for (const p of this.config.panels) {
+                const wr = (p.wr ?? 0) | 0; // default 0; ensure int
+                if (wr >= 0 && wr < this.wrArray.length) {
+                    this.groupArray[wr].push(p);
+                }
+            }
+        }
 
         if (this.config.wmo_station !== '' && this.config.dwd_station_id !== '') {
             this.log.warn(
@@ -1040,12 +1052,11 @@ class Brightsky extends utils.Adapter {
         const diffuseFraction = 1 - beamFraction;
 
         let totalWh = 0;
-        for (let w = 0; w < wrArray.length && w < 4; w++) {
-            const maxPower = wrArray[w]; // kWh
-
+        for (let w = 0; w < this.wrArray.length; w++) {
+            const maxPower = wrArray[w];
             let totalGroupPower = 0;
 
-            for (const p of panels) {
+            for (const p of this.groupArray[w]) {
                 p.wr = p.wr ?? 0;
                 if (p.wr !== w) {
                     continue;
