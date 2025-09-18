@@ -33,6 +33,7 @@
     "tilt": "Tilt (0-90°)",
     "efficiency": "Efficiency (0-1)",
     "area": "Area (m²)",
+    "__wr": "Inverter",
     "Inverter1": "Inverter 1",
     "Inverter2": "Inverter 2",
     "Inverter3": "Inverter 3",

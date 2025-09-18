@@ -40,5 +40,6 @@
     "wr1": "Falownik 1 maks. Power (KW)",
     "wr2": "Falownik 2 maks. Power (KW)",
     "wr3": "Falownik 3 maks. Power (KW)",
-    "wr4": "Falownik 4 maks. Power (KW)"
+    "wr4": "Falownik 4 maks. Power (KW)",
+    "__wr": "Falownik"
 }

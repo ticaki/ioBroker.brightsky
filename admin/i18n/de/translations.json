@@ -41,5 +41,6 @@
     "wr1": "Wechselrichter 1 max. Leistung (KW)",
     "wr2": "Wechselrichter 2 Max. Leistung (KW)",
     "wr3": "Wechselrichter 3 Max. Leistung (KW)",
-    "wr4": "Wechselrichter 4 Max. Leistung (KW)"
+    "wr4": "Wechselrichter 4 Max. Leistung (KW)",
+    "__wr": "Wechselrichter"
 }

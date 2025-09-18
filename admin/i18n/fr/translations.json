@@ -41,5 +41,6 @@
     "wr1": "Onduleur 1 max. Power (KW)",
     "wr2": "Onduleur 2 max. Power (KW)",
     "wr3": "Onduleur 3 max. Power (KW)",
-    "wr4": "Onduleur 4 max. Power (KW)"
+    "wr4": "Onduleur 4 max. Power (KW)",
+    "__wr": "Onduleur"
 }

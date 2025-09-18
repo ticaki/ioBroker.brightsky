@@ -41,5 +41,6 @@
     "wr1": "Inverter 1 Max. Potenza (KW)",
     "wr2": "Inverter 2 Max. Potenza (KW)",
     "wr3": "Inverter 3 Max. Potenza (KW)",
-    "wr4": "Inverter 4 Max. Potenza (KW)"
+    "wr4": "Inverter 4 Max. Potenza (KW)",
+    "__wr": "Inverter"
 }
