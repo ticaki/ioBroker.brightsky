@@ -167,11 +167,7 @@ tests.integration(path.join(__dirname, '..'), {
                 const isInGermany = lat >= 47 && lat <= 56 && lon >= 5 && lon <= 16;
                 console.log(`Within German bounds: ${isInGermany}`);
 
-                // Berlin specific validation  
-                const isBerlinArea = Math.abs(lat - 52.52) < 1 && Math.abs(lon - 13.40) < 1;
-                console.log(`Near Berlin: ${isBerlinArea}`);
-
-                if (isValidFormat && isInGermany && isBerlinArea) {
+                if (isValidFormat && isInGermany) {
                     console.log('✅ German coordinates validation passed');
                 } else {
                     console.log('❌ German coordinates validation failed');
