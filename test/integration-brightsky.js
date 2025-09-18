@@ -1,3 +1,6 @@
+// Load test setup FIRST to configure mocking for offline testing
+require('./test-setup');
+
 const path = require('path');
 const { tests } = require('@iobroker/testing');
 
@@ -8,7 +11,7 @@ const GERMAN_COORDINATES = '52.520008,13.404954';
 tests.integration(path.join(__dirname, '..'), {
     // Define additional tests that test the adapter with German coordinates
     defineAdditionalTests({ suite }) {
-        // Test suite for German coordinates functionality
+        // Test suite for German coordinates functionality using offline data
         suite('Test adapter with German coordinates - complete workflow', (getHarness) => {
             let harness;
             
@@ -16,12 +19,12 @@ tests.integration(path.join(__dirname, '..'), {
                 harness = getHarness();
             });
 
-            it('should start adapter with German coordinates, fetch data, and write states', () => new Promise(async (resolve) => {
+            it('should start adapter with German coordinates, fetch data, and write states', () => new Promise(async (resolve, reject) => {
                 // Configure adapter with German coordinates  
                 harness.objects.getObject('system.adapter.brightsky.0', async (err, obj) => {
                     if (err) {
                         console.error('Error getting adapter object:', err);
-                        resolve();
+                        reject(err);
                         return;
                     }
 
@@ -38,8 +41,9 @@ tests.integration(path.join(__dirname, '..'), {
                     obj.native.wmo_station = '';
                     obj.native.panels = [];
 
-                    console.log('\n=== ADAPTER INTEGRATION TEST START ===');
+                    console.log('\n=== ADAPTER INTEGRATION TEST START (OFFLINE MODE) ===');
                     console.log('✅ Step 1: Configuring adapter with German coordinates:', GERMAN_COORDINATES);
+                    console.log('📦 Using offline test data (no real API calls)');
 
                     // First, create the connection state object that the adapter expects
                     try {
@@ -76,7 +80,7 @@ tests.integration(path.join(__dirname, '..'), {
                     console.log('✅ Step 3: Adapter started successfully');
 
                     // Give adapter time to fetch data and write states
-                    console.log('⏳ Step 4: Waiting for adapter to fetch weather data and write states...');
+                    console.log('⏳ Step 4: Waiting for adapter to process offline data and write states...');
                     
                     setTimeout(() => {
                         console.log('🔍 Step 5: Verifying weather data was written to states...');
@@ -90,15 +94,17 @@ tests.integration(path.join(__dirname, '..'), {
                             }
 
                             // Get all states to see what was created
-                            harness.states.getStates('brightsky.0.*', (err, allStates) => {
-                                if (err) {
-                                    console.error('❌ Error getting states:', err);
-                                    resolve();
-                                    return;
-                                }
+                            // First get the state IDs that match the pattern
+                            harness.dbConnection.getStateIDs('brightsky.0.*').then(stateIds => {
+                                if (stateIds && stateIds.length > 0) {
+                                    harness.states.getStates(stateIds, (err, allStates) => {
+                                        if (err) {
+                                            console.error('❌ Error getting states:', err);
+                                            reject(err); // Properly fail the test instead of just resolving
+                                            return;
+                                        }
 
-                                const stateKeys = Object.keys(allStates || {});
-                                const stateCount = stateKeys.length;
+                                const stateCount = stateIds.length;
                                 
                                 console.log(`📊 Found ${stateCount} total states created by adapter`);
 
@@ -107,13 +113,13 @@ tests.integration(path.join(__dirname, '..'), {
                                     
                                     // Show sample of created states
                                     console.log('📋 Sample states created:');
-                                    stateKeys.slice(0, 10).forEach(key => {
-                                        const state = allStates[key];
-                                        console.log(`   ${key}: ${state.val}`);
+                                    stateIds.slice(0, 10).forEach((stateId, index) => {
+                                        const state = allStates[index];
+                                        console.log(`   ${stateId}: ${state && state.val !== undefined ? state.val : 'undefined'}`);
                                     });
 
                                     // Check for specific weather states
-                                    const weatherStates = stateKeys.filter(key => 
+                                    const weatherStates = stateIds.filter(key => 
                                         key.includes('temperature') || 
                                         key.includes('condition') || 
                                         key.includes('cloud_cover') ||
@@ -122,54 +128,67 @@ tests.integration(path.join(__dirname, '..'), {
 
                                     if (weatherStates.length > 0) {
                                         console.log(`✅ Found ${weatherStates.length} weather-specific datapoints:`);
-                                        weatherStates.slice(0, 5).forEach(key => {
-                                            console.log(`   📊 ${key}: ${allStates[key].val}`);
+                                        weatherStates.slice(0, 5).forEach(stateId => {
+                                            const index = stateIds.indexOf(stateId);
+                                            const state = allStates[index];
+                                            console.log(`   📊 ${stateId}: ${state && state.val !== undefined ? state.val : 'undefined'}`);
                                         });
                                     }
 
                                     // Check for current weather states
-                                    const currentStates = stateKeys.filter(key => key.includes('current'));
+                                    const currentStates = stateIds.filter(key => key.includes('current'));
                                     if (currentStates.length > 0) {
                                         console.log(`✅ Found ${currentStates.length} current weather datapoints`);
                                     }
 
                                     // Check for hourly weather states
-                                    const hourlyStates = stateKeys.filter(key => key.includes('hourly'));
+                                    const hourlyStates = stateIds.filter(key => key.includes('hourly'));
                                     if (hourlyStates.length > 0) {
                                         console.log(`✅ Found ${hourlyStates.length} hourly weather datapoints`);
                                     }
 
                                     // Check for daily weather states
-                                    const dailyStates = stateKeys.filter(key => key.includes('daily'));
+                                    const dailyStates = stateIds.filter(key => key.includes('daily'));
                                     if (dailyStates.length > 0) {
                                         console.log(`✅ Found ${dailyStates.length} daily weather datapoints`);
                                     }
 
                                     // Check for source information
-                                    const sourceStates = stateKeys.filter(key => key.includes('sources'));
+                                    const sourceStates = stateIds.filter(key => key.includes('sources'));
                                     if (sourceStates.length > 0) {
                                         console.log(`✅ Found ${sourceStates.length} weather source datapoints`);
                                     }
 
                                     console.log('\n🎉 === INTEGRATION TEST SUMMARY ===');
                                     console.log(`✅ Adapter initialized with German coordinates: ${GERMAN_COORDINATES}`);
-                                    console.log(`✅ Adapter started successfully`);
+                                    console.log(`✅ Adapter started successfully using offline test data`);
                                     console.log(`✅ Adapter created ${stateCount} total datapoints`);
                                     console.log(`✅ Weather-specific datapoints: ${weatherStates.length}`);
                                     
                                     if (connectionState && connectionState.val === true) {
-                                        console.log(`✅ API calls successful - real weather data downloaded and written to states`);
+                                        console.log(`✅ Offline data processing successful`);
                                     } else {
-                                        console.log(`⚠️  API calls may have failed, but adapter structure was created successfully`);
+                                        console.log(`⚠️  Connection state indicates potential issue, but adapter structure was created successfully`);
                                     }
                                     
+                                    console.log(`✅ No real API calls were made - all data from offline test files`);
                                     console.log(`✅ Integration test completed successfully\n`);
 
                                 } else {
                                     console.log('❌ No states created by adapter');
+                                    reject(new Error('No states were created by the adapter'));
+                                    return;
                                 }
 
                                 resolve();
+                            });
+                            } else {
+                                console.log('❌ No states found with pattern brightsky.0.*');
+                                reject(new Error('No states found matching pattern brightsky.0.*'));
+                            }
+                            }).catch(err => {
+                                console.error('❌ Error getting state IDs:', err);
+                                reject(err); // Properly fail the test
                             });
                         });
                     }, 15000); // Wait 15 seconds for data fetching
@@ -197,6 +216,7 @@ tests.integration(path.join(__dirname, '..'), {
                     console.log('✅ German coordinates validation passed');
                 } else {
                     console.log('❌ German coordinates validation failed');
+                    throw new Error('German coordinates validation failed');
                 }
 
                 console.log('=== COORDINATE VALIDATION COMPLETE ===\n');
