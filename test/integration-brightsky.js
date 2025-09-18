@@ -1,3 +1,6 @@
+// Load test setup FIRST to configure mocking for offline testing
+require('./test-setup');
+
 const path = require('path');
 const { tests } = require('@iobroker/testing');
 
@@ -8,7 +11,7 @@ const GERMAN_COORDINATES = '52.520008,13.404954';
 tests.integration(path.join(__dirname, '..'), {
     // Define additional tests that test the adapter with German coordinates
     defineAdditionalTests({ suite }) {
-        // Test suite for German coordinates functionality
+        // Test suite for German coordinates functionality using offline data
         suite('Test adapter with German coordinates - complete workflow', (getHarness) => {
             let harness;
             
@@ -16,12 +19,12 @@ tests.integration(path.join(__dirname, '..'), {
                 harness = getHarness();
             });
 
-            it('should start adapter with German coordinates, fetch data, and write states', () => new Promise(async (resolve) => {
+            it('should start adapter with German coordinates, fetch data, and write states', () => new Promise(async (resolve, reject) => {
                 // Configure adapter with German coordinates  
                 harness.objects.getObject('system.adapter.brightsky.0', async (err, obj) => {
                     if (err) {
                         console.error('Error getting adapter object:', err);
-                        resolve();
+                        reject(err);
                         return;
                     }
 
@@ -38,8 +41,9 @@ tests.integration(path.join(__dirname, '..'), {
                     obj.native.wmo_station = '';
                     obj.native.panels = [];
 
-                    console.log('\n=== ADAPTER INTEGRATION TEST START ===');
+                    console.log('\n=== ADAPTER INTEGRATION TEST START (OFFLINE MODE) ===');
                     console.log('✅ Step 1: Configuring adapter with German coordinates:', GERMAN_COORDINATES);
+                    console.log('📦 Using offline test data (no real API calls)');
 
                     // First, create the connection state object that the adapter expects
                     try {
@@ -76,7 +80,7 @@ tests.integration(path.join(__dirname, '..'), {
                     console.log('✅ Step 3: Adapter started successfully');
 
                     // Give adapter time to fetch data and write states
-                    console.log('⏳ Step 4: Waiting for adapter to fetch weather data and write states...');
+                    console.log('⏳ Step 4: Waiting for adapter to process offline data and write states...');
                     
                     setTimeout(() => {
                         console.log('🔍 Step 5: Verifying weather data was written to states...');
@@ -94,11 +98,11 @@ tests.integration(path.join(__dirname, '..'), {
                             harness.dbConnection.getStateIDs('brightsky.0.*').then(stateIds => {
                                 if (stateIds && stateIds.length > 0) {
                                     harness.states.getStates(stateIds, (err, allStates) => {
-                                if (err) {
-                                    console.error('❌ Error getting states:', err);
-                                    resolve();
-                                    return;
-                                }
+                                        if (err) {
+                                            console.error('❌ Error getting states:', err);
+                                            reject(err); // Properly fail the test instead of just resolving
+                                            return;
+                                        }
 
                                 const stateCount = stateIds.length;
                                 
@@ -157,31 +161,34 @@ tests.integration(path.join(__dirname, '..'), {
 
                                     console.log('\n🎉 === INTEGRATION TEST SUMMARY ===');
                                     console.log(`✅ Adapter initialized with German coordinates: ${GERMAN_COORDINATES}`);
-                                    console.log(`✅ Adapter started successfully`);
+                                    console.log(`✅ Adapter started successfully using offline test data`);
                                     console.log(`✅ Adapter created ${stateCount} total datapoints`);
                                     console.log(`✅ Weather-specific datapoints: ${weatherStates.length}`);
                                     
                                     if (connectionState && connectionState.val === true) {
-                                        console.log(`✅ API calls successful - real weather data downloaded and written to states`);
+                                        console.log(`✅ Offline data processing successful`);
                                     } else {
-                                        console.log(`⚠️  API calls may have failed, but adapter structure was created successfully`);
+                                        console.log(`⚠️  Connection state indicates potential issue, but adapter structure was created successfully`);
                                     }
                                     
+                                    console.log(`✅ No real API calls were made - all data from offline test files`);
                                     console.log(`✅ Integration test completed successfully\n`);
 
                                 } else {
                                     console.log('❌ No states created by adapter');
+                                    reject(new Error('No states were created by the adapter'));
+                                    return;
                                 }
 
                                 resolve();
                             });
                             } else {
                                 console.log('❌ No states found with pattern brightsky.0.*');
-                                resolve();
+                                reject(new Error('No states found matching pattern brightsky.0.*'));
                             }
                             }).catch(err => {
                                 console.error('❌ Error getting state IDs:', err);
-                                resolve();
+                                reject(err); // Properly fail the test
                             });
                         });
                     }, 15000); // Wait 15 seconds for data fetching
@@ -209,6 +216,7 @@ tests.integration(path.join(__dirname, '..'), {
                     console.log('✅ German coordinates validation passed');
                 } else {
                     console.log('❌ German coordinates validation failed');
+                    throw new Error('German coordinates validation failed');
                 }
 
                 console.log('=== COORDINATE VALIDATION COMPLETE ===\n');
