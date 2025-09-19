@@ -207,7 +207,7 @@ tests.integration(path.join(__dirname, '..'), {
                             position: GERMAN_COORDINATES,
                             createCurrently: false,
                             createHourly: true,
-                            createDaily: false, // Daily enabled, others disabled
+                            createDaily: false, // Daily disabled, others as set above
                         });
 
                         await new Promise((res, rej) => {
