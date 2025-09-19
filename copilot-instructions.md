@@ -228,14 +228,220 @@ try {
 
 #### Test Structure
 - Unit tests: `src/**/*.test.ts`
-- Integration tests: `test/integration.js`
+- Integration tests: `test/integration-brightsky.js` (working offline test)
 - Package tests: `test/package.js`
 
 #### Test Commands
 ```bash
 npm run test:ts      # TypeScript unit tests
 npm run test:package # Package validation
-npm run test         # All tests
+npm run test         # All tests (unit + package)
+npm run test:integration # Integration tests
+```
+
+#### ioBroker Integration Testing
+
+**CRITICAL**: This project uses **OFFLINE integration testing** with mocked data to avoid real API calls during testing.
+
+##### Framework Structure
+Integration tests MUST use the working pattern from `test/integration-brightsky.js`:
+
+```javascript
+// Load test setup FIRST to configure mocking for offline testing
+require('./test-setup');
+
+const path = require('path');
+const { tests } = require('@iobroker/testing');
+
+const GERMAN_COORDINATES = '52.520008,13.404954';
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+tests.integration(path.join(__dirname, '..'), {
+    defineAdditionalTests({ suite }) {
+        suite('Test adapter with German coordinates - complete workflow', (getHarness) => {
+            let harness;
+
+            before(() => {
+                harness = getHarness();
+            });
+
+            it('should start adapter and create states', function () {
+                return new Promise(async (resolve, reject) => {
+                    harness = getHarness();
+                    const obj = await harness.objects.getObject('system.adapter.brightsky.0');
+
+                    // Configure adapter properties
+                    Object.assign(obj.native, {
+                        position: GERMAN_COORDINATES,
+                        createCurrently: true,
+                        createHourly: true,
+                        createDaily: true,
+                        // ... other configuration
+                    });
+
+                    // Create connection state object
+                    harness.objects.setObject(
+                        'brightsky.0.info.connection',
+                        {
+                            type: 'state',
+                            common: {
+                                name: 'Connection status',
+                                type: 'boolean',
+                                role: 'indicator.connected',
+                                read: true,
+                                write: false
+                            },
+                            native: {}
+                        },
+                        () => {}
+                    );
+
+                    // Set configuration and start adapter
+                    harness.objects.setObject(obj._id, obj);
+                    await harness.startAdapterAndWait();
+                    
+                    // Wait for adapter to process offline data
+                    await wait(15000);
+
+                    // Get states and validate
+                    const stateIds = await harness.dbConnection.getStateIDs('brightsky.0.*');
+                    const allStates = await new Promise((resolve, reject) => {
+                        harness.states.getStates(stateIds, (err, states) => {
+                            if (err) return reject(err);
+                            resolve(states || []);
+                        });
+                    });
+
+                    if (stateIds.length === 0) {
+                        reject(new Error('No states were created by the adapter'));
+                        return;
+                    }
+
+                    // CRITICAL: Test both SUCCESS and FAILURE scenarios
+                    // Check that required states exist (MUST FAIL if missing)
+                    const currentStates = stateIds.filter(key => key.includes('current'));
+                    if (currentStates.length === 0) {
+                        reject(new Error('Expected current weather states but none were found'));
+                        return;
+                    }
+
+                    const hourlyStates = stateIds.filter(key => key.includes('hourly'));
+                    if (hourlyStates.length === 0) {
+                        reject(new Error('Expected hourly weather states but none were found'));
+                        return;
+                    }
+
+                    const dailyStates = stateIds.filter(key => key.includes('daily'));
+                    if (dailyStates.length === 0) {
+                        reject(new Error('Expected daily weather states but none were found'));
+                        return;
+                    }
+
+                    await harness.stopAdapter();
+                    resolve(true);
+                });
+            }).timeout(40000);
+        });
+
+        // FAILURE TEST: Test when data types are disabled
+        suite('should NOT create daily states when daily is disabled', (getHarness) => {
+            let harness;
+
+            before(() => {
+                harness = getHarness();
+            });
+
+            it('should NOT create daily states when daily is disabled', () => {
+                return new Promise(async (resolve, reject) => {
+                    harness = getHarness();
+                    const obj = await harness.objects.getObject('system.adapter.brightsky.0');
+
+                    // Configure with daily DISABLED
+                    Object.assign(obj.native, {
+                        position: GERMAN_COORDINATES,
+                        createCurrently: false,
+                        createHourly: true,
+                        createDaily: false, // DISABLED
+                    });
+
+                    harness.objects.setObject(obj._id, obj);
+                    await harness.startAdapterAndWait();
+                    await wait(20000);
+
+                    const stateIds = await harness.dbConnection.getStateIDs('brightsky.0.*');
+
+                    // Verify hourly states exist (enabled)
+                    const hourlyStates = stateIds.filter(key => key.includes('hourly'));
+                    if (hourlyStates.length === 0) {
+                        reject(new Error('Expected hourly states but found none'));
+                        return;
+                    }
+
+                    // Verify daily states DON'T exist (disabled)
+                    const dailyStates = stateIds.filter(key => key.includes('daily'));
+                    if (dailyStates.length > 0) {
+                        reject(new Error('Expected no daily states but found some'));
+                        return;
+                    }
+
+                    // Verify current states DON'T exist (disabled)
+                    const currentStates = stateIds.filter(key => key.includes('current'));
+                    if (currentStates.length > 0) {
+                        reject(new Error('Expected no current states but found some'));
+                        return;
+                    }
+
+                    await harness.stopAdapter();
+                    resolve(true);
+                });
+            }).timeout(40000);
+        });
+    }
+});
+```
+
+##### Key Integration Testing Rules
+
+**CRITICAL PRINCIPLES:**
+1. **ALWAYS use offline testing** - Load `require('./test-setup')` at the top
+2. **Split test suites** - Use separate suites for different scenarios (can't restart adapter within same `it`)
+3. **Test SUCCESS and FAILURE** - For every "it works" test, add corresponding "it fails when disabled" test
+4. **MUST FAIL when expected states missing** - Use `reject(new Error(...))` not just logging
+5. **Use proper async patterns** - `await harness.startAdapterAndWait()`, proper Promise handling
+6. **Allow sufficient time** - `await wait(15000)` for data processing, `timeout(40000)` for tests
+
+**Required Test Structure:**
+- ✅ Success test: All data types enabled → Verify all state types exist
+- ✅ Failure test: Daily disabled → Verify no daily states created  
+- ✅ Failure test: All disabled → Verify no weather states created
+- ✅ Use `reject(new Error(...))` when validation fails
+- ✅ Use offline mocked data (no real API calls)
+
+##### What NOT to Do
+❌ Real API calls in integration tests
+❌ Single test suite for all scenarios (adapter restart issues)
+❌ Only logging failures without rejecting
+❌ Testing only success cases without corresponding failure cases
+❌ Insufficient timeouts for async operations
+
+##### What TO Do  
+✅ Use offline testing with `test-setup.js` mocking
+✅ Separate test suites for different scenarios
+✅ Test both success (states created) and failure (states not created) scenarios
+✅ Use `reject(new Error(...))` when expected states are missing
+✅ Use proper timeouts: `timeout(40000)` for tests, `await wait(15000)` for processing
+✅ Follow the exact pattern from the working `integration-brightsky.js`
+
+##### Workflow Dependencies
+Integration tests should run ONLY after lint and adapter tests pass:
+
+```yaml
+integration-tests:
+  needs: [check-and-lint, adapter-tests]
+  runs-on: ubuntu-latest
+  steps:
+    - name: Run integration tests
+      run: npx mocha test/integration-*.js --exit
 ```
 
 ### Build and Development
@@ -262,6 +468,7 @@ npm run lint         # ESLint checking
 - [German Weather Service (DWD)](https://www.dwd.de/)
 
 ### ioBroker Specific
+- [Official Testing Framework Documentation](https://github.com/ioBroker/testing)
 - [State Roles Documentation](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/objectsschema.md)
 - [Adapter Configuration Schema](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterconfigschema.md)
 - [Translation Guidelines](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/translating.md)

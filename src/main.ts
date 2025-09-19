@@ -49,6 +49,18 @@ class Brightsky extends utils.Adapter {
      * Is called when databases are connected and adapter received configuration.
      */
     private async onReady(): Promise<void> {
+        // Create the connection state object if it doesn't exist
+        await this.setObjectNotExistsAsync('info.connection', {
+            type: 'state',
+            common: {
+                name: 'Connection status',
+                type: 'boolean',
+                role: 'indicator.connected',
+                read: true,
+                write: false,
+            },
+            native: {},
+        });
         await this.setState('info.connection', false, true);
         if (!this.config.createDaily) {
             await this.delObjectAsync('daily', { recursive: true });

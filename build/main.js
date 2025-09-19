@@ -48,6 +48,7 @@ class Brightsky extends utils.Adapter {
    */
   async onReady() {
     var _a, _b, _c, _d, _e;
+
     await this.setState("info.connection", false, true);
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
