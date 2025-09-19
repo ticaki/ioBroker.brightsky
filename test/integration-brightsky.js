@@ -244,7 +244,7 @@ tests.integration(path.join(__dirname, '..'), {
                         if (dailyStates.length === 0) {
                             console.log(`✅ Step 10: No daily states found as expected`);
                         } else {
-                            console.log('❌ Step 10: Daily states present (${dailyStates.length}) (test failed)');
+                            console.log(`❌ Step 10: Daily states present (${dailyStates.length}) (test failed)`);
                             return reject(new Error('Expected daily states but found none'));
                         }
 
