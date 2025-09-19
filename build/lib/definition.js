@@ -918,7 +918,7 @@ const daily = {
     _id: "icon_special",
     type: "state",
     common: {
-      name: "Special Weather Icon",
+      name: "Weather Icon(mdi)",
       type: "string",
       role: "weather.icon.name",
       read: true,
@@ -1276,6 +1276,18 @@ const genericStateObjects = {
           name: "Timestamp",
           type: "string",
           role: "date",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      icon_special: {
+        _id: "icon_special",
+        type: "state",
+        common: {
+          name: "Weather Icon(mdi)",
+          type: "string",
+          role: "weather.icon.name",
           read: true,
           write: false
         },

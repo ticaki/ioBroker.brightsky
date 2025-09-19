@@ -2,12 +2,15 @@
  * Created with @iobroker/create-adapter v2.6.5
  */
 
+type Coords = { lat: number; lon: number };
+
+type Panel = ioBroker.AdapterConfig['panels'][0];
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
 import axios from 'axios';
 import { Library } from './lib/library';
-import type { BrightskyHourly } from './lib/definition';
+import type { BrightskyCurrently, BrightskyHourly } from './lib/definition';
 import {
     genericStateObjects,
     type BrightskyDailyData,
@@ -27,6 +30,8 @@ class Brightsky extends utils.Adapter {
     posId: string = '';
     weatherTimeout: (ioBroker.Timeout | null | undefined)[] = [];
 
+    groupArray: Panel[][] = [];
+    wrArray: number[] = [];
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
@@ -80,6 +85,23 @@ class Brightsky extends utils.Adapter {
             this.log.warn(`Invalid DWD station ID. Using default value of "".`);
             this.config.dwd_station_id = ''; // Default to 0 if invalid
         }
+
+        this.wrArray.push(this.config.wr1 ?? 0);
+        this.wrArray.push(this.config.wr2 ?? 0);
+        this.wrArray.push(this.config.wr3 ?? 0);
+        this.wrArray.push(this.config.wr4 ?? 0);
+        this.wrArray.forEach(() => {
+            this.groupArray.push([]);
+        });
+        if (this.config.panels) {
+            for (const p of this.config.panels) {
+                const wr = (p.wr ?? 0) | 0; // default 0; ensure int
+                if (wr >= 0 && wr < this.wrArray.length) {
+                    this.groupArray[wr].push(p);
+                }
+            }
+        }
+
         if (this.config.wmo_station !== '' && this.config.dwd_station_id !== '') {
             this.log.warn(
                 'Both WMO station ID and DWD station ID are set. Using DWD station ID for location identification.',
@@ -255,7 +277,7 @@ class Brightsky extends utils.Adapter {
                                                         sum = 0; // Initialize sum to 0 if it's not a number
                                                     }
                                                     if (value) {
-                                                        const newValue = estimatePVEnergyForHour(
+                                                        const newValue = this.estimatePVEnergyForHour(
                                                             value,
                                                             new Date(weatherArr[i].timestamp[index] as string),
                                                             {
@@ -389,7 +411,6 @@ class Brightsky extends utils.Adapter {
                                     dailyData.icon_special = this.pickDailyWeatherIcon({
                                         condition: weatherArr[i].condition as (string | null | undefined)[],
                                         wind_speed: weatherArr[i].wind_speed as (number | null | undefined)[],
-                                        precipitation: weatherArr[i].precipitation as (number | null | undefined)[],
                                         cloud_cover: weatherArr[i].cloud_cover as (number | null | undefined)[],
                                     });
                                     break;
@@ -443,12 +464,21 @@ class Brightsky extends utils.Adapter {
         }
         await this.weatherCurrentlyUpdate();
 
-        this.weatherTimeout[0] = this.setTimeout(
-            () => {
-                void this.weatherCurrentlyLoop();
-            },
-            this.config.pollIntervalCurrently * 60000 + Math.ceil(Math.random() * 8000),
-        );
+        let nextInterval = this.config.pollIntervalCurrently * 60000 + Math.ceil(Math.random() * 8000);
+
+        const coords = this.config.position.split(',').map(parseFloat);
+        const { sunrise, sunset } = suncalc.getTimes(new Date(), coords[0], coords[1]);
+
+        const now = Date.now();
+        const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
+
+        if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
+            nextInterval = testTime.getTime() - now + 30000 + Math.ceil(Math.random() * 5000);
+        }
+
+        this.weatherTimeout[0] = this.setTimeout(() => {
+            void this.weatherCurrentlyLoop();
+        }, nextInterval);
     }
 
     async weatherHourlyLoop(): Promise<void> {
@@ -486,7 +516,7 @@ class Brightsky extends utils.Adapter {
                             this.config.panels.length > 0 &&
                             item.solar
                         ) {
-                            item.solar_estimate = estimatePVEnergyForHour(
+                            item.solar_estimate = this.estimatePVEnergyForHour(
                                 item.solar ?? 0,
                                 item.timestamp,
                                 {
@@ -535,16 +565,21 @@ class Brightsky extends utils.Adapter {
             if (result.data) {
                 this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
                 if (result.data.weather) {
-                    result.data.weather.wind_bearing_text = this.getWindBearingText(
-                        result.data.weather.wind_direction_10 ?? undefined,
-                    );
-                    await this.library.writeFromJson(
-                        'current',
-                        'weather.current',
-                        genericStateObjects,
-                        result.data.weather,
-                        true,
-                    );
+                    const weather = result.data.weather as BrightskyCurrently;
+                    weather.wind_bearing_text = this.getWindBearingText(weather.wind_direction_10 ?? undefined);
+
+                    const coords = this.config.position.split(',').map(parseFloat);
+                    const { sunrise, sunset } = suncalc.getTimes(new Date(), coords[0], coords[1]);
+                    const now = new Date();
+                    const isDayTime = now >= sunrise && now <= sunset;
+
+                    weather.icon_special = this.pickDailyWeatherIcon({
+                        condition: [weather.condition],
+                        wind_speed: [weather.wind_speed_10],
+                        cloud_cover: [weather.cloud_cover],
+                        day: isDayTime,
+                    });
+                    await this.library.writeFromJson('current', 'weather.current', genericStateObjects, weather, true);
                     await this.library.writedp(
                         'current.sources',
                         undefined,
@@ -613,15 +648,13 @@ class Brightsky extends utils.Adapter {
      * @param bucket Aggregated hourly data for one day
      * @param bucket.condition Hourly condition values
      * @param bucket.wind_speed Hourly wind speed values
-     * @param bucket.precipitation Hourly precipitation values
      * @param bucket.cloud_cover Hourly cloud cover values
-     * @param bucket.day
+     * @param bucket.day If false, night icons will be used; defaults to true
      * @returns Weather icon string (MDI icon name, day variant only)
      */
     pickDailyWeatherIcon(bucket: {
         condition: (string | null | undefined)[];
         wind_speed: (number | null | undefined)[];
-        precipitation?: (number | null | undefined)[];
         cloud_cover?: (number | null | undefined)[];
         day?: boolean;
     }): string {
@@ -927,7 +960,6 @@ class Brightsky extends utils.Adapter {
                     result.icon_special = this.pickDailyWeatherIcon({
                         condition: weatherValues.condition as (string | null | undefined)[],
                         wind_speed: weatherValues.wind_speed as (number | null | undefined)[],
-                        precipitation: weatherValues.precipitation as (number | null | undefined)[],
                         cloud_cover: weatherValues.cloud_cover as (number | null | undefined)[],
                         day: weatherValues.day,
                     });
@@ -972,113 +1004,116 @@ class Brightsky extends utils.Adapter {
 
         return result;
     }
-}
 
-type Panel = {
-    /** Azimut des Panels in Grad, 0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen */
-    azimuth: number;
-    /** Neigung in Grad, 0 = horizontal, 90 = senkrecht */
-    tilt: number;
-    /** Fläche in m² */
-    area: number;
-    /** Wirkungsgrad 0..1 */
-    efficiency: number;
-};
-
-type Coords = { lat: number; lon: number };
-
-/**
- * Schätzt die erzeugte elektrische Energie (Wh) für die kommende Stunde.
- *
- * @param valueWhPerM2 GHI für die Stunde (Wh/m²) auf horizontaler Ebene
- * @param time Zeitstempel dieser Stunde (Date | number | string)
- * @param coords { lat, lon }
- * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
- * @returns Wh (elektrisch) für alle Panels zusammen
- */
-function estimatePVEnergyForHour(
-    valueWhPerM2: number,
-    time: Date | number | string,
-    coords: Coords,
-    panels: Panel[],
-): number {
-    let quarterHoursValueSum = 0;
-    for (let i = 0; i < 4; i++) {
-        const quarterHourTime =
-            time instanceof Date
-                ? new Date(time.getTime() + i * 15 * 60000)
-                : typeof time === 'number'
-                  ? new Date(time + i * 15 * 60000)
-                  : new Date(new Date(time).getTime() + i * 15 * 60000);
-        quarterHoursValueSum += estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels);
+    /**
+     * Schätzt die erzeugte elektrische Energie (Wh) für die kommende Stunde.
+     *
+     * @param valueWhPerM2 GHI für die Stunde (Wh/m²) auf horizontaler Ebene
+     * @param time Zeitstempel dieser Stunde (Date | number | string)
+     * @param coords { lat, lon }
+     * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
+     * @returns Wh (elektrisch) für alle Panels zusammen
+     */
+    estimatePVEnergyForHour(
+        valueWhPerM2: number,
+        time: Date | number | string,
+        coords: Coords,
+        panels: Panel[],
+    ): number {
+        let quarterHoursValueSum = 0;
+        for (let i = 0; i < 4; i++) {
+            const quarterHourTime =
+                time instanceof Date
+                    ? new Date(time.getTime() + i * 15 * 60000)
+                    : typeof time === 'number'
+                      ? new Date(time + i * 15 * 60000)
+                      : new Date(new Date(time).getTime() + i * 15 * 60000);
+            quarterHoursValueSum += this.estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels, this.wrArray);
+        }
+        return quarterHoursValueSum / 4;
     }
-    return quarterHoursValueSum / 4;
-}
-function estimatePvEnergy(valueWhPerM2: number, time: Date | number | string, coords: Coords, panels: Panel[]): number {
-    // ===== Helpers (funktion-lokal) =====
-    const toRad = (d: number): number => (d * Math.PI) / 180;
-    const clamp01 = (x: number): number => Math.min(1, Math.max(0, x));
-    const normEff = (pct: number): number => clamp01(pct / 100); // 0..100% → 0..1
+    estimatePvEnergy(
+        valueWhPerM2: number,
+        time: Date | number | string,
+        coords: Coords,
+        panels: Panel[],
+        wrArray: number[],
+    ): number {
+        // ===== Helpers (funktion-lokal) =====
+        const toRad = (d: number): number => (d * Math.PI) / 180;
+        const clamp01 = (x: number): number => Math.min(1, Math.max(0, x));
+        const normEff = (pct: number): number => clamp01(pct / 100); // 0..100% → 0..1
 
-    // Konstanten (einfaches, robustes Modell)
-    const ALBEDO = 0.2; // Bodenreflexionsfaktor
+        // Konstanten (einfaches, robustes Modell)
+        const ALBEDO = 0.2; // Bodenreflexionsfaktor
 
-    // Sonnenstand holen
-    const date = time instanceof Date ? time : new Date(time);
-    const pos = suncalc.getPosition(date, coords.lat, coords.lon);
-    const sunEl = pos.altitude; // Elevation in rad
-    // SunCalc-Azimut: 0 = Süd, +West; auf 0=N, 90=E normieren:
-    const sunAzDeg = ((pos.azimuth * 180) / Math.PI + 180 + 360) % 360;
-    const sunAz = toRad(sunAzDeg);
+        // Sonnenstand holen
+        const date = time instanceof Date ? time : new Date(time);
+        const pos = suncalc.getPosition(date, coords.lat, coords.lon);
+        const sunEl = pos.altitude; // Elevation in rad
+        // SunCalc-Azimut: 0 = Süd, +West; auf 0=N, 90=E normieren:
+        const sunAzDeg = ((pos.azimuth * 180) / Math.PI + 180 + 360) % 360;
+        const sunAz = toRad(sunAzDeg);
 
-    if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
-        return 0;
-    }
-
-    // Grobe Aufteilung in Direkt/Diffus aus Elevation (ohne externe Daten):
-    const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
-    const diffuseFraction = 1 - beamFraction;
-
-    let totalWh = 0;
-
-    for (const p of panels) {
-        const eff = normEff(p.efficiency);
-        if (eff <= 0 || p.area <= 0) {
-            continue;
+        if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
+            return 0;
         }
 
-        const tilt = toRad(p.tilt);
-        const az = toRad(((p.azimuth % 360) + 360) % 360);
+        // Grobe Aufteilung in Direkt/Diffus aus Elevation (ohne externe Daten):
+        const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
+        const diffuseFraction = 1 - beamFraction;
 
-        // Modulnormalen-Vektor
-        const nx = Math.sin(tilt) * Math.sin(az);
-        const ny = Math.sin(tilt) * Math.cos(az);
-        const nz = Math.cos(tilt);
+        let totalWh = 0;
+        for (let w = 0; w < this.wrArray.length; w++) {
+            const maxPower = wrArray[w];
+            let totalGroupPower = 0;
 
-        // Sonnenvektor
-        const sx = Math.cos(sunEl) * Math.sin(sunAz);
-        const sy = Math.cos(sunEl) * Math.cos(sunAz);
-        const sz = Math.sin(sunEl);
+            for (const p of this.groupArray[w]) {
+                p.wr = p.wr ?? 0;
+                if (p.wr !== w) {
+                    continue;
+                }
+                const eff = normEff(p.efficiency);
+                if (eff <= 0 || p.area <= 0) {
+                    continue;
+                }
 
-        // Einfallswinkel
-        const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
+                const tilt = toRad(p.tilt);
+                const az = toRad(((p.azimuth % 360) + 360) % 360);
 
-        // Direktanteil von horizontal → Modulfläche
-        const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
+                // Modulnormalen-Vektor
+                const nx = Math.sin(tilt) * Math.sin(az);
+                const ny = Math.sin(tilt) * Math.cos(az);
+                const nz = Math.cos(tilt);
 
-        // Diffus isotrop + Bodenreflexion
-        const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
-        const groundRefGain = (ALBEDO * (1 - Math.cos(tilt))) / 2;
+                // Sonnenvektor
+                const sx = Math.cos(sunEl) * Math.sin(sunAz);
+                const sy = Math.cos(sunEl) * Math.cos(sunAz);
+                const sz = Math.sin(sunEl);
 
-        // POA-Energie (Wh/m²) auf dem Modul für die Stunde
-        const poaWhPerM2 = valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
+                // Einfallswinkel
+                const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
 
-        // Elektrische Energie
-        const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
-        totalWh += elecWh;
+                // Direktanteil von horizontal → Modulfläche
+                const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
+
+                // Diffus isotrop + Bodenreflexion
+                const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
+                const groundRefGain = (ALBEDO * (1 - Math.cos(tilt))) / 2;
+
+                // POA-Energie (Wh/m²) auf dem Modul für die Stunde
+                const poaWhPerM2 =
+                    valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
+
+                // Elektrische Energie
+                const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
+                totalGroupPower += elecWh; // max. Wechselrichter-Leistung beachten
+            }
+            totalWh += maxPower > 0 ? Math.min(maxPower, totalGroupPower) : totalGroupPower;
+        }
+
+        return totalWh;
     }
-
-    return totalWh;
 }
 
 if (require.main !== module) {

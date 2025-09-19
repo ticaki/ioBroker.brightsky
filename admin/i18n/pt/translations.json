@@ -32,5 +32,14 @@
     "azimuth": "Azimute (0-360 °)",
     "tilt": "Inclinação (0-90 °)",
     "efficiency": "Eficiência (0-1)",
-    "area": "Área (m²)"
+    "area": "Área (m²)",
+    "Inverter1": "Inversor 1",
+    "Inverter2": "Inversor 2",
+    "Inverter3": "Inversor 3",
+    "Inverter4": "Inversor 4",
+    "wr1": "Inversor 1 máx. Power (KW)",
+    "wr2": "Inversor 2 máx. Power (KW)",
+    "wr3": "Inversor 3 máx. Power (KW)",
+    "wr4": "Inversor 4 máx. Power (KW)",
+    "__wr": "Inversor"
 }

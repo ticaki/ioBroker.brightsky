@@ -32,6 +32,8 @@ class Brightsky extends utils.Adapter {
   unload = false;
   posId = "";
   weatherTimeout = [];
+  groupArray = [];
+  wrArray = [];
   constructor(options = {}) {
     super({
       ...options,
@@ -45,17 +47,8 @@ class Brightsky extends utils.Adapter {
    * Is called when databases are connected and adapter received configuration.
    */
   async onReady() {
-    await this.setObjectNotExistsAsync("info.connection", {
-      type: "state",
-      common: {
-        name: "Connection status",
-        type: "boolean",
-        role: "indicator.connected",
-        read: true,
-        write: false
-      },
-      native: {}
-    });
+    var _a, _b, _c, _d, _e;
+
     await this.setState("info.connection", false, true);
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
@@ -79,6 +72,21 @@ class Brightsky extends utils.Adapter {
     if (this.config.dwd_station_id == void 0 || typeof this.config.dwd_station_id !== "string") {
       this.log.warn(`Invalid DWD station ID. Using default value of "".`);
       this.config.dwd_station_id = "";
+    }
+    this.wrArray.push((_a = this.config.wr1) != null ? _a : 0);
+    this.wrArray.push((_b = this.config.wr2) != null ? _b : 0);
+    this.wrArray.push((_c = this.config.wr3) != null ? _c : 0);
+    this.wrArray.push((_d = this.config.wr4) != null ? _d : 0);
+    this.wrArray.forEach(() => {
+      this.groupArray.push([]);
+    });
+    if (this.config.panels) {
+      for (const p of this.config.panels) {
+        const wr = ((_e = p.wr) != null ? _e : 0) | 0;
+        if (wr >= 0 && wr < this.wrArray.length) {
+          this.groupArray[wr].push(p);
+        }
+      }
     }
     if (this.config.wmo_station !== "" && this.config.dwd_station_id !== "") {
       this.log.warn(
@@ -236,7 +244,7 @@ class Brightsky extends utils.Adapter {
                             sum = 0;
                           }
                           if (value) {
-                            const newValue = estimatePVEnergyForHour(
+                            const newValue = this.estimatePVEnergyForHour(
                               value,
                               new Date(weatherArr[i].timestamp[index]),
                               {
@@ -362,7 +370,6 @@ class Brightsky extends utils.Adapter {
                   dailyData.icon_special = this.pickDailyWeatherIcon({
                     condition: weatherArr[i].condition,
                     wind_speed: weatherArr[i].wind_speed,
-                    precipitation: weatherArr[i].precipitation,
                     cloud_cover: weatherArr[i].cloud_cover
                   });
                   break;
@@ -399,12 +406,17 @@ class Brightsky extends utils.Adapter {
       this.clearTimeout(this.weatherTimeout[0]);
     }
     await this.weatherCurrentlyUpdate();
-    this.weatherTimeout[0] = this.setTimeout(
-      () => {
-        void this.weatherCurrentlyLoop();
-      },
-      this.config.pollIntervalCurrently * 6e4 + Math.ceil(Math.random() * 8e3)
-    );
+    let nextInterval = this.config.pollIntervalCurrently * 6e4 + Math.ceil(Math.random() * 8e3);
+    const coords = this.config.position.split(",").map(parseFloat);
+    const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
+    const now = Date.now();
+    const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
+    if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
+      nextInterval = testTime.getTime() - now + 3e4 + Math.ceil(Math.random() * 5e3);
+    }
+    this.weatherTimeout[0] = this.setTimeout(() => {
+      void this.weatherCurrentlyLoop();
+    }, nextInterval);
   }
   async weatherHourlyLoop() {
     if (this.weatherTimeout[1]) {
@@ -434,7 +446,7 @@ class Brightsky extends utils.Adapter {
             item.solar_estimate = 0;
             item.wind_bearing_text = this.getWindBearingText((_a = item.wind_direction) != null ? _a : void 0);
             if (this.config.position.split(",").length === 2 && this.config.panels.length > 0 && item.solar) {
-              item.solar_estimate = estimatePVEnergyForHour(
+              item.solar_estimate = this.estimatePVEnergyForHour(
                 (_b = item.solar) != null ? _b : 0,
                 item.timestamp,
                 {
@@ -484,16 +496,19 @@ class Brightsky extends utils.Adapter {
       if (result.data) {
         this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
         if (result.data.weather) {
-          result.data.weather.wind_bearing_text = this.getWindBearingText(
-            (_a = result.data.weather.wind_direction_10) != null ? _a : void 0
-          );
-          await this.library.writeFromJson(
-            "current",
-            "weather.current",
-            import_definition.genericStateObjects,
-            result.data.weather,
-            true
-          );
+          const weather = result.data.weather;
+          weather.wind_bearing_text = this.getWindBearingText((_a = weather.wind_direction_10) != null ? _a : void 0);
+          const coords = this.config.position.split(",").map(parseFloat);
+          const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
+          const now = /* @__PURE__ */ new Date();
+          const isDayTime = now >= sunrise && now <= sunset;
+          weather.icon_special = this.pickDailyWeatherIcon({
+            condition: [weather.condition],
+            wind_speed: [weather.wind_speed_10],
+            cloud_cover: [weather.cloud_cover],
+            day: isDayTime
+          });
+          await this.library.writeFromJson("current", "weather.current", import_definition.genericStateObjects, weather, true);
           await this.library.writedp(
             "current.sources",
             void 0,
@@ -559,9 +574,8 @@ class Brightsky extends utils.Adapter {
    * @param bucket Aggregated hourly data for one day
    * @param bucket.condition Hourly condition values
    * @param bucket.wind_speed Hourly wind speed values
-   * @param bucket.precipitation Hourly precipitation values
    * @param bucket.cloud_cover Hourly cloud cover values
-   * @param bucket.day
+   * @param bucket.day If false, night icons will be used; defaults to true
    * @returns Weather icon string (MDI icon name, day variant only)
    */
   pickDailyWeatherIcon(bucket) {
@@ -815,7 +829,6 @@ class Brightsky extends utils.Adapter {
           result.icon_special = this.pickDailyWeatherIcon({
             condition: weatherValues.condition,
             wind_speed: weatherValues.wind_speed,
-            precipitation: weatherValues.precipitation,
             cloud_cover: weatherValues.cloud_cover,
             day: weatherValues.day
           });
@@ -857,53 +870,72 @@ class Brightsky extends utils.Adapter {
     }
     return result;
   }
-}
-function estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
-  let quarterHoursValueSum = 0;
-  for (let i = 0; i < 4; i++) {
-    const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
-    quarterHoursValueSum += estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels);
-  }
-  return quarterHoursValueSum / 4;
-}
-function estimatePvEnergy(valueWhPerM2, time, coords, panels) {
-  const toRad = (d) => d * Math.PI / 180;
-  const clamp01 = (x) => Math.min(1, Math.max(0, x));
-  const normEff = (pct) => clamp01(pct / 100);
-  const ALBEDO = 0.2;
-  const date = time instanceof Date ? time : new Date(time);
-  const pos = suncalc.getPosition(date, coords.lat, coords.lon);
-  const sunEl = pos.altitude;
-  const sunAzDeg = (pos.azimuth * 180 / Math.PI + 180 + 360) % 360;
-  const sunAz = toRad(sunAzDeg);
-  if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
-    return 0;
-  }
-  const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
-  const diffuseFraction = 1 - beamFraction;
-  let totalWh = 0;
-  for (const p of panels) {
-    const eff = normEff(p.efficiency);
-    if (eff <= 0 || p.area <= 0) {
-      continue;
+  /**
+   * Schätzt die erzeugte elektrische Energie (Wh) für die kommende Stunde.
+   *
+   * @param valueWhPerM2 GHI für die Stunde (Wh/m²) auf horizontaler Ebene
+   * @param time Zeitstempel dieser Stunde (Date | number | string)
+   * @param coords { lat, lon }
+   * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
+   * @returns Wh (elektrisch) für alle Panels zusammen
+   */
+  estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
+    let quarterHoursValueSum = 0;
+    for (let i = 0; i < 4; i++) {
+      const quarterHourTime = time instanceof Date ? new Date(time.getTime() + i * 15 * 6e4) : typeof time === "number" ? new Date(time + i * 15 * 6e4) : new Date(new Date(time).getTime() + i * 15 * 6e4);
+      quarterHoursValueSum += this.estimatePvEnergy(valueWhPerM2, quarterHourTime, coords, panels, this.wrArray);
     }
-    const tilt = toRad(p.tilt);
-    const az = toRad((p.azimuth % 360 + 360) % 360);
-    const nx = Math.sin(tilt) * Math.sin(az);
-    const ny = Math.sin(tilt) * Math.cos(az);
-    const nz = Math.cos(tilt);
-    const sx = Math.cos(sunEl) * Math.sin(sunAz);
-    const sy = Math.cos(sunEl) * Math.cos(sunAz);
-    const sz = Math.sin(sunEl);
-    const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
-    const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
-    const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
-    const groundRefGain = ALBEDO * (1 - Math.cos(tilt)) / 2;
-    const poaWhPerM2 = valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
-    const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
-    totalWh += elecWh;
+    return quarterHoursValueSum / 4;
   }
-  return totalWh;
+  estimatePvEnergy(valueWhPerM2, time, coords, panels, wrArray) {
+    var _a;
+    const toRad = (d) => d * Math.PI / 180;
+    const clamp01 = (x) => Math.min(1, Math.max(0, x));
+    const normEff = (pct) => clamp01(pct / 100);
+    const ALBEDO = 0.2;
+    const date = time instanceof Date ? time : new Date(time);
+    const pos = suncalc.getPosition(date, coords.lat, coords.lon);
+    const sunEl = pos.altitude;
+    const sunAzDeg = (pos.azimuth * 180 / Math.PI + 180 + 360) % 360;
+    const sunAz = toRad(sunAzDeg);
+    if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
+      return 0;
+    }
+    const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
+    const diffuseFraction = 1 - beamFraction;
+    let totalWh = 0;
+    for (let w = 0; w < this.wrArray.length; w++) {
+      const maxPower = wrArray[w];
+      let totalGroupPower = 0;
+      for (const p of this.groupArray[w]) {
+        p.wr = (_a = p.wr) != null ? _a : 0;
+        if (p.wr !== w) {
+          continue;
+        }
+        const eff = normEff(p.efficiency);
+        if (eff <= 0 || p.area <= 0) {
+          continue;
+        }
+        const tilt = toRad(p.tilt);
+        const az = toRad((p.azimuth % 360 + 360) % 360);
+        const nx = Math.sin(tilt) * Math.sin(az);
+        const ny = Math.sin(tilt) * Math.cos(az);
+        const nz = Math.cos(tilt);
+        const sx = Math.cos(sunEl) * Math.sin(sunAz);
+        const sy = Math.cos(sunEl) * Math.cos(sunAz);
+        const sz = Math.sin(sunEl);
+        const cosTheta = Math.max(0, nx * sx + ny * sy + nz * sz);
+        const dirGain = cosTheta / Math.max(1e-6, Math.sin(sunEl));
+        const skyDiffuseGain = (1 + Math.cos(tilt)) / 2;
+        const groundRefGain = ALBEDO * (1 - Math.cos(tilt)) / 2;
+        const poaWhPerM2 = valueWhPerM2 * (beamFraction * dirGain + diffuseFraction * skyDiffuseGain + groundRefGain);
+        const elecWh = Math.max(0, poaWhPerM2) * p.area * eff;
+        totalGroupPower += elecWh;
+      }
+      totalWh += maxPower > 0 ? Math.min(maxPower, totalGroupPower) : totalGroupPower;
+    }
+    return totalWh;
+  }
 }
 if (require.main !== module) {
   module.exports = (options) => new Brightsky(options);
