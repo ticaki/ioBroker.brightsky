@@ -56,7 +56,6 @@ tests.integration(path.join(__dirname, '..'), {
                     // Objekt speichern und Adapter starten
                     harness.objects.setObject(obj._id, obj);
 
-
                     console.log('✅ Step 1: Configuration written, starting adapter...');
 
                     await harness.startAdapterAndWait();
