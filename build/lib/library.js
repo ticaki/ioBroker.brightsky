@@ -122,7 +122,7 @@ class Library extends BaseClass {
     if (data === void 0 || ["string", "number", "boolean", "object"].indexOf(typeof data) == -1) {
       return;
     }
-    const objectDefinition = objNode ? await this.getObjectDefFromJson(`${objNode}`, def, data) : null;
+    let objectDefinition = objNode ? await this.getObjectDefFromJson(`${objNode}`, def, data) : null;
     if (objectDefinition) {
       objectDefinition.native = {
         ...objectDefinition.native || {},
@@ -176,6 +176,18 @@ class Library extends BaseClass {
     } else {
       if (!objectDefinition) {
         return;
+      }
+      if (objectDefinition.type === "state" && objectDefinition.common.role && objectDefinition.common.role !== "value" && prefix.startsWith("daily")) {
+        const d = prefix.split(".");
+        if (d.length == 3 && !isNaN(parseInt(d[1], 10))) {
+          objectDefinition = {
+            ...objectDefinition,
+            common: {
+              ...objectDefinition.common,
+              role: `${objectDefinition.common.role}.forecast.${parseInt(d[1])}`
+            }
+          };
+        }
       }
       await this.writedp(prefix, data, objectDefinition);
     }
