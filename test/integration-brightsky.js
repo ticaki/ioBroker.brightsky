@@ -23,7 +23,7 @@ tests.integration(path.join(__dirname, '..'), {
 
             it('should start adapter with German coordinates, fetch data, and write states', function () {
                 return new Promise(async (resolve, reject) => {
-                    harness = getHarness()
+                    harness = getHarness();
                     const obj = await harness.objects.getObject('system.adapter.brightsky.0');
 
 
@@ -54,8 +54,7 @@ tests.integration(path.join(__dirname, '..'), {
                     );
 
                     // Objekt speichern und Adapter starten
-                    harness.objects.setObject(obj._id, obj)
-
+                    harness.objects.setObject(obj._id, obj);
 
                     console.log('✅ Step 1: Configuration written, starting adapter...');
 
@@ -84,7 +83,7 @@ tests.integration(path.join(__dirname, '..'), {
 
                     // Beispielausgabe der ersten paar States
                     stateIds.slice(0, 5).forEach((id, idx) => {
-                        const st = allStates[ idx ];
+                        const st = allStates[idx];
                         console.log(`   ${id}: ${st && st.val !== undefined ? st.val : 'undefined'}`);
                     });
                     const stateCount = stateIds.length;
@@ -207,7 +206,7 @@ tests.integration(path.join(__dirname, '..'), {
                             position: GERMAN_COORDINATES,
                             createCurrently: false,
                             createHourly: true,
-                            createDaily: false, // Daily enabled, others disabled
+                            createDaily: false, // Daily disabled, others as set above
                         });
 
                         await new Promise((res, rej) => {
@@ -244,7 +243,7 @@ tests.integration(path.join(__dirname, '..'), {
                         if (dailyStates.length === 0) {
                             console.log(`✅ Step 10: No daily states found as expected`);
                         } else {
-                            console.log('❌ Step 10: Daily states present (${dailyStates.length}) (test failed)');
+                            console.log(`❌ Step 10: Daily states present (${dailyStates.length}) (test failed)`);
                             return reject(new Error('Expected daily states but found none'));
                         }
 
