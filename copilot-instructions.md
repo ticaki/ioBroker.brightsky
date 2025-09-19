@@ -432,6 +432,18 @@ tests.integration(path.join(__dirname, '..'), {
 ✅ Use proper timeouts: `timeout(40000)` for tests, `await wait(15000)` for processing
 ✅ Follow the exact pattern from the working `integration-brightsky.js`
 
+##### Workflow Dependencies
+Integration tests should run ONLY after lint and adapter tests pass:
+
+```yaml
+integration-tests:
+  needs: [check-and-lint, adapter-tests]
+  runs-on: ubuntu-latest
+  steps:
+    - name: Run integration tests
+      run: npx mocha test/integration-*.js --exit
+```
+
 ### Build and Development
 
 #### Build Process
@@ -456,6 +468,7 @@ npm run lint         # ESLint checking
 - [German Weather Service (DWD)](https://www.dwd.de/)
 
 ### ioBroker Specific
+- [Official Testing Framework Documentation](https://github.com/ioBroker/testing)
 - [State Roles Documentation](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/objectsschema.md)
 - [Adapter Configuration Schema](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/adapterconfigschema.md)
 - [Translation Guidelines](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/translating.md)
