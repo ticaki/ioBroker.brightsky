@@ -84,7 +84,7 @@ tests.integration(path.join(__dirname, '..'), {
 
                     // Beispielausgabe der ersten paar States
                     stateIds.slice(0, 5).forEach((id, idx) => {
-                        const st = allStates[ idx ];
+                        const st = allStates[idx];
                         console.log(`   ${id}: ${st && st.val !== undefined ? st.val : 'undefined'}`);
                     });
                     const stateCount = stateIds.length;
