@@ -129,14 +129,18 @@ class Brightsky extends utils.Adapter {
             this.config.hours = 24; // Default to 24 hours if invalid
         }
 
-        if (this.config.pollInterval == undefined || this.config.pollInterval < 1) {
+        if (
+            this.config.pollInterval == undefined ||
+            this.config.pollInterval < 1 ||
+            this.config.pollInterval >= 2 ** 31 / (60000 * 60)
+        ) {
             this.log.warn(`Invalid poll interval: ${this.config.pollInterval}. Using default value of 12 hour.`);
             this.config.pollInterval = 12; // Default to 1 hour if invalid
         }
         if (
             this.config.pollIntervalCurrently == undefined ||
             this.config.pollIntervalCurrently < 10 ||
-            this.config.pollIntervalCurrently >= 2 ** 21 / 60000
+            this.config.pollIntervalCurrently >= 2 ** 31 / 60000
         ) {
             this.log.warn(
                 `Invalid poll interval currently: ${this.config.pollIntervalCurrently}. Using default value of 30 minute.`,

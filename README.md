@@ -83,6 +83,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 0.3.4 (2025-09-19)
+- (ticaki) fixed too low limit for currently updates
+
 ### 0.3.3 (2025-09-19)
 - (ticaki) update current at sunrise and sunset (unless custom interval is too large)
 - (ticaki) added inverter limiting

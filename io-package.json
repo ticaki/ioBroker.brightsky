@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "brightsky",
-        "version": "0.3.3",
+        "version": "0.3.4",
         "news": {
+            "0.3.4": {
+                "en": "fixed too low limit for currently updates",
+                "de": "zu niedriges Limit für 'currently'-Aktualisierungen korrigiert",
+                "ru": "исправлено слишком низкое ограничение для обновлений 'currently'",
+                "pt": "corrigido limite muito baixo para atualizações de 'currently'",
+                "nl": "te lage limiet voor 'currently'-updates gecorrigeerd",
+                "fr": "correction d'une limite trop basse pour les mises à jour 'currently'",
+                "it": "corretto limite troppo basso per gli aggiornamenti 'currently'",
+                "es": "corregido límite demasiado bajo para actualizaciones de 'currently'",
+                "pl": "naprawiono zbyt niski limit dla aktualizacji 'currently'",
+                "uk": "виправлено занадто низький ліміт для оновлень 'currently'",
+                "zh-cn": "修复了“currently”更新的限制过低问题"
+            },
             "0.3.3": {
                 "en": "update current at sunrise and sunset (unless custom interval is too large)\nadded inverter limiting",
                 "de": "Aktualisierung bei Sonnenaufgang und Sonnenuntergang (außer wenn das benutzerdefinierte Intervall zu groß ist)\nWechselrichterbegrenzung hinzugefügt",
@@ -80,19 +93,6 @@
                 "pl": "dodany tekst nośnika wiatru\naktualizacje deps",
                 "uk": "оболонка тексту додано\nоновлення deps",
                 "zh-cn": "添加风向标文字\n更新代码"
-            },
-            "0.2.2": {
-                "en": "Sunrise and sunset times added to the daily overview.",
-                "de": "Sonnenaufgang und Sonnenuntergang in der Tagesübersicht.",
-                "ru": "Время восхода и заката добавлено к ежедневному обзору.",
-                "pt": "O nascer do sol e o pôr do sol somaram-se ao panorama diário.",
-                "nl": "Zonsopgang en zonsondergang tijden toegevoegd aan het dagelijkse overzicht.",
-                "fr": "Les heures du lever et du coucher du soleil s'ajoutent à l'aperçu quotidien.",
-                "it": "Tempi di alba e tramonto aggiunti alla panoramica giornaliera.",
-                "es": "Tiempos de amanecer y puesta de sol añadidos a la visión general diaria.",
-                "pl": "Czas wschodu słońca i zachodu słońca dodawany do codziennego przeglądu.",
-                "uk": "Сонце і час заходу додано до щоденного огляду.",
-                "zh-cn": "日出和日落时间加进了每日概览."
             }
         },
         "titleLang": {
