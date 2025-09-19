@@ -621,7 +621,7 @@ const daily = {
     common: {
       name: "Solar Max (per hour)",
       type: "number",
-      role: "value.power",
+      role: "value.power.max",
       read: true,
       write: false,
       unit: "kWh/m\xB2"
@@ -634,7 +634,7 @@ const daily = {
     common: {
       name: "Solar Median",
       type: "number",
-      role: "value.power",
+      role: "value.power.median",
       read: true,
       write: false,
       unit: "kWh/m\xB2"
@@ -686,7 +686,7 @@ const daily = {
     common: {
       name: "Wind Direction Median",
       type: "number",
-      role: "value.direction",
+      role: "value.direction.median",
       read: true,
       write: false,
       unit: "\xB0"
@@ -699,7 +699,7 @@ const daily = {
     common: {
       name: "Wind Speed Median",
       type: "number",
-      role: "value.speed",
+      role: "value.speed.median",
       read: true,
       write: false,
       unit: "km/h"
@@ -712,7 +712,7 @@ const daily = {
     common: {
       name: "Cloud Cover Median",
       type: "number",
-      role: "value.clouds",
+      role: "value.clouds.median",
       read: true,
       write: false,
       unit: "%"
@@ -725,7 +725,7 @@ const daily = {
     common: {
       name: "Relative Humidity Median",
       type: "number",
-      role: "value.humidity",
+      role: "value.humidity.median",
       read: true,
       write: false,
       unit: "%"
@@ -738,7 +738,7 @@ const daily = {
     common: {
       name: "Visibility Median",
       type: "number",
-      role: "value.distance",
+      role: "value.distance.median",
       read: true,
       write: false,
       unit: "m"
@@ -751,7 +751,7 @@ const daily = {
     common: {
       name: "Dew Point Median",
       type: "number",
-      role: "value.temperature.dewpoint",
+      role: "value.temperature.dewpoint.median",
       read: true,
       write: false,
       unit: "\xB0C"
@@ -764,7 +764,7 @@ const daily = {
     common: {
       name: "Temperature Median",
       type: "number",
-      role: "value.temperature",
+      role: "value.temperature.median",
       read: true,
       write: false,
       unit: "\xB0C"
@@ -777,7 +777,7 @@ const daily = {
     common: {
       name: "Wind Gust Direction Median",
       type: "number",
-      role: "value.direction",
+      role: "value.direction.median",
       read: true,
       write: false,
       unit: "\xB0"
@@ -790,7 +790,7 @@ const daily = {
     common: {
       name: "Wind Gust Speed Median",
       type: "number",
-      role: "value.speed",
+      role: "value.speed.median",
       read: true,
       write: false,
       unit: "km/h"
@@ -881,7 +881,7 @@ const daily = {
     common: {
       name: "Wind Speed Max",
       type: "number",
-      role: "value.speed",
+      role: "value.speed.max",
       read: true,
       write: false,
       unit: "km/h"
@@ -894,7 +894,7 @@ const daily = {
     common: {
       name: "Temperature Min",
       type: "number",
-      role: "value.temperature.minmax.min",
+      role: "value.temperature.min",
       read: true,
       write: false,
       unit: "\xB0C"
@@ -907,7 +907,7 @@ const daily = {
     common: {
       name: "Temperature Max",
       type: "number",
-      role: "value.temperature.minmax.max",
+      role: "value.temperature.max",
       read: true,
       write: false,
       unit: "\xB0C"

@@ -145,7 +145,7 @@ class Brightsky extends utils.Adapter {
             this.log.warn(
                 `Invalid poll interval currently: ${this.config.pollIntervalCurrently}. Using default value of 30 minute.`,
             );
-            this.config.pollIntervalCurrently = 30; // Default to 1 minute if invalid
+            this.config.pollIntervalCurrently = 60; // Default to 1 minute if invalid
         }
 
         if (this.config.maxDistance == undefined || this.config.maxDistance < 1000) {

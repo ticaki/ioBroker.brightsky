@@ -124,7 +124,7 @@ class Brightsky extends utils.Adapter {
       this.log.warn(
         `Invalid poll interval currently: ${this.config.pollIntervalCurrently}. Using default value of 30 minute.`
       );
-      this.config.pollIntervalCurrently = 30;
+      this.config.pollIntervalCurrently = 60;
     }
     if (this.config.maxDistance == void 0 || this.config.maxDistance < 1e3) {
       this.log.warn(`Invalid max distance: ${this.config.maxDistance}. Using default value of 50000 meters.`);

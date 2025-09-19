@@ -83,6 +83,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Corrected roles for visualisation
+
 ### 0.3.4 (2025-09-19)
 - (ticaki) fixed too low limit for currently updates
 
