@@ -1064,7 +1064,7 @@ class Brightsky extends utils.Adapter {
         const diffuseFraction = 1 - beamFraction;
 
         let totalWh = 0;
-        for (let w = 0; w < this.wrArray.length; w++) {
+        for (let w = 0; w < wrArray.length; w++) {
             const maxPower = wrArray[w];
             let totalGroupPower = 0;
 

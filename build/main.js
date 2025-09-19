@@ -48,7 +48,17 @@ class Brightsky extends utils.Adapter {
    */
   async onReady() {
     var _a, _b, _c, _d, _e;
-
+    await this.setObjectNotExistsAsync("info.connection", {
+      type: "state",
+      common: {
+        name: "Connection status",
+        type: "boolean",
+        role: "indicator.connected",
+        read: true,
+        write: false
+      },
+      native: {}
+    });
     await this.setState("info.connection", false, true);
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
@@ -904,7 +914,7 @@ class Brightsky extends utils.Adapter {
     const beamFraction = clamp01(Math.sin(sunEl) * 1.1);
     const diffuseFraction = 1 - beamFraction;
     let totalWh = 0;
-    for (let w = 0; w < this.wrArray.length; w++) {
+    for (let w = 0; w < wrArray.length; w++) {
       const maxPower = wrArray[w];
       let totalGroupPower = 0;
       for (const p of this.groupArray[w]) {
