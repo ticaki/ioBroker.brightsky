@@ -475,7 +475,7 @@ const hourly = {
     common: {
       name: "Precipitation Probability",
       type: "number",
-      role: "",
+      role: "value",
       read: true,
       write: false,
       unit: "%"
@@ -488,7 +488,7 @@ const hourly = {
     common: {
       name: "Precipitation Probability 6h",
       type: "number",
-      role: "",
+      role: "value",
       read: true,
       write: false,
       unit: "%"
@@ -803,7 +803,7 @@ const daily = {
     common: {
       name: "Precipitation Probability Median",
       type: "number",
-      role: "",
+      role: "value",
       read: true,
       write: false,
       unit: "%"
@@ -816,7 +816,7 @@ const daily = {
     common: {
       name: "Precipitation Probability 6h Median",
       type: "number",
-      role: "",
+      role: "value",
       read: true,
       write: false,
       unit: "%"
