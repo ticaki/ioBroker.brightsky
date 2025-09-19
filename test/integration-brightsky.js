@@ -206,8 +206,8 @@ tests.integration(path.join(__dirname, '..'), {
                         Object.assign(obj.native, {
                             position: GERMAN_COORDINATES,
                             createCurrently: false,
-                            createHourly: false,
-                            createDaily: true, // Daily enabled, others disabled
+                            createHourly: true,
+                            createDaily: false, // Daily enabled, others disabled
                         });
 
                         await new Promise((res, rej) => {
@@ -241,10 +241,10 @@ tests.integration(path.join(__dirname, '..'), {
 
                         // ▶️ Step 10: Daily present?
                         const dailyStates = stateIds.filter((key) => key.includes('daily'));
-                        if (dailyStates.length > 0) {
-                            console.log(`✅ Step 10: Daily states present (${dailyStates.length})`);
+                        if (dailyStates.length === 0) {
+                            console.log(`✅ Step 10: No daily states found as expected`);
                         } else {
-                            console.log('❌ Step 10: No daily states found (test failed)');
+                            console.log('❌ Step 10: Daily states present (${dailyStates.length}) (test failed)');
                             return reject(new Error('Expected daily states but found none'));
                         }
 
