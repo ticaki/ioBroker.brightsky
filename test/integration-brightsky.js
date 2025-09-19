@@ -23,7 +23,7 @@ tests.integration(path.join(__dirname, '..'), {
 
             it('should start adapter with German coordinates, fetch data, and write states', function () {
                 return new Promise(async (resolve, reject) => {
-                    harness = getHarness()
+                    harness = getHarness();
                     const obj = await harness.objects.getObject('system.adapter.brightsky.0');
 
 
