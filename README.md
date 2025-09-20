@@ -84,7 +84,7 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (ticaki) Corrected roles for visualisation (lovelance) fixes [#28](https://github.com/ticaki/ioBroker.brightsky/issues/28)
+- (ticaki) Corrected roles for visualisation (lovelance) fixes #28
 
 ### 0.3.4 (2025-09-19)
 - (ticaki) fixed too low limit for currently updates
