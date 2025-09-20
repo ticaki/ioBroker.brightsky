@@ -187,6 +187,7 @@ export class Library extends BaseClass {
                 objectDefinition.type === 'state' &&
                 objectDefinition.common.role &&
                 objectDefinition.common.role !== 'value' &&
+                objectDefinition.common.role !== 'text' &&
                 prefix.startsWith('daily')
             ) {
                 const d = prefix.split('.');
@@ -196,6 +197,26 @@ export class Library extends BaseClass {
                         common: {
                             ...objectDefinition.common,
                             role: `${objectDefinition.common.role}.forecast.${parseInt(d[1])}`,
+                        },
+                    };
+                } else if (d.length == 4 && !isNaN(parseInt(d[1], 10))) {
+                    let role = 'state';
+                    switch (objectDefinition.common.type) {
+                        case 'number':
+                            role = 'value';
+                            break;
+                        case 'string':
+                            role = 'text';
+                            break;
+                        case 'boolean':
+                            role = 'indicator';
+                            break;
+                    }
+                    objectDefinition = {
+                        ...objectDefinition,
+                        common: {
+                            ...objectDefinition.common,
+                            role: role,
                         },
                     };
                 }
