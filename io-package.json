@@ -1,190 +1,190 @@
 {
-    "common": {
-        "name": "brightsky",
-        "version": "0.3.4",
-        "news": {
-            "0.3.4": {
-                "en": "fixed too low limit for currently updates",
-                "de": "zu niedriges Limit für 'currently'-Aktualisierungen korrigiert",
-                "ru": "исправлено слишком низкое ограничение для обновлений 'currently'",
-                "pt": "corrigido limite muito baixo para atualizações de 'currently'",
-                "nl": "te lage limiet voor 'currently'-updates gecorrigeerd",
-                "fr": "correction d'une limite trop basse pour les mises à jour 'currently'",
-                "it": "corretto limite troppo basso per gli aggiornamenti 'currently'",
-                "es": "corregido límite demasiado bajo para actualizaciones de 'currently'",
-                "pl": "naprawiono zbyt niski limit dla aktualizacji 'currently'",
-                "uk": "виправлено занадто низький ліміт для оновлень 'currently'",
-                "zh-cn": "修复了“currently”更新的限制过低问题"
-            },
-            "0.3.3": {
-                "en": "update current at sunrise and sunset (unless custom interval is too large)\nadded inverter limiting",
-                "de": "Aktualisierung bei Sonnenaufgang und Sonnenuntergang (außer wenn das benutzerdefinierte Intervall zu groß ist)\nWechselrichterbegrenzung hinzugefügt",
-                "ru": "обновление значений на восходе и закате солнца (если пользовательский интервал не слишком большой)\nдобавлено ограничение инвертора",
-                "pt": "atualização ao nascer e ao pôr do sol (a menos que o intervalo personalizado seja demasiado grande)\nlimitação do inversor adicionada",
-                "nl": "Bijwerken bij zonsopgang en zonsondergang (behalve wanneer het aangepaste interval te groot is)\ninverterbegrenzing toegevoegd",
-                "fr": "mise à jour au lever et au coucher du soleil (sauf si l’intervalle personnalisé est trop grand)\najout d’une limitation de l’onduleur",
-                "it": "aggiornamento all’alba e al tramonto (tranne quando l’intervallo personalizzato è troppo grande)\naggiunta la limitazione dell’inverter",
-                "es": "actualización al amanecer y al atardecer (excepto cuando el intervalo personalizado sea demasiado grande)\nañadida la limitación del inversor",
-                "pl": "aktualizacja o wschodzie i zachodzie słońca (chyba że niestandardowy interwał jest zbyt duży)\ndodano ograniczenie falownika",
-                "uk": "оновлення на світанку та заході сонця (крім випадків, коли власний інтервал надто великий)\nдодано обмеження інвертора",
-                "zh-cn": "在日出和日落时更新（除非自定义间隔过大）\n添加逆变器限制"
-            },
-            "0.3.2": {
-                "en": "Solar estimation calculation revised",
-                "de": "Überarbeitete Berechnung der Solarabschätzung",
-                "ru": "Пересмотрен расчет оценки солнечной энергии",
-                "pt": "Cálculo de estimativa solar revisado",
-                "nl": "Herziene berekening van zonneschijnschatting",
-                "fr": "Calcul de l'estimation solaire révisé",
-                "it": "Calcolo della stima solare rivisto",
-                "es": "Cálculo de estimación solar revisado",
-                "pl": "Przeliczanie szacunkowe energii słonecznej poprawione",
-                "uk": "Перераховано розрахунок оцінки сонячного потенціалу",
-                "zh-cn": "太阳能估算计算已经修订"
-            },
-            "0.3.1": {
-                "en": "Fixed data evaluation crash when no panels are defined  \nstate name fixed",
-                "de": "Behoben: Abbruch der Datenauswertung, wenn keine Panels definiert sind\nState common.name korrigiert",
-                "ru": "Исправлена ошибка сбоя при оценке данных, если панели не определены\nИсправлено имя состояния",
-                "pt": "Corrigido erro de falha na avaliação de dados quando nenhum painel é definido\nNome do estado corrigido.",
-                "nl": "Opgelost: Crash bij het evalueren van gegevens wanneer er geen panelen zijn gedefinieerd\nStatusnaam hersteld",
-                "fr": "Correction du plantage de l'évaluation des données lorsque aucun panneau n'est défini\nNom de l'état corrigé",
-                "it": "Risolto il crash dell'elaborazione dei dati quando non vengono definite pannelli.\nStato del nome corretto",
-                "es": "Corregido fallo en la evaluación de datos cuando no se definen paneles\nNombre del estado corregido",
-                "pl": "Naprawiono awarię evaluacji danych, gdy nie zdefiniowano żadnych paneli.\nstan nazwy naprawiony",
-                "uk": "Виправлено аварійне завершення оцінки даних, коли не визначено панелі\nВиправлено назву стану",
-                "zh-cn": "修复当未定义面板时数据评估崩溃的问题\n修正了状态名称"
-            },
-            "0.3.0": {
-                "en": "Added experimental datapoint for solar energy estimation (daily and hourly); Wind bearing text translated into ioBroker system language; Added new datapoint for MDI icons support; Add day and night objects in addition to daily objects; Enhanced day and night support with dedicated day/night icons",
-                "de": "Experimentellen Datenpunkt für Solarenergie-Schätzung (täglich und stündlich) hinzugefügt; Windrichtungs-Text wird in die ioBroker-Systemsprache übersetzt; Neuen Datenpunkt für MDI-Icons hinzugefügt; Tag- und Nacht-Objekte zusätzlich zu täglichen Objekten hinzugefügt; Verbesserte Tag-/Nacht-Unterstützung mit eigenen Tag-/Nacht-Icons",
-                "ru": "Добавлен экспериментальный датапоинт для оценки солнечной энергии (ежедневно и ежечасно); Текст направления ветра переведен на системный язык ioBroker; Добавлен новый датапоинт для поддержки MDI-иконок; Добавлены дневные и ночные объекты в дополнение к ежедневным; Улучшена поддержка дня и ночи с выделенными иконками дня/ночи",
-                "pt": "Adicionado ponto de dados experimental para estimativa de energia solar (diária e horária); Texto da direção do vento traduzido para o idioma do sistema ioBroker; Adicionado novo ponto de dados para suporte a ícones MDI; Adicionados objetos de dia e noite além de objetos diários; Suporte de dia e noite aprimorado com ícones dedicados de dia/noite",
-                "nl": "Experimenteel datapunt toegevoegd voor zonne-energie schatting (dagelijks en elk uur); Windrichtingtekst vertaald naar de ioBroker-systeemtaal; Nieuw datapunt toegevoegd voor MDI-iconen ondersteuning; Dag- en nachtobjecten toegevoegd naast dagelijkse objecten; Verbeterde dag- en nachtondersteuning met speciale dag/nacht-iconen",
-                "fr": "Ajout d'un point de données expérimental pour l'estimation de l'énergie solaire (quotidienne et horaire); Texte de direction du vent traduit dans la langue du système ioBroker; Nouveau point de données ajouté pour le support des icônes MDI; Ajout d'objets de jour et de nuit en plus des objets quotidiens; Prise en charge améliorée du jour et de la nuit avec des icônes dédiées",
-                "it": "Aggiunto datapoint sperimentale per la stima dell'energia solare (giornaliera e oraria); Testo della direzione del vento tradotto nella lingua di sistema di ioBroker; Aggiunto nuovo datapoint per il supporto delle icone MDI; Aggiunti oggetti giorno e notte oltre agli oggetti giornalieri; Supporto giorno/notte migliorato con icone dedicate",
-                "es": "Añadido punto de datos experimental para la estimación de energía solar (diaria y por hora); Texto de la dirección del viento traducido al idioma del sistema ioBroker; Añadido nuevo punto de datos para soporte de iconos MDI; Añadidos objetos de día y noche además de objetos diarios; Soporte de día y noche mejorado con iconos dedicados",
-                "pl": "Dodano eksperymentalny punkt danych do szacowania energii słonecznej (dziennie i godzinowo); Tekst kierunku wiatru przetłumaczony na język systemowy ioBroker; Dodano nowy punkt danych dla obsługi ikon MDI; Dodano obiekty dzienne i nocne oprócz obiektów codziennych; Ulepszono obsługę dnia i nocy z dedykowanymi ikonami dnia/nocy",
-                "uk": "Додано експериментальний датапоінт для оцінки сонячної енергії (щоденно та щогодини); Текст напрямку вітру перекладено мовою системи ioBroker; Додано новий датапоінт для підтримки іконок MDI; Додано денні та нічні об'єкти на додаток до щоденних; Покращена підтримка дня та ночі з окремими іконками дня/ночі",
-                "zh-cn": "新增用于太阳能估算（每日和每小时）的实验性数据点；风向文本翻译为 ioBroker 系统语言；新增支持 MDI 图标的数据点；除了每日对象外，还新增白天和夜间对象；改进了昼夜支持，提供专用的昼夜图标"
-            },
-            "0.2.4": {
-                "en": "Create all folders",
-                "de": "Alle Ordner erstellen",
-                "ru": "Создаем все папки",
-                "pt": "Criar todas as pastas",
-                "nl": "Alle mappen aanmaken",
-                "fr": "Créer tous les dossiers",
-                "it": "Crea tutte le cartelle",
-                "es": "Crear todas las carpetas",
-                "pl": "Utwórz wszystkie foldery",
-                "uk": "Створіть всі папки",
-                "zh-cn": "创建全部文件夹"
-            },
-            "0.2.3": {
-                "en": "wind bearing text added\nupdate deps",
-                "de": "windlager text hinzugefügt\nupdate deps",
-                "ru": "ветровой подшипник текст\nобновление deps",
-                "pt": "texto de rolamento de vento adicionado\natualizar deps",
-                "nl": "windlager tekst toegevoegd\nupdate deps",
-                "fr": "texte de roulement à vent ajouté\nmettre à jour les deps",
-                "it": "testo del cuscinetto del vento aggiunto\naggiornamento dep",
-                "es": "texto añadido\nactualización de los deps",
-                "pl": "dodany tekst nośnika wiatru\naktualizacje deps",
-                "uk": "оболонка тексту додано\nоновлення deps",
-                "zh-cn": "添加风向标文字\n更新代码"
-            }
-        },
-        "titleLang": {
-            "en": "Bright Sky",
-            "de": "Bright Sky",
-            "ru": "Bright Sky",
-            "pt": "Bright Sky",
-            "nl": "Bright Sky",
-            "fr": "Bright Sky",
-            "it": "Bright Sky",
-            "es": "Bright Sky",
-            "pl": "Bright Sky",
-            "uk": "Bright Sky",
-            "zh-cn": "Bright Sky"
-        },
-        "desc": {
-            "en": "Retrieve data from Bright Sky",
-            "de": "Daten vom Bright Sky abrufen",
-            "ru": "Получить данные с яркого неба",
-            "pt": "Recuperar dados do céu brilhante",
-            "nl": "Gegevens ophalen van Bright Sky",
-            "fr": "Récupérer les données de Bright Sky",
-            "it": "Recupera i dati dal cielo luminoso",
-            "es": "Recuperar datos de Bright Sky",
-            "pl": "Odzyskać dane z jasnego nieba",
-            "uk": "Отримати дані з яскравого неба",
-            "zh-cn": "从明亮的天空检索数据"
-        },
-        "authors": [
-            "ticaki <github@renopoint.de>"
-        ],
-        "keywords": [
-            "weather",
-            "Bright Sky"
-        ],
-        "licenseInformation": {
-            "type": "free",
-            "license": "MIT"
-        },
-        "platform": "Javascript/Node.js",
-        "icon": "brightsky.png",
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ticaki/ioBroker.brightsky/main/admin/brightsky.png",
-        "readme": "https://github.com/ticaki/ioBroker.brightsky/blob/main/README.md",
-        "loglevel": "info",
-        "tier": 2,
-        "mode": "daemon",
-        "type": "weather",
-        "compact": true,
-        "connectionType": "cloud",
-        "dataSource": "poll",
-        "adminUI": {
-            "config": "json"
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=6.0.11"
-            }
-        ],
-        "globalDependencies": [
-            {
-                "admin": ">=7.6.17"
-            }
-        ]
+  "common": {
+    "name": "brightsky",
+    "version": "0.3.5",
+    "news": {
+      "0.3.5": {
+        "en": "Corrected roles for visualisation (lovelance) fixes #28",
+        "de": "Korrigierte Rollen für Visualisierung (Lovelance) behoben #28",
+        "ru": "Исправлены роли для визуализации (Lovelace) исправление #28.",
+        "pt": "Corrigidos papéis para visualização (Lovelace) corrige #28",
+        "nl": "Gecorrigeerde rollen voor visualisatie (Lovelace) opgelost #28",
+        "fr": "Rôles corrigés pour la visualisation (lovelace) corrections #28",
+        "it": "Ruoli corretti per la visualizzazione (Lovelace) risolve #28",
+        "es": "Roles corregidos para visualización (Lovelace) soluciona #28",
+        "pl": "Poprawione role dla wizualizacji (Lovelace) naprawia #28",
+        "uk": "Виправлені ролі для візуалізації (lovelace) виправляють #28",
+        "zh-cn": "为可视化（lovelace）修正了角色（修复＃28）"
+      },
+      "0.3.4": {
+        "en": "fixed too low limit for currently updates",
+        "de": "zu niedriges Limit für 'currently'-Aktualisierungen korrigiert",
+        "ru": "исправлено слишком низкое ограничение для обновлений 'currently'",
+        "pt": "corrigido limite muito baixo para atualizações de 'currently'",
+        "nl": "te lage limiet voor 'currently'-updates gecorrigeerd",
+        "fr": "correction d'une limite trop basse pour les mises à jour 'currently'",
+        "it": "corretto limite troppo basso per gli aggiornamenti 'currently'",
+        "es": "corregido límite demasiado bajo para actualizaciones de 'currently'",
+        "pl": "naprawiono zbyt niski limit dla aktualizacji 'currently'",
+        "uk": "виправлено занадто низький ліміт для оновлень 'currently'",
+        "zh-cn": "修复了“currently”更新的限制过低问题"
+      },
+      "0.3.3": {
+        "en": "update current at sunrise and sunset (unless custom interval is too large)\nadded inverter limiting",
+        "de": "Aktualisierung bei Sonnenaufgang und Sonnenuntergang (außer wenn das benutzerdefinierte Intervall zu groß ist)\nWechselrichterbegrenzung hinzugefügt",
+        "ru": "обновление значений на восходе и закате солнца (если пользовательский интервал не слишком большой)\nдобавлено ограничение инвертора",
+        "pt": "atualização ao nascer e ao pôr do sol (a menos que o intervalo personalizado seja demasiado grande)\nlimitação do inversor adicionada",
+        "nl": "Bijwerken bij zonsopgang en zonsondergang (behalve wanneer het aangepaste interval te groot is)\ninverterbegrenzing toegevoegd",
+        "fr": "mise à jour au lever et au coucher du soleil (sauf si l’intervalle personnalisé est trop grand)\najout d’une limitation de l’onduleur",
+        "it": "aggiornamento all’alba e al tramonto (tranne quando l’intervallo personalizzato è troppo grande)\naggiunta la limitazione dell’inverter",
+        "es": "actualización al amanecer y al atardecer (excepto cuando el intervalo personalizado sea demasiado grande)\nañadida la limitación del inversor",
+        "pl": "aktualizacja o wschodzie i zachodzie słońca (chyba że niestandardowy interwał jest zbyt duży)\ndodano ograniczenie falownika",
+        "uk": "оновлення на світанку та заході сонця (крім випадків, коли власний інтервал надто великий)\nдодано обмеження інвертора",
+        "zh-cn": "在日出和日落时更新（除非自定义间隔过大）\n添加逆变器限制"
+      },
+      "0.3.2": {
+        "en": "Solar estimation calculation revised",
+        "de": "Überarbeitete Berechnung der Solarabschätzung",
+        "ru": "Пересмотрен расчет оценки солнечной энергии",
+        "pt": "Cálculo de estimativa solar revisado",
+        "nl": "Herziene berekening van zonneschijnschatting",
+        "fr": "Calcul de l'estimation solaire révisé",
+        "it": "Calcolo della stima solare rivisto",
+        "es": "Cálculo de estimación solar revisado",
+        "pl": "Przeliczanie szacunkowe energii słonecznej poprawione",
+        "uk": "Перераховано розрахунок оцінки сонячного потенціалу",
+        "zh-cn": "太阳能估算计算已经修订"
+      },
+      "0.3.1": {
+        "en": "Fixed data evaluation crash when no panels are defined  \nstate name fixed",
+        "de": "Behoben: Abbruch der Datenauswertung, wenn keine Panels definiert sind\nState common.name korrigiert",
+        "ru": "Исправлена ошибка сбоя при оценке данных, если панели не определены\nИсправлено имя состояния",
+        "pt": "Corrigido erro de falha na avaliação de dados quando nenhum painel é definido\nNome do estado corrigido.",
+        "nl": "Opgelost: Crash bij het evalueren van gegevens wanneer er geen panelen zijn gedefinieerd\nStatusnaam hersteld",
+        "fr": "Correction du plantage de l'évaluation des données lorsque aucun panneau n'est défini\nNom de l'état corrigé",
+        "it": "Risolto il crash dell'elaborazione dei dati quando non vengono definite pannelli.\nStato del nome corretto",
+        "es": "Corregido fallo en la evaluación de datos cuando no se definen paneles\nNombre del estado corregido",
+        "pl": "Naprawiono awarię evaluacji danych, gdy nie zdefiniowano żadnych paneli.\nstan nazwy naprawiony",
+        "uk": "Виправлено аварійне завершення оцінки даних, коли не визначено панелі\nВиправлено назву стану",
+        "zh-cn": "修复当未定义面板时数据评估崩溃的问题\n修正了状态名称"
+      },
+      "0.3.0": {
+        "en": "Added experimental datapoint for solar energy estimation (daily and hourly); Wind bearing text translated into ioBroker system language; Added new datapoint for MDI icons support; Add day and night objects in addition to daily objects; Enhanced day and night support with dedicated day/night icons",
+        "de": "Experimentellen Datenpunkt für Solarenergie-Schätzung (täglich und stündlich) hinzugefügt; Windrichtungs-Text wird in die ioBroker-Systemsprache übersetzt; Neuen Datenpunkt für MDI-Icons hinzugefügt; Tag- und Nacht-Objekte zusätzlich zu täglichen Objekten hinzugefügt; Verbesserte Tag-/Nacht-Unterstützung mit eigenen Tag-/Nacht-Icons",
+        "ru": "Добавлен экспериментальный датапоинт для оценки солнечной энергии (ежедневно и ежечасно); Текст направления ветра переведен на системный язык ioBroker; Добавлен новый датапоинт для поддержки MDI-иконок; Добавлены дневные и ночные объекты в дополнение к ежедневным; Улучшена поддержка дня и ночи с выделенными иконками дня/ночи",
+        "pt": "Adicionado ponto de dados experimental para estimativa de energia solar (diária e horária); Texto da direção do vento traduzido para o idioma do sistema ioBroker; Adicionado novo ponto de dados para suporte a ícones MDI; Adicionados objetos de dia e noite além de objetos diários; Suporte de dia e noite aprimorado com ícones dedicados de dia/noite",
+        "nl": "Experimenteel datapunt toegevoegd voor zonne-energie schatting (dagelijks en elk uur); Windrichtingtekst vertaald naar de ioBroker-systeemtaal; Nieuw datapunt toegevoegd voor MDI-iconen ondersteuning; Dag- en nachtobjecten toegevoegd naast dagelijkse objecten; Verbeterde dag- en nachtondersteuning met speciale dag/nacht-iconen",
+        "fr": "Ajout d'un point de données expérimental pour l'estimation de l'énergie solaire (quotidienne et horaire); Texte de direction du vent traduit dans la langue du système ioBroker; Nouveau point de données ajouté pour le support des icônes MDI; Ajout d'objets de jour et de nuit en plus des objets quotidiens; Prise en charge améliorée du jour et de la nuit avec des icônes dédiées",
+        "it": "Aggiunto datapoint sperimentale per la stima dell'energia solare (giornaliera e oraria); Testo della direzione del vento tradotto nella lingua di sistema di ioBroker; Aggiunto nuovo datapoint per il supporto delle icone MDI; Aggiunti oggetti giorno e notte oltre agli oggetti giornalieri; Supporto giorno/notte migliorato con icone dedicate",
+        "es": "Añadido punto de datos experimental para la estimación de energía solar (diaria y por hora); Texto de la dirección del viento traducido al idioma del sistema ioBroker; Añadido nuevo punto de datos para soporte de iconos MDI; Añadidos objetos de día y noche además de objetos diarios; Soporte de día y noche mejorado con iconos dedicados",
+        "pl": "Dodano eksperymentalny punkt danych do szacowania energii słonecznej (dziennie i godzinowo); Tekst kierunku wiatru przetłumaczony na język systemowy ioBroker; Dodano nowy punkt danych dla obsługi ikon MDI; Dodano obiekty dzienne i nocne oprócz obiektów codziennych; Ulepszono obsługę dnia i nocy z dedykowanymi ikonami dnia/nocy",
+        "uk": "Додано експериментальний датапоінт для оцінки сонячної енергії (щоденно та щогодини); Текст напрямку вітру перекладено мовою системи ioBroker; Додано новий датапоінт для підтримки іконок MDI; Додано денні та нічні об'єкти на додаток до щоденних; Покращена підтримка дня та ночі з окремими іконками дня/ночі",
+        "zh-cn": "新增用于太阳能估算（每日和每小时）的实验性数据点；风向文本翻译为 ioBroker 系统语言；新增支持 MDI 图标的数据点；除了每日对象外，还新增白天和夜间对象；改进了昼夜支持，提供专用的昼夜图标"
+      },
+      "0.2.4": {
+        "en": "Create all folders",
+        "de": "Alle Ordner erstellen",
+        "ru": "Создаем все папки",
+        "pt": "Criar todas as pastas",
+        "nl": "Alle mappen aanmaken",
+        "fr": "Créer tous les dossiers",
+        "it": "Crea tutte le cartelle",
+        "es": "Crear todas las carpetas",
+        "pl": "Utwórz wszystkie foldery",
+        "uk": "Створіть всі папки",
+        "zh-cn": "创建全部文件夹"
+      }
     },
-    "native": {
-        "position": "",
-        "pollInterval": 1,
-        "maxDistance": 50000
+    "titleLang": {
+      "en": "Bright Sky",
+      "de": "Bright Sky",
+      "ru": "Bright Sky",
+      "pt": "Bright Sky",
+      "nl": "Bright Sky",
+      "fr": "Bright Sky",
+      "it": "Bright Sky",
+      "es": "Bright Sky",
+      "pl": "Bright Sky",
+      "uk": "Bright Sky",
+      "zh-cn": "Bright Sky"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Device or service connected",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
+    "desc": {
+      "en": "Retrieve data from Bright Sky",
+      "de": "Daten vom Bright Sky abrufen",
+      "ru": "Получить данные с яркого неба",
+      "pt": "Recuperar dados do céu brilhante",
+      "nl": "Gegevens ophalen van Bright Sky",
+      "fr": "Récupérer les données de Bright Sky",
+      "it": "Recupera i dati dal cielo luminoso",
+      "es": "Recuperar datos de Bright Sky",
+      "pl": "Odzyskać dane z jasnego nieba",
+      "uk": "Отримати дані з яскравого неба",
+      "zh-cn": "从明亮的天空检索数据"
+    },
+    "authors": [
+      "ticaki <github@renopoint.de>"
+    ],
+    "keywords": [
+      "weather",
+      "Bright Sky"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "icon": "brightsky.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/ticaki/ioBroker.brightsky/main/admin/brightsky.png",
+    "readme": "https://github.com/ticaki/ioBroker.brightsky/blob/main/README.md",
+    "loglevel": "info",
+    "tier": 2,
+    "mode": "daemon",
+    "type": "weather",
+    "compact": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.17"
+      }
     ]
+  },
+  "native": {
+    "position": "",
+    "pollInterval": 1,
+    "maxDistance": 50000
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
