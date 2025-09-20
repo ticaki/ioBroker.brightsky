@@ -178,7 +178,7 @@ class Library extends BaseClass {
         return;
       }
       if (objectDefinition.type === "state" && objectDefinition.common.role && objectDefinition.common.role !== "value" && objectDefinition.common.role !== "text" && prefix.startsWith("daily")) {
-       const d = prefix.split(".");
+        const d = prefix.split(".");
         if (d.length == 3 && !isNaN(parseInt(d[1], 10))) {
           objectDefinition = {
             ...objectDefinition,
