@@ -103,7 +103,7 @@ class TestDataProvider {
         throw new Error(`Unknown API endpoint: ${url}`);
     }
 
-    // axios-Mock is no longer needed
+    // axios mock is no longer needed
 }
 
 module.exports = { TestDataProvider };
