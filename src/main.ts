@@ -1138,7 +1138,7 @@ class Brightsky extends utils.Adapter {
 
         const response = await fetch(url, {
             ...init,
-            method: 'GET',
+            method: init?.method ?? 'GET',
             signal: controller.signal,
         });
 
