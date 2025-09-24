@@ -83,7 +83,7 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.4.0 (2025-09-24)
 - (ticaki) Code migration from axios to node:fetch
 
 ### 0.3.5 (2025-09-20)

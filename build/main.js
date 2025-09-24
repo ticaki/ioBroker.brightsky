@@ -510,7 +510,7 @@ class Brightsky extends utils.Adapter {
         `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`
       );
       if (response.status !== 200) {
-        throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
+        throw new Error(`Error fetching current weather data: ${response.status} ${response.statusText}`);
       }
       const result = { data: await response.json() };
       if (result.data) {
@@ -957,11 +957,12 @@ class Brightsky extends utils.Adapter {
     return totalWh;
   }
   async fetch(url, init) {
+    var _a;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3e4);
     const response = await fetch(url, {
       ...init,
-      method: "GET",
+      method: (_a = init == null ? void 0 : init.method) != null ? _a : "GET",
       signal: controller.signal
     });
     clearTimeout(timeoutId);
