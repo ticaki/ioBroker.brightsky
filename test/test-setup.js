@@ -3,8 +3,6 @@
  * This module must be loaded before any tests that use the adapter
  */
 
-const path = require('path');
-const fs = require('fs');
 const { TestDataProvider } = require('./test-data-provider');
 
 // Initialize test data provider
@@ -56,36 +54,10 @@ function setupTestEnvironment() {
     console.log('✅ Test environment configured with offline data');
 }
 
-/**
- * Restore original environment after tests
- */
-function teardownTestEnvironment() {
-    console.log('🧹 Restoring original environment after tests');
-    Module.prototype.require = originalRequire;
-}
-
-/**
- * Setup process handlers
- */
-function setupProcessHandlers() {
-    // Clean up on exit
-    process.on('exit', teardownTestEnvironment);
-    process.on('SIGINT', () => {
-        teardownTestEnvironment();
-        process.exit(0);
-    });
-    process.on('SIGTERM', () => {
-        teardownTestEnvironment();
-        process.exit(0);
-    });
-}
-
 // Auto-setup when this module is loaded
 setupTestEnvironment();
-setupProcessHandlers();
 
 module.exports = {
     setupTestEnvironment,
-    teardownTestEnvironment,
     testDataProvider
 };
