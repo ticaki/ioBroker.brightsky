@@ -28,8 +28,9 @@ class TestDataProvider {
             );
             console.log('✅ Test data loaded successfully');
         } catch (error) {
-            console.error('❌ Error loading test data:', error.message);
-            throw error;
+            const err = error instanceof Error ? error : new Error(String(error));
+            console.error('❌ Error loading test data:', err.message);
+            throw err;
         }
     }
 
@@ -55,10 +56,10 @@ class TestDataProvider {
     }
 
     /**
-     * Mock axios response for different API endpoints
-     * @param {string} url - The API URL to mock
-     * @returns {Object} Mocked axios response
-     */
+    * Mock response for different API endpoints
+    * @param {string} url - The API URL to mock
+    * @returns {Object} Mocked response
+    */
     mockAxiosResponse(url) {
         if (url.includes('current_weather')) {
             return {
@@ -102,20 +103,7 @@ class TestDataProvider {
         throw new Error(`Unknown API endpoint: ${url}`);
     }
 
-    /**
-     * Create a mock axios object for testing
-     */
-    createMockAxios() {
-        return {
-            get: async (url) => {
-                console.log(`🔄 Mock API call: ${url}`);
-                return this.mockAxiosResponse(url);
-            },
-            defaults: {
-                timeout: 15000
-            }
-        };
-    }
+    // axios-Mock is no longer needed
 }
 
 module.exports = { TestDataProvider };
