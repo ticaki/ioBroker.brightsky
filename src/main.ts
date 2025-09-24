@@ -576,7 +576,7 @@ class Brightsky extends utils.Adapter {
                 `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`,
             );
             if (response.status !== 200) {
-                throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
+                throw new Error(`Error fetching current weather data: ${response.status} ${response.statusText}`);
             }
             const result = { data: await response.json() } as any;
             if (result.data) {
