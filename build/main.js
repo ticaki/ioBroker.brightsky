@@ -22,11 +22,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var utils = __toESM(require("@iobroker/adapter-core"));
-var import_axios = __toESM(require("axios"));
 var import_library = require("./lib/library");
 var import_definition = require("./lib/definition");
 var suncalc = __toESM(require("suncalc"));
-import_axios.default.defaults.timeout = 15e3;
 class Brightsky extends utils.Adapter {
   library;
   unload = false;
@@ -177,12 +175,16 @@ class Brightsky extends utils.Adapter {
       new Date((/* @__PURE__ */ new Date()).setHours(23, 59, 59, 999)).setDate((/* @__PURE__ */ new Date()).getDate() + 7)
     ).toISOString();
     try {
-      const result = await import_axios.default.get(
+      const response = await this.fetch(
         `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
       this.log.debug(
         `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
+      if (response.status !== 200) {
+        throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
+      }
+      const result = { data: await response.json() };
       if (result.data) {
         this.log.debug(`Daily weather data fetched successfully: ${JSON.stringify(result.data)}`);
         if (result.data.weather && Array.isArray(result.data.weather)) {
@@ -443,9 +445,13 @@ class Brightsky extends utils.Adapter {
     const startTime = new Date((/* @__PURE__ */ new Date()).setMinutes(0, 0, 0)).toISOString();
     const endTime = new Date((/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.hours, 0, 0, 0)).toISOString();
     try {
-      const result = await import_axios.default.get(
+      const response = await this.fetch(
         `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
+      if (response.status !== 200) {
+        throw new Error(`Error fetching hourly weather data: ${response.status} ${response.statusText}`);
+      }
+      const result = { data: await response.json() };
       if (result.data) {
         this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
         if (result.data.weather && Array.isArray(result.data.weather)) {
@@ -500,9 +506,13 @@ class Brightsky extends utils.Adapter {
   async weatherCurrentlyUpdate() {
     var _a;
     try {
-      const result = await import_axios.default.get(
+      const response = await this.fetch(
         `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`
       );
+      if (response.status !== 200) {
+        throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
+      }
+      const result = { data: await response.json() };
       if (result.data) {
         this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
         if (result.data.weather) {
@@ -945,6 +955,17 @@ class Brightsky extends utils.Adapter {
       totalWh += maxPower > 0 ? Math.min(maxPower, totalGroupPower) : totalGroupPower;
     }
     return totalWh;
+  }
+  async fetch(url, init) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3e4);
+    const response = await fetch(url, {
+      ...init,
+      method: "GET",
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response;
   }
 }
 if (require.main !== module) {

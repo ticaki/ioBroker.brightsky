@@ -8,7 +8,6 @@ type Panel = ioBroker.AdapterConfig['panels'][0];
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
-import axios from 'axios';
 import { Library } from './lib/library';
 import type { BrightskyCurrently, BrightskyHourly } from './lib/definition';
 import {
@@ -18,8 +17,6 @@ import {
     type BrightskyWeather,
 } from './lib/definition';
 import * as suncalc from 'suncalc';
-
-axios.defaults.timeout = 15000; // Set a default timeout of 10 seconds for all axios requests
 
 // Load your modules here, e.g.:
 // import * as fs from "fs";
@@ -200,12 +197,18 @@ class Brightsky extends utils.Adapter {
             new Date(new Date().setHours(23, 59, 59, 999)).setDate(new Date().getDate() + 7),
         ).toISOString();
         try {
-            const result: { data: BrightskyHourly } = await axios.get(
+            const response = await this.fetch(
                 `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
             this.log.debug(
                 `https://api.brightsky.dev/weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
+            if (response.status !== 200) {
+                throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
+            }
+            const result = { data: await response.json() } as {
+                data: { weather: BrightskyWeather[]; sources: any[] } | null;
+            };
             if (result.data) {
                 this.log.debug(`Daily weather data fetched successfully: ${JSON.stringify(result.data)}`);
                 if (result.data.weather && Array.isArray(result.data.weather)) {
@@ -502,14 +505,20 @@ class Brightsky extends utils.Adapter {
         const startTime = new Date(new Date().setMinutes(0, 0, 0)).toISOString();
         const endTime = new Date(new Date().setHours(new Date().getHours() + this.config.hours, 0, 0, 0)).toISOString();
         try {
-            const result = await axios.get(
+            const response = await this.fetch(
                 `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
+            if (response.status !== 200) {
+                throw new Error(`Error fetching hourly weather data: ${response.status} ${response.statusText}`);
+            }
+            const result = { data: await response.json() } as {
+                data: BrightskyHourly | null;
+            };
             if (result.data) {
                 this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
 
                 if (result.data.weather && Array.isArray(result.data.weather)) {
-                    for (const item of result.data.weather as BrightskyWeather[]) {
+                    for (const item of result.data.weather) {
                         if (!item) {
                             continue; // Skip if item is null or undefined
                         }
@@ -563,9 +572,13 @@ class Brightsky extends utils.Adapter {
     }
     async weatherCurrentlyUpdate(): Promise<void> {
         try {
-            const result = await axios.get(
+            const response = await this.fetch(
                 `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`,
             );
+            if (response.status !== 200) {
+                throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
+            }
+            const result = { data: await response.json() } as any;
             if (result.data) {
                 this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
                 if (result.data.weather) {
@@ -1117,6 +1130,21 @@ class Brightsky extends utils.Adapter {
         }
 
         return totalWh;
+    }
+
+    async fetch(url: string, init?: RequestInit): Promise<Response> {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds timeout
+
+        const response = await fetch(url, {
+            ...init,
+            method: 'GET',
+            signal: controller.signal,
+        });
+
+        // Clear the timeout since the request completed
+        clearTimeout(timeoutId);
+        return response;
     }
 }
 
