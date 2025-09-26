@@ -26,7 +26,8 @@ class Brightsky extends utils.Adapter {
     unload: boolean = false;
     posId: string = '';
     weatherTimeout: (ioBroker.Timeout | null | undefined)[] = [];
-
+    controller: AbortController | null = null;
+    timeoutId: ioBroker.Timeout | undefined = undefined;
     groupArray: Panel[][] = [];
     wrArray: number[] = [];
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
@@ -655,6 +656,13 @@ class Brightsky extends utils.Adapter {
                 if (timeout) {
                     this.clearTimeout(timeout);
                 }
+            }
+            if (this.timeoutId) {
+                this.clearTimeout(this.timeoutId);
+            }
+            if (this.controller) {
+                this.controller.abort();
+                this.controller = null;
             }
 
             callback();
@@ -1309,18 +1317,33 @@ class Brightsky extends utils.Adapter {
     }
 
     async fetch(url: string, init?: RequestInit): Promise<Response> {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds timeout
+        this.controller = new AbortController();
+        const currentController = this.controller;
+        this.timeoutId = this.setTimeout(() => {
+            if (this.controller === currentController && this.controller) {
+                this.controller.abort();
+                this.controller = null;
+            }
+        }, 30000); // 30 seconds timeout
 
-        const response = await fetch(url, {
-            ...init,
-            method: init?.method ?? 'GET',
-            signal: controller.signal,
-        });
+        try {
+            const response = await fetch(url, {
+                ...init,
+                method: init?.method ?? 'GET',
+                signal: this.controller.signal,
+            });
 
-        // Clear the timeout since the request completed
-        clearTimeout(timeoutId);
-        return response;
+            // Clear the timeout since the request completed
+            this.clearTimeout(this.timeoutId);
+            this.timeoutId = undefined;
+            this.controller = null;
+            return response;
+        } catch (error) {
+            this.clearTimeout(this.timeoutId);
+            this.timeoutId = undefined;
+            this.controller = null;
+            throw error;
+        }
     }
 }
 

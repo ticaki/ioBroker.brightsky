@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.3.5",
+    "version": "0.4.0",
     "news": {
+      "0.4.0": {
+        "en": "Code migration from axios to node:fetch",
+        "de": "Code Migration von axios zu node:fetch",
+        "ru": "Код миграции из аксиоса в узел: прим",
+        "pt": "Migração de código de axios para nó:fetch",
+        "nl": "Code migratie van axios naar node:fetch",
+        "fr": "Migration de code de l'axios vers le noeud:fetch",
+        "it": "Codice di migrazione da assios a nodo:fetch",
+        "es": "Migración de códigos desde el eje hasta el nodo:fetch",
+        "pl": "Kod migracji z aksjozów do węzła: pobrać",
+        "uk": "Переміщення коду з аксіосу в вузол:fetch",
+        "zh-cn": "代码从轴移到节点: fatch"
+      },
       "0.3.5": {
         "en": "Corrected roles for visualisation (lovelance) fixes #28",
         "de": "Korrigierte Rollen für Visualisierung (Lovelance) behoben #28",
@@ -80,19 +93,6 @@
         "pl": "Dodano eksperymentalny punkt danych do szacowania energii słonecznej (dziennie i godzinowo); Tekst kierunku wiatru przetłumaczony na język systemowy ioBroker; Dodano nowy punkt danych dla obsługi ikon MDI; Dodano obiekty dzienne i nocne oprócz obiektów codziennych; Ulepszono obsługę dnia i nocy z dedykowanymi ikonami dnia/nocy",
         "uk": "Додано експериментальний датапоінт для оцінки сонячної енергії (щоденно та щогодини); Текст напрямку вітру перекладено мовою системи ioBroker; Додано новий датапоінт для підтримки іконок MDI; Додано денні та нічні об'єкти на додаток до щоденних; Покращена підтримка дня та ночі з окремими іконками дня/ночі",
         "zh-cn": "新增用于太阳能估算（每日和每小时）的实验性数据点；风向文本翻译为 ioBroker 系统语言；新增支持 MDI 图标的数据点；除了每日对象外，还新增白天和夜间对象；改进了昼夜支持，提供专用的昼夜图标"
-      },
-      "0.2.4": {
-        "en": "Create all folders",
-        "de": "Alle Ordner erstellen",
-        "ru": "Создаем все папки",
-        "pt": "Criar todas as pastas",
-        "nl": "Alle mappen aanmaken",
-        "fr": "Créer tous les dossiers",
-        "it": "Crea tutte le cartelle",
-        "es": "Crear todas las carpetas",
-        "pl": "Utwórz wszystkie foldery",
-        "uk": "Створіть всі папки",
-        "zh-cn": "创建全部文件夹"
       }
     },
     "titleLang": {

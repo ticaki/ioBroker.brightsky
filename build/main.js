@@ -30,6 +30,8 @@ class Brightsky extends utils.Adapter {
   unload = false;
   posId = "";
   weatherTimeout = [];
+  controller = null;
+  timeoutId = void 0;
   groupArray = [];
   wrArray = [];
   constructor(options = {}) {
@@ -586,6 +588,13 @@ class Brightsky extends utils.Adapter {
           this.clearTimeout(timeout);
         }
       }
+      if (this.timeoutId) {
+        this.clearTimeout(this.timeoutId);
+      }
+      if (this.controller) {
+        this.controller.abort();
+        this.controller = null;
+      }
       callback();
     } catch {
       callback();
@@ -1128,15 +1137,27 @@ class Brightsky extends utils.Adapter {
   }
   async fetch(url, init) {
     var _a;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3e4);
-    const response = await fetch(url, {
-      ...init,
-      method: (_a = init == null ? void 0 : init.method) != null ? _a : "GET",
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-    return response;
+    this.controller = new AbortController();
+    this.timeoutId = this.setTimeout(() => {
+      this.controller && this.controller.abort();
+      this.controller = null;
+    }, 3e4);
+    try {
+      const response = await fetch(url, {
+        ...init,
+        method: (_a = init == null ? void 0 : init.method) != null ? _a : "GET",
+        signal: this.controller.signal
+      });
+      this.clearTimeout(this.timeoutId);
+      this.timeoutId = void 0;
+      this.controller = null;
+      return response;
+    } catch (error) {
+      this.clearTimeout(this.timeoutId);
+      this.timeoutId = void 0;
+      this.controller = null;
+      throw error;
+    }
   }
 }
 if (require.main !== module) {
