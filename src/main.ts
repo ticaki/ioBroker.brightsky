@@ -1318,9 +1318,12 @@ class Brightsky extends utils.Adapter {
 
     async fetch(url: string, init?: RequestInit): Promise<Response> {
         this.controller = new AbortController();
+        const currentController = this.controller;
         this.timeoutId = this.setTimeout(() => {
-            this.controller && this.controller.abort();
-            this.controller = null;
+            if (this.controller === currentController && this.controller) {
+                this.controller.abort();
+                this.controller = null;
+            }
         }, 30000); // 30 seconds timeout
 
         try {
