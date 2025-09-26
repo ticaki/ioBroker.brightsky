@@ -890,9 +890,6 @@ class Brightsky extends utils.Adapter {
                 }
             }
 
-            this.log.info(
-                `DEBUG: rainCount=${rainCount}, drizzleCount=${drizzleCount}, rainFrac=${rainFrac}, drizzleFrac=${drizzleCount / hours}`,
-            );
             // Rain
             if (rainCount >= T.rain.minCount) {
                 if (rainFrac >= T.rain.heavy) {
@@ -909,7 +906,6 @@ class Brightsky extends utils.Adapter {
             }
 
             // Fog
-            this.log.info(`DEBUG: fogCount=${fogCount}, fogFrac=${fogFrac}`);
             if (fogCount >= T.fog.minCount) {
                 if (fogFrac >= T.fog.present) {
                     return 'fog';
