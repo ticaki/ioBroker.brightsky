@@ -1594,6 +1594,8 @@ export type BrightskyWeather = {
     solar_estimate?: number | null;
 
     icon: string | null;
+    icon_special?: string | null;
+    iconUrl?: string | null;
 };
 
 // Typ für ein einzelnes Source-Objekt in testdata.sources

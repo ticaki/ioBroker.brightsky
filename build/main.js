@@ -459,12 +459,25 @@ class Brightsky extends utils.Adapter {
       if (result.data) {
         this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
         if (result.data.weather && Array.isArray(result.data.weather)) {
+          const coords = this.config.position.split(",").map(parseFloat);
           for (const item of result.data.weather) {
             if (!item) {
               continue;
             }
             item.solar_estimate = 0;
             item.wind_bearing_text = this.getWindBearingText((_a = item.wind_direction) != null ? _a : void 0);
+            const t = new Date(item.timestamp);
+            const { sunrise, sunset } = suncalc.getTimes(t, coords[0], coords[1]);
+            const isDayTime = t >= sunrise && t <= sunset;
+            const iconsHour = this.pickHourlyWeatherIcon({
+              condition: item.condition,
+              wind_speed: item.wind_speed,
+              cloud_cover: item.cloud_cover,
+              day: isDayTime,
+              precipitation_probability: item.precipitation_probability
+            });
+            item.icon_special = iconsHour.mdi;
+            item.iconUrl = iconsHour.url;
             if (this.config.position.split(",").length === 2 && this.config.panels.length > 0 && item.solar) {
               item.solar_estimate = this.estimatePVEnergyForHour(
                 (_b = item.solar) != null ? _b : 0,
@@ -526,10 +539,10 @@ class Brightsky extends utils.Adapter {
           const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
           const now = /* @__PURE__ */ new Date();
           const isDayTime = now >= sunrise && now <= sunset;
-          const iconsNow = this.pickDailyWeatherIcon({
-            condition: [weather.condition],
-            wind_speed: [weather.wind_speed_10],
-            cloud_cover: [weather.cloud_cover],
+          const iconsNow = this.pickHourlyWeatherIcon({
+            condition: weather.condition,
+            wind_speed: weather.wind_speed_10,
+            cloud_cover: weather.cloud_cover,
             day: isDayTime
           });
           weather.icon_special = iconsNow.mdi;
@@ -840,6 +853,136 @@ class Brightsky extends utils.Adapter {
         return "breezy";
       }
       return isDay ? T.defaults.iceDay : T.defaults.iceNight;
+    };
+    const mdi = selectMdi();
+    const iceFile = selectIcebear();
+    const icebear = `/adapter/${this.name}/icons/icebear/${iceFile}.svg`;
+    return { mdi, url: icebear };
+  }
+  /**
+   * Pick best fitting weather icon for a single hour, honoring day/night, for both MDI and Icebear.
+   * Inputs are single values (not arrays) from one hourly datapoint.
+   *
+   * @param hour Inputs for one hour
+   * @param hour.condition Condition string (e.g. rain, snow, fog, thunderstorm, ...)
+   * @param hour.wind_speed Wind speed in km/h
+   * @param hour.cloud_cover Cloud cover in %
+   * @param hour.precipitation_probability Probability of precipitation in % (0..100)
+   * @param hour.day Whether it is day (true) or night (false); default true
+   */
+  pickHourlyWeatherIcon(hour) {
+    var _a, _b, _c, _d;
+    const T = {
+      wind: { dangerous: 118.8, strong: 61.2, breezy: 35 },
+      // km/h
+      clouds: { cloudy: 80, partly: 40 },
+      // %
+      precip: {
+        // possible rain via probability window (if no solid precip condition)
+        possibleMinPct: 20,
+        possibleMaxPct: 60
+      }
+    };
+    const isDay = hour.day !== false;
+    const cond = (_a = hour.condition) != null ? _a : "";
+    const wind = (_b = hour.wind_speed) != null ? _b : 0;
+    const clouds = (_c = hour.cloud_cover) != null ? _c : 0;
+    const prob = (_d = hour.precipitation_probability) != null ? _d : null;
+    const hasDangerousWind = wind >= T.wind.dangerous;
+    const hasStrongWind = wind >= T.wind.strong;
+    const hasBreezyWind = wind >= T.wind.breezy;
+    const isThunder = cond === "thunderstorm";
+    const isHail = cond === "hail";
+    const isSnow = cond === "snow";
+    const isSleet = cond === "sleet";
+    const isDrizzle = cond === "drizzle";
+    const isRain = cond === "rain";
+    const isFogLike = cond === "fog" || cond === "mist" || cond === "haze";
+    const isSmoke = cond === "smoke";
+    const selectMdi = () => {
+      if (hasDangerousWind) {
+        return "weather-tornado";
+      }
+      if (isThunder) {
+        return "weather-lightning";
+      }
+      if (isHail) {
+        return "weather-hail";
+      }
+      if (isSnow) {
+        return "weather-snowy-heavy";
+      }
+      if (isSleet) {
+        return "weather-snowy-rainy";
+      }
+      if (isRain) {
+        return "weather-pouring";
+      }
+      if (isDrizzle) {
+        return "weather-rainy";
+      }
+      if (isFogLike || isSmoke) {
+        return "weather-fog";
+      }
+      if (hasStrongWind) {
+        return "weather-windy";
+      }
+      if (clouds > T.clouds.cloudy) {
+        return "weather-cloudy";
+      }
+      if (clouds > T.clouds.partly) {
+        return isDay ? "weather-partly-cloudy" : "weather-night-partly-cloudy";
+      }
+      if (!isDay) {
+        return "weather-night";
+      }
+      return "weather-sunny";
+    };
+    const selectIcebear = () => {
+      const daySuffix = isDay ? "day" : "night";
+      if (hasDangerousWind) {
+        return "dangerous-wind";
+      }
+      if (isThunder) {
+        return "thunderstorm";
+      }
+      if (isHail) {
+        return "hail";
+      }
+      if (isSnow) {
+        return "snow";
+      }
+      if (isSleet) {
+        return "sleet";
+      }
+      if (!cond && prob != null && prob >= T.precip.possibleMinPct && prob < T.precip.possibleMaxPct) {
+        return `possible-rain-${daySuffix}`;
+      }
+      if (isFogLike) {
+        return "fog";
+      }
+      if (isSmoke) {
+        return "smoke";
+      }
+      if (isRain) {
+        return "rain";
+      }
+      if (isDrizzle) {
+        return "drizzle";
+      }
+      if (hasStrongWind) {
+        return "wind";
+      }
+      if (clouds > T.clouds.cloudy) {
+        return "cloudy";
+      }
+      if (hasBreezyWind) {
+        return "breezy";
+      }
+      if (clouds > T.clouds.partly) {
+        return `partly-cloudy-${daySuffix}`;
+      }
+      return isDay ? "clear-day" : "clear-night";
     };
     const mdi = selectMdi();
     const iceFile = selectIcebear();
