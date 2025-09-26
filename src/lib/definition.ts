@@ -527,6 +527,30 @@ const hourly: ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject> =
         },
         native: {},
     },
+    icon_special: {
+        _id: 'icon_special',
+        type: 'state',
+        common: {
+            name: 'Weather Icon(mdi)',
+            type: 'string',
+            role: 'weather.icon.name',
+            read: true,
+            write: false,
+        },
+        native: {},
+    },
+    iconUrl: {
+        _id: 'iconUrl',
+        type: 'state',
+        common: {
+            name: 'Icon URL',
+            type: 'string',
+            role: 'weather.icon',
+            read: true,
+            write: false,
+        },
+        native: {},
+    },
 };
 const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, ioBroker.StateObject> = {
     _channel: {
