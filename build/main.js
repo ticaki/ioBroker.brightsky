@@ -379,11 +379,13 @@ class Brightsky extends utils.Adapter {
                   } else {
                     dailyData[k] = null;
                   }
-                  dailyData.icon_special = this.pickDailyWeatherIcon({
+                  const iconsDay = this.pickDailyWeatherIcon({
                     condition: weatherArr[i].condition,
                     wind_speed: weatherArr[i].wind_speed,
                     cloud_cover: weatherArr[i].cloud_cover
                   });
+                  dailyData.icon_special = iconsDay.mdi;
+                  dailyData.iconUrl = iconsDay.url;
                   break;
                 }
               }
@@ -510,7 +512,7 @@ class Brightsky extends utils.Adapter {
         `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`
       );
       if (response.status !== 200) {
-        throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
+        throw new Error(`Error fetching current weather data: ${response.status} ${response.statusText}`);
       }
       const result = { data: await response.json() };
       if (result.data) {
@@ -522,12 +524,14 @@ class Brightsky extends utils.Adapter {
           const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
           const now = /* @__PURE__ */ new Date();
           const isDayTime = now >= sunrise && now <= sunset;
-          weather.icon_special = this.pickDailyWeatherIcon({
+          const iconsNow = this.pickDailyWeatherIcon({
             condition: [weather.condition],
             wind_speed: [weather.wind_speed_10],
             cloud_cover: [weather.cloud_cover],
             day: isDayTime
           });
+          weather.icon_special = iconsNow.mdi;
+          weather.iconUrl = iconsNow.url;
           await this.library.writeFromJson("current", "weather.current", import_definition.genericStateObjects, weather, true);
           await this.library.writedp(
             "current.sources",
@@ -599,75 +603,243 @@ class Brightsky extends utils.Adapter {
    * @returns Weather icon string (MDI icon name, day variant only)
    */
   pickDailyWeatherIcon(bucket) {
-    if (bucket.day !== false) {
-      bucket.day = true;
-    }
-    const avg = (arr) => {
-      const xs = arr.filter((v) => v != null);
-      return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
+    const T = {
+      wind: {
+        dangerous: 118.8,
+        // km/h Orkan
+        strong: 61.2,
+        // km/h Sturm
+        breezy: 35
+        // km/h böig
+      },
+      rain: {
+        heavy: 0.5,
+        // Anteil für heavy rain
+        light: 0.2,
+        // Anteil für light rain
+        possibleMin: 0.1,
+        // Anteil für possible rain
+        possibleMax: 0.35,
+        minCount: 2
+        // min. Stunden für rain relevant
+      },
+      drizzle: {
+        minCount: 2,
+        possibleMin: 0.1,
+        possibleMax: 0.35
+      },
+      snow: {
+        heavy: 0.3,
+        possibleMin: 0.1,
+        possibleMax: 0.35,
+        minCount: 2
+      },
+      sleet: {
+        heavy: 0.3,
+        possibleMin: 0.1,
+        possibleMax: 0.35,
+        minCount: 2
+      },
+      hail: {
+        possibleMin: 0.01,
+        possibleMax: 0.35,
+        minCount: 1
+      },
+      fog: {
+        present: 0.2,
+        possibleMin: 0.1,
+        possibleMax: 0.35,
+        minCount: 4
+      },
+      smoke: {
+        present: 0.2,
+        possibleMin: 0.1,
+        possibleMax: 0.35,
+        minCount: 3
+      },
+      thunder: {
+        partly: 0.1,
+        solid: 0.35
+      },
+      clouds: {
+        cloudy: 70,
+        partly: 30
+      },
+      bucket: {
+        minHours: 1,
+        defaultHours: 24
+      },
+      defaults: {
+        iceDay: "clear-day",
+        iceNight: "clear-night"
+      }
+    };
+    const median = (arr) => {
+      const xs = arr.filter((v) => v != null).sort((a, b) => a - b);
+      if (!xs.length) {
+        return 0;
+      }
+      const mid = Math.floor(xs.length / 2);
+      return xs.length % 2 === 0 ? (xs[mid - 1] + xs[mid]) / 2 : xs[mid];
     };
     const maxN = (arr) => {
       const xs = arr.filter((v) => v != null);
       return xs.length ? Math.max(...xs) : 0;
     };
     const count = (arr, labels) => arr.filter((v) => v != null && labels.includes(v)).length;
-    const WIND_ORKAN = 118.8;
-    const WIND_STORM = 61.2;
-    const FRACTION_THUNDER_PARTLY = 0.1;
-    const FRACTION_THUNDER_SOLID = 0.35;
-    const FRACTION_RAIN_SOLID = 0.5;
-    const FRACTION_RAIN_LIGHT = 0.2;
-    const hours = bucket.condition.length || 24;
+    const inPossibleRange = (frac, min, max) => frac >= min && frac < max;
+    const isDay = bucket.day !== false;
+    const hours = Math.max(T.bucket.minHours, bucket.condition.length || T.bucket.defaultHours);
+    const medianClouds = bucket.cloud_cover ? median(bucket.cloud_cover) : 0;
     const maxWind = maxN(bucket.wind_speed);
-    if (maxWind >= WIND_ORKAN) {
-      return "weather-tornado";
-    }
     const thunderCount = count(bucket.condition, ["thunderstorm"]);
-    if (thunderCount / hours >= FRACTION_THUNDER_SOLID) {
-      return "weather-lightning";
-    }
-    if (thunderCount / hours >= FRACTION_THUNDER_PARTLY) {
-      return "weather-partly-lightning";
-    }
-    if (maxWind >= WIND_STORM) {
-      return "weather-windy";
-    }
     const hailCount = count(bucket.condition, ["hail"]);
-    if (hailCount > 0) {
-      return "weather-hail";
-    }
     const snowCount = count(bucket.condition, ["snow"]);
-    if (snowCount / hours >= 0.3) {
-      return "weather-snowy-heavy";
-    }
-    if (snowCount > 0) {
-      return "weather-snowy";
-    }
-    const rainCount = count(bucket.condition, ["rain", "sleet", "drizzle"]);
-    if (rainCount / hours >= FRACTION_RAIN_SOLID) {
-      return "weather-pouring";
-    }
-    const fogCount = count(bucket.condition, ["fog"]);
-    if (fogCount / hours > 0.2) {
-      return "weather-fog";
-    }
-    if (rainCount / hours >= FRACTION_RAIN_LIGHT) {
-      return "weather-rainy";
-    }
-    const avgClouds = bucket.cloud_cover ? avg(bucket.cloud_cover) : 0;
-    if (avgClouds > 80) {
-      return "weather-cloudy";
-    }
-    if (avgClouds > 40) {
-      if (bucket.day) {
-        return "weather-partly-cloudy";
+    const sleetCount = count(bucket.condition, ["sleet"]);
+    const drizzleCount = count(bucket.condition, ["drizzle"]);
+    const rainCount = count(bucket.condition, ["rain"]);
+    const fogCount = count(bucket.condition, ["fog", "mist", "haze"]);
+    const smokeCount = count(bucket.condition, ["smoke"]);
+    const rainFrac = (rainCount + drizzleCount) / hours;
+    const snowFrac = snowCount / hours;
+    const sleetFrac = sleetCount / hours;
+    const thunderFrac = thunderCount / hours;
+    const hailFrac = hailCount / hours;
+    const fogFrac = fogCount / hours;
+    const smokeFrac = smokeCount / hours;
+    const hasDangerousWind = maxWind >= T.wind.dangerous;
+    const hasStrongWind = maxWind >= T.wind.strong;
+    const hasBreezyWind = maxWind >= T.wind.breezy;
+    const hasThunderSolid = thunderFrac >= T.thunder.solid;
+    const hasThunderPartly = !hasThunderSolid && thunderFrac >= T.thunder.partly;
+    const hasHeavyRain = rainFrac >= T.rain.heavy;
+    const hasLightRain = !hasHeavyRain && rainFrac >= T.rain.light;
+    const hasHeavySnow = snowFrac >= T.snow.heavy;
+    const hasSleet = sleetCount >= T.sleet.minCount;
+    const hasHail = hailCount >= T.hail.minCount;
+    const hasFogPresent = fogFrac >= T.fog.present;
+    const hasSmokePresent = smokeFrac >= T.smoke.present;
+    const selectMdi = () => {
+      if (hasDangerousWind) {
+        return "weather-tornado";
       }
-      return "weather-night-partly-cloudy";
-    }
-    if (bucket.day) {
+      if (hasThunderSolid) {
+        return "weather-lightning";
+      }
+      if (hasThunderPartly) {
+        return "weather-partly-lightning";
+      }
+      if (hasHail) {
+        return "weather-hail";
+      }
+      if (hasHeavySnow) {
+        return "weather-snowy-heavy";
+      }
+      if (hasSleet) {
+        return "weather-snowy-rainy";
+      }
+      if (hasHeavyRain) {
+        return "weather-pouring";
+      }
+      if (hasLightRain) {
+        return "weather-rainy";
+      }
+      if (hasFogPresent || hasSmokePresent) {
+        return "weather-fog";
+      }
+      if (medianClouds > T.clouds.cloudy) {
+        return "weather-cloudy";
+      }
+      if (medianClouds > T.clouds.partly) {
+        return isDay ? "weather-partly-cloudy" : "weather-night-partly-cloudy";
+      }
+      if (!isDay) {
+        return "weather-night";
+      }
+      if (hasStrongWind) {
+        return "weather-windy";
+      }
       return "weather-sunny";
-    }
-    return "weather-night";
+    };
+    const selectIcebear = () => {
+      const daySuffix = isDay ? "day" : "night";
+      if (hasDangerousWind) {
+        return "dangerous-wind";
+      }
+      if (hasThunderSolid || hasThunderPartly) {
+        return "thunderstorm";
+      }
+      if (hailCount >= T.hail.minCount) {
+        if (inPossibleRange(hailFrac, T.hail.possibleMin, T.hail.possibleMax)) {
+          return `possible-hail-${daySuffix}`;
+        }
+        return "hail";
+      }
+      if (snowCount >= T.snow.minCount) {
+        if (snowFrac >= T.snow.heavy) {
+          return "snow";
+        }
+        if (inPossibleRange(snowFrac, T.snow.possibleMin, T.snow.possibleMax)) {
+          return `possible-snow-${daySuffix}`;
+        }
+      }
+      if (sleetCount >= T.sleet.minCount) {
+        if (sleetFrac >= T.sleet.heavy) {
+          return "sleet";
+        }
+        if (inPossibleRange(sleetFrac, T.sleet.possibleMin, T.sleet.possibleMax)) {
+          return `possible-sleet-${daySuffix}`;
+        }
+      }
+      this.log.info(
+        `DEBUG: rainCount=${rainCount}, drizzleCount=${drizzleCount}, rainFrac=${rainFrac}, drizzleFrac=${drizzleCount / hours}`
+      );
+      if (rainCount >= T.rain.minCount) {
+        if (rainFrac >= T.rain.heavy) {
+          return "rain";
+        }
+        if (inPossibleRange(rainFrac, T.rain.possibleMin, T.rain.possibleMax)) {
+          return `possible-rain-${daySuffix}`;
+        }
+      }
+      if (drizzleCount >= T.drizzle.minCount) {
+        return "drizzle";
+      }
+      this.log.info(`DEBUG: fogCount=${fogCount}, fogFrac=${fogFrac}`);
+      if (fogCount >= T.fog.minCount) {
+        if (fogFrac >= T.fog.present) {
+          return "fog";
+        }
+        if (inPossibleRange(fogFrac, T.fog.possibleMin, T.fog.possibleMax)) {
+          return `possible-fog-${daySuffix}`;
+        }
+      }
+      if (smokeCount >= T.smoke.minCount) {
+        if (smokeFrac >= T.smoke.present) {
+          return "smoke";
+        }
+        if (inPossibleRange(smokeFrac, T.smoke.possibleMin, T.smoke.possibleMax)) {
+          return `possible-smoke-${daySuffix}`;
+        }
+      }
+      if (medianClouds > T.clouds.cloudy) {
+        return "cloudy";
+      }
+      if (medianClouds > T.clouds.partly) {
+        return `partly-cloudy-${daySuffix}`;
+      }
+      if (hasStrongWind) {
+        return "wind";
+      }
+      if (hasBreezyWind) {
+        return "breezy";
+      }
+      return isDay ? T.defaults.iceDay : T.defaults.iceNight;
+    };
+    const mdi = selectMdi();
+    const iceFile = selectIcebear();
+    const icebear = `/adapter/${this.name}/icons/icebear/${iceFile}.svg`;
+    return { mdi, url: icebear };
   }
   /**
    * Calculate day and night aggregated data from hourly data based on sunrise/sunset times
@@ -846,12 +1018,14 @@ class Brightsky extends utils.Adapter {
           } else {
             result[k] = null;
           }
-          result.icon_special = this.pickDailyWeatherIcon({
+          const iconsAgg = this.pickDailyWeatherIcon({
             condition: weatherValues.condition,
             wind_speed: weatherValues.wind_speed,
             cloud_cover: weatherValues.cloud_cover,
             day: weatherValues.day
           });
+          result.icon_special = iconsAgg.mdi;
+          result.iconUrl = iconsAgg.url;
           break;
         }
         case "pressure_msl": {
@@ -957,11 +1131,12 @@ class Brightsky extends utils.Adapter {
     return totalWh;
   }
   async fetch(url, init) {
+    var _a;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3e4);
     const response = await fetch(url, {
       ...init,
-      method: "GET",
+      method: (_a = init == null ? void 0 : init.method) != null ? _a : "GET",
       signal: controller.signal
     });
     clearTimeout(timeoutId);
