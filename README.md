@@ -84,7 +84,7 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-
+- (ticaki) Icons provided by icebear added
 
 ### 0.4.0 (2025-09-24)
 - (ticaki) Code migration from axios to node:fetch
