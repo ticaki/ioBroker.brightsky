@@ -922,6 +922,18 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         },
         native: {},
     },
+    iconUrl: {
+        _id: '',
+        type: 'state',
+        common: {
+            name: 'Icon URL',
+            type: 'string',
+            role: 'weather.icon',
+            read: true,
+            write: false,
+        },
+        native: {},
+    },
     icon: {
         _id: 'icon',
         type: 'state',
@@ -1301,6 +1313,18 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
+            iconUrl: {
+                _id: '',
+                type: 'state',
+                common: {
+                    name: 'Icon URL',
+                    type: 'string',
+                    role: 'weather.icon',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
             wind_bearing_text: {
                 _id: '',
                 type: 'state',
@@ -1516,6 +1540,7 @@ export type BrightskyDailyData = BrightskyWeather & {
     sunset?: number | null;
     sunrise?: number | null;
     icon_special?: string | null;
+    iconUrl?: string | null;
     day?: Partial<BrightskyDayNightData>;
     night?: Partial<BrightskyDayNightData>;
 };
@@ -1542,6 +1567,7 @@ export type BrightskyDayNightData = BrightskyWeather & {
     precipitation_probability_6h_median?: number | null;
     solar_median?: number | null;
     icon_special?: string | null;
+    iconUrl?: string | null;
 };
 
 // Gemeinsame Typen für Wetterdaten
@@ -1629,6 +1655,7 @@ export type BrightskyCurrently = {
     wind_speed_30: number;
     wind_speed_60: number;
     icon_special?: string;
+    iconUrl?: string;
     temperature: number;
     fallback_source_ids: BrightskyCurrentlyFallback;
     icon: string;
