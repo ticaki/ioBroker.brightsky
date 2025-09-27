@@ -5,7 +5,7 @@
     "news": {
       "0.5.1": {
         "en": "more robust fetch usage",
-        "de": "robuster einsatz von fick",
+        "de": "robuster einsatz von fetch",
         "ru": "более надежное использование",
         "pt": "uso de busca mais robusto",
         "nl": "robuuster fetchgebruik",
