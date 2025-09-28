@@ -83,7 +83,7 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.5.2 (2025-09-28)
 - (ticaki) New data point wind_gust_speed_max for role value.speed.max.wind
 - (ticaki) role checked
 

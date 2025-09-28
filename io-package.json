@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "news": {
+      "0.5.2": {
+        "en": "New data point wind_gust_speed_max for role value.speed.max.wind\nrole checked",
+        "de": "Neuer Datenpunkt wind_gust_speed_max für Role value.speed.max.wind\nRollen geprüft",
+        "ru": "Новая точка данных wind_gust_speed_max для ролевого значения.speed.max.wind\nпроверка роли",
+        "pt": "Novo ponto de dados wind_gust_speed_max para role value.speed.max.wind\nfunção verificada",
+        "nl": "Nieuw datapunt wind_gust_speed_max voor rolwaarde.speed.max.wind\nrol gecontroleerd",
+        "fr": "Nouveau point de données wind_gust_speed_max pour la valeur de rôle.speed.max.wind\nrôle vérifié",
+        "it": "Nuovo punto dati wind_gust_speed_max per valore di ruolo.speed.max.wind\nruolo controllato",
+        "es": "Nuevo punto de datos wind_gust_speed_max para el valor del papel.speed.max.wind\nfunción revisada",
+        "pl": "Nowy punkt danych wind _ hurst _ speed _ max for role value.speed.max.wind\nkontrola roli",
+        "uk": "Нова точка даних вітру_gust_speed_max для значення ролі.speed.max.wind\nроль перевіряється",
+        "zh-cn": "新的数据点风_gust_speed_max 对于角色值.speed.max.wind\n角色检查"
+      },
       "0.5.1": {
         "en": "more robust fetch usage",
         "de": "robuster einsatz von fetch",
@@ -80,19 +93,6 @@
         "pl": "aktualizacja o wschodzie i zachodzie słońca (chyba że niestandardowy interwał jest zbyt duży)\ndodano ograniczenie falownika",
         "uk": "оновлення на світанку та заході сонця (крім випадків, коли власний інтервал надто великий)\nдодано обмеження інвертора",
         "zh-cn": "在日出和日落时更新（除非自定义间隔过大）\n添加逆变器限制"
-      },
-      "0.3.2": {
-        "en": "Solar estimation calculation revised",
-        "de": "Überarbeitete Berechnung der Solarabschätzung",
-        "ru": "Пересмотрен расчет оценки солнечной энергии",
-        "pt": "Cálculo de estimativa solar revisado",
-        "nl": "Herziene berekening van zonneschijnschatting",
-        "fr": "Calcul de l'estimation solaire révisé",
-        "it": "Calcolo della stima solare rivisto",
-        "es": "Cálculo de estimación solar revisado",
-        "pl": "Przeliczanie szacunkowe energii słonecznej poprawione",
-        "uk": "Перераховано розрахунок оцінки сонячного потенціалу",
-        "zh-cn": "太阳能估算计算已经修订"
       }
     },
     "titleLang": {
