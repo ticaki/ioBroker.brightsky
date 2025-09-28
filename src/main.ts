@@ -26,10 +26,10 @@ class Brightsky extends utils.Adapter {
     unload: boolean = false;
     posId: string = '';
     weatherTimeout: (ioBroker.Timeout | null | undefined)[] = [];
+    controller: AbortController | null = null;
+    timeoutId: ioBroker.Timeout | undefined = undefined;
     groupArray: Panel[][] = [];
     wrArray: number[] = [];
-    fetchs: Map<AbortController, ioBroker.Timeout | undefined> = new Map();
-
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
@@ -204,10 +204,10 @@ class Brightsky extends utils.Adapter {
             this.log.debug(
                 `https://api.brightsky.dev/weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
-            if (!response) {
-                return;
+            if (response.status !== 200) {
+                throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
             }
-            const result = { data: response } as {
+            const result = { data: await response.json() } as {
                 data: { weather: BrightskyWeather[]; sources: any[] } | null;
             };
             if (result.data) {
@@ -511,10 +511,10 @@ class Brightsky extends utils.Adapter {
             const response = await this.fetch(
                 `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
-            if (!response) {
-                return;
+            if (response.status !== 200) {
+                throw new Error(`Error fetching hourly weather data: ${response.status} ${response.statusText}`);
             }
-            const result = { data: response } as {
+            const result = { data: await response.json() } as {
                 data: BrightskyHourly | null;
             };
             if (result.data) {
@@ -593,10 +593,10 @@ class Brightsky extends utils.Adapter {
             const response = await this.fetch(
                 `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`,
             );
-            if (!response) {
-                return;
+            if (response.status !== 200) {
+                throw new Error(`Error fetching current weather data: ${response.status} ${response.statusText}`);
             }
-            const result = { data: response } as any;
+            const result = { data: await response.json() } as any;
             if (result.data) {
                 this.log.debug(`Currently weather data fetched successfully: ${JSON.stringify(result.data)}`);
                 if (result.data.weather) {
@@ -672,17 +672,13 @@ class Brightsky extends utils.Adapter {
                     this.clearTimeout(timeout);
                 }
             }
-            for (const [controller, timeoutId] of this.fetchs.entries()) {
-                try {
-                    if (timeoutId) {
-                        this.clearTimeout(timeoutId);
-                    }
-                    controller.abort();
-                } catch {
-                    // ignore errors during abort/clear
-                }
+            if (this.timeoutId) {
+                this.clearTimeout(this.timeoutId);
             }
-            this.fetchs.clear();
+            if (this.controller) {
+                this.controller.abort();
+                this.controller = null;
+            }
 
             callback();
         } catch {
@@ -1481,39 +1477,33 @@ class Brightsky extends utils.Adapter {
         return totalWh;
     }
 
-    async fetch(url: string, init?: RequestInit, timeout = 30_000): Promise<unknown> {
-        const controller = new AbortController();
-
-        // 30 seconds timeout
-        const timeoutId = this.setTimeout(() => {
-            // Abort and remove entry to avoid leak
-            try {
-                controller.abort();
-            } catch {
-                // ignore
+    async fetch(url: string, init?: RequestInit): Promise<Response> {
+        this.controller = new AbortController();
+        const currentController = this.controller;
+        this.timeoutId = this.setTimeout(() => {
+            if (this.controller === currentController && this.controller) {
+                this.controller.abort();
+                this.controller = null;
             }
-            this.fetchs.delete(controller);
-        }, timeout);
-
-        this.fetchs.set(controller, timeoutId);
+        }, 30000); // 30 seconds timeout
 
         try {
             const response = await fetch(url, {
                 ...init,
                 method: init?.method ?? 'GET',
-                signal: controller.signal,
+                signal: this.controller.signal,
             });
-            if (response.status === 200) {
-                return await response.json();
-            }
-            throw new Error({ status: response.status, statusText: response.statusText } as any);
-        } finally {
-            // always clear timeout and remove the controller
-            const id = this.fetchs.get(controller);
-            if (typeof id !== 'undefined') {
-                this.clearTimeout(id);
-            }
-            this.fetchs.delete(controller);
+
+            // Clear the timeout since the request completed
+            this.clearTimeout(this.timeoutId);
+            this.timeoutId = undefined;
+            this.controller = null;
+            return response;
+        } catch (error) {
+            this.clearTimeout(this.timeoutId);
+            this.timeoutId = undefined;
+            this.controller = null;
+            throw error;
         }
     }
 }

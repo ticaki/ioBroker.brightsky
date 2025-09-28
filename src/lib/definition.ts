@@ -186,7 +186,7 @@ const BrightskyCurrentlyFallback: ChangeTypeOfKeysForState<BrightskyCurrentlyFal
         common: {
             name: 'Wind Gust Direction 60 min',
             type: 'number',
-            role: 'value.direction.wind',
+            role: 'value.direction.max.wind',
             read: true,
             write: false,
             unit: '°',
@@ -431,7 +431,7 @@ const hourly: ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject> =
         common: {
             name: 'Wind Gust Direction',
             type: 'number',
-            role: 'value.direction',
+            role: 'value',
             read: true,
             write: false,
             unit: '°',
@@ -705,7 +705,7 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         common: {
             name: 'Wind Direction Median',
             type: 'number',
-            role: 'value.direction.median',
+            role: 'value.direction.median.wind',
             read: true,
             write: false,
             unit: '°',
@@ -790,13 +790,26 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         },
         native: {},
     },
+    wind_gust_speed_max: {
+        _id: 'wind_gust_speed_max',
+        type: 'state',
+        common: {
+            name: 'Wind Gust Speed Max',
+            type: 'number',
+            role: 'value.speed.max.wind',
+            read: true,
+            write: false,
+            unit: 'km/h',
+        },
+        native: {},
+    },
     wind_gust_direction_median: {
         _id: 'wind_gust_direction_median',
         type: 'state',
         common: {
             name: 'Wind Gust Direction Median',
             type: 'number',
-            role: 'value.direction.median',
+            role: 'value',
             read: true,
             write: false,
             unit: '°',
@@ -809,7 +822,7 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         common: {
             name: 'Wind Gust Speed Median',
             type: 'number',
-            role: 'value.speed.median.wind.gust',
+            role: 'value',
             read: true,
             write: false,
             unit: 'km/h',
@@ -901,7 +914,7 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         common: {
             name: 'Wind Speed Max',
             type: 'number',
-            role: 'value.speed.max.wind',
+            role: 'value',
             read: true,
             write: false,
             unit: 'km/h',
@@ -1554,6 +1567,7 @@ export type BrightskyDailyData = BrightskyWeather & {
     visibility_median: number | null;
     wind_gust_direction_median: number | null;
     wind_gust_speed_median: number | null;
+    wind_gust_speed_max?: number | null;
     condition: string | null;
     precipitation_probability_median: number | null;
     precipitation_probability_6h_median: number | null;

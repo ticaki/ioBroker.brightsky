@@ -193,7 +193,7 @@ const BrightskyCurrentlyFallback = {
     common: {
       name: "Wind Gust Direction 60 min",
       type: "number",
-      role: "value.direction.wind",
+      role: "value.direction.max.wind",
       read: true,
       write: false,
       unit: "\xB0"
@@ -437,7 +437,7 @@ const hourly = {
     common: {
       name: "Wind Gust Direction",
       type: "number",
-      role: "value.direction",
+      role: "value",
       read: true,
       write: false,
       unit: "\xB0"
@@ -710,7 +710,7 @@ const daily = {
     common: {
       name: "Wind Direction Median",
       type: "number",
-      role: "value.direction.median",
+      role: "value.direction.median.wind",
       read: true,
       write: false,
       unit: "\xB0"
@@ -795,13 +795,26 @@ const daily = {
     },
     native: {}
   },
+  wind_gust_speed_max: {
+    _id: "wind_gust_speed_max",
+    type: "state",
+    common: {
+      name: "Wind Gust Speed Max",
+      type: "number",
+      role: "value.speed.max.wind",
+      read: true,
+      write: false,
+      unit: "km/h"
+    },
+    native: {}
+  },
   wind_gust_direction_median: {
     _id: "wind_gust_direction_median",
     type: "state",
     common: {
       name: "Wind Gust Direction Median",
       type: "number",
-      role: "value.direction.median",
+      role: "value",
       read: true,
       write: false,
       unit: "\xB0"
@@ -814,7 +827,7 @@ const daily = {
     common: {
       name: "Wind Gust Speed Median",
       type: "number",
-      role: "value.speed.median.wind.gust",
+      role: "value",
       read: true,
       write: false,
       unit: "km/h"
@@ -905,7 +918,7 @@ const daily = {
     common: {
       name: "Wind Speed Max",
       type: "number",
-      role: "value.speed.max.wind",
+      role: "value",
       read: true,
       write: false,
       unit: "km/h"

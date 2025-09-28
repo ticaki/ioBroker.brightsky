@@ -84,6 +84,7 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (ticaki) New data point wind_gust_speed_max for role value.speed.max.wind
 - (ticaki) role checked
 
 ### 0.5.1 (2025-09-27)
