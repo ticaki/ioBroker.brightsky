@@ -167,7 +167,7 @@ const BrightskyCurrentlyFallback = {
     common: {
       name: "Wind Gust Direction 10 min",
       type: "number",
-      role: "value.direction",
+      role: "value",
       read: true,
       write: false,
       unit: "\xB0"
@@ -180,7 +180,7 @@ const BrightskyCurrentlyFallback = {
     common: {
       name: "Wind Gust Direction 30 min",
       type: "number",
-      role: "value.direction",
+      role: "value",
       read: true,
       write: false,
       unit: "\xB0"
@@ -193,7 +193,7 @@ const BrightskyCurrentlyFallback = {
     common: {
       name: "Wind Gust Direction 60 min",
       type: "number",
-      role: "value.direction",
+      role: "value.direction.wind",
       read: true,
       write: false,
       unit: "\xB0"
@@ -206,7 +206,7 @@ const BrightskyCurrentlyFallback = {
     common: {
       name: "Wind Gust Speed 10 min",
       type: "number",
-      role: "value.speed",
+      role: "value",
       read: true,
       write: false,
       unit: "km/h"
@@ -219,7 +219,7 @@ const BrightskyCurrentlyFallback = {
     common: {
       name: "Wind Gust Speed 30 min",
       type: "number",
-      role: "value.speed",
+      role: "value",
       read: true,
       write: false,
       unit: "km/h"
@@ -232,7 +232,7 @@ const BrightskyCurrentlyFallback = {
     common: {
       name: "Wind Gust Speed 60 min",
       type: "number",
-      role: "value.speed",
+      role: "value.speed.wind.gust",
       read: true,
       write: false,
       unit: "km/h"
@@ -308,7 +308,7 @@ const hourly = {
     common: {
       name: "Pressure MSL",
       type: "number",
-      role: "value",
+      role: "value.pressure",
       read: true,
       write: false,
       unit: "hPa"
@@ -347,7 +347,7 @@ const hourly = {
     common: {
       name: "Wind Direction",
       type: "number",
-      role: "value.direction",
+      role: "value.direction.wind",
       read: true,
       write: false,
       unit: "\xB0"
@@ -372,7 +372,7 @@ const hourly = {
     common: {
       name: "Wind Speed",
       type: "number",
-      role: "value.speed",
+      role: "value.speed.wind",
       read: true,
       write: false,
       unit: "km/h"
@@ -450,7 +450,7 @@ const hourly = {
     common: {
       name: "Wind Gust Speed",
       type: "number",
-      role: "value.speed",
+      role: "value.speed.wind.gust",
       read: true,
       write: false,
       unit: "km/h"
@@ -595,7 +595,7 @@ const daily = {
     common: {
       name: "Precipitation (daily total)",
       type: "number",
-      role: "value.precipitation.forecast.0",
+      role: "value.precipitation",
       read: true,
       write: false,
       unit: "mm"
@@ -723,7 +723,7 @@ const daily = {
     common: {
       name: "Wind Speed Median",
       type: "number",
-      role: "value.speed.median",
+      role: "value.speed.median.wind",
       read: true,
       write: false,
       unit: "km/h"
@@ -814,7 +814,7 @@ const daily = {
     common: {
       name: "Wind Gust Speed Median",
       type: "number",
-      role: "value.speed.median",
+      role: "value.speed.median.wind.gust",
       read: true,
       write: false,
       unit: "km/h"
@@ -892,7 +892,7 @@ const daily = {
     common: {
       name: "Wind Speed Min",
       type: "number",
-      role: "value.speed",
+      role: "value.speed.min.wind",
       read: true,
       write: false,
       unit: "km/h"
@@ -905,7 +905,7 @@ const daily = {
     common: {
       name: "Wind Speed Max",
       type: "number",
-      role: "value.speed.max",
+      role: "value.speed.max.wind",
       read: true,
       write: false,
       unit: "km/h"
@@ -1397,7 +1397,7 @@ const genericStateObjects = {
         common: {
           name: "Wind Direction 10 min",
           type: "number",
-          role: "value.direction",
+          role: "value",
           read: true,
           write: false,
           unit: "\xB0"
@@ -1410,7 +1410,7 @@ const genericStateObjects = {
         common: {
           name: "Wind Direction 30 min",
           type: "number",
-          role: "value.direction",
+          role: "value",
           read: true,
           write: false,
           unit: "\xB0"
@@ -1423,7 +1423,7 @@ const genericStateObjects = {
         common: {
           name: "Wind Direction 60 min",
           type: "number",
-          role: "value.direction",
+          role: "value.direction.wind",
           read: true,
           write: false,
           unit: "\xB0"
@@ -1436,7 +1436,7 @@ const genericStateObjects = {
         common: {
           name: "Wind Speed 10 min",
           type: "number",
-          role: "value.speed",
+          role: "value",
           read: true,
           write: false,
           unit: "km/h"
@@ -1449,7 +1449,7 @@ const genericStateObjects = {
         common: {
           name: "Wind Speed 30 min",
           type: "number",
-          role: "value.speed",
+          role: "value",
           read: true,
           write: false,
           unit: "km/h"
@@ -1462,7 +1462,7 @@ const genericStateObjects = {
         common: {
           name: "Wind Speed 60 min",
           type: "number",
-          role: "value.speed",
+          role: "value.speed.wind",
           read: true,
           write: false,
           unit: "km/h"

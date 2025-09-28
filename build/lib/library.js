@@ -179,7 +179,7 @@ class Library extends BaseClass {
       }
       if (objectDefinition.type === "state" && objectDefinition.common.role && objectDefinition.common.role !== "value" && objectDefinition.common.role !== "text" && prefix.startsWith("daily")) {
         const d = prefix.split(".");
-        if (d.length == 3 && !isNaN(parseInt(d[1], 10))) {
+        if (objectDefinition.common.role !== "weather.icon.name" && d.length == 3 && !isNaN(parseInt(d[1], 10))) {
           objectDefinition = {
             ...objectDefinition,
             common: {

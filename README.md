@@ -83,6 +83,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) role checked
+
 ### 0.5.1 (2025-09-27)
 - (ticaki) more robust fetch usage
 

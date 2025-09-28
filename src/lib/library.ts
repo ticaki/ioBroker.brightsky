@@ -191,7 +191,11 @@ export class Library extends BaseClass {
                 prefix.startsWith('daily')
             ) {
                 const d = prefix.split('.');
-                if (d.length == 3 && !isNaN(parseInt(d[1], 10))) {
+                if (
+                    objectDefinition.common.role !== 'weather.icon.name' &&
+                    d.length == 3 &&
+                    !isNaN(parseInt(d[1], 10))
+                ) {
                     objectDefinition = {
                         ...objectDefinition,
                         common: {
