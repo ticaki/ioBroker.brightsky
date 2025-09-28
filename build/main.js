@@ -763,11 +763,14 @@ class Brightsky extends utils.Adapter {
       if (hasHeavyRain) {
         return "weather-pouring";
       }
-      if (hasLightRain) {
-        return "weather-rainy";
+      if (hasStrongWind) {
+        return "weather-windy";
       }
       if (hasFogPresent || hasSmokePresent) {
         return "weather-fog";
+      }
+      if (hasLightRain) {
+        return "weather-rainy";
       }
       if (medianClouds > T.clouds.cloudy) {
         return "weather-cloudy";
@@ -777,9 +780,6 @@ class Brightsky extends utils.Adapter {
       }
       if (!isDay) {
         return "weather-night";
-      }
-      if (hasStrongWind) {
-        return "weather-windy";
       }
       return "weather-sunny";
     };
@@ -801,22 +801,31 @@ class Brightsky extends utils.Adapter {
         if (snowFrac >= T.snow.heavy) {
           return "snow";
         }
-        if (inPossibleRange(snowFrac, T.snow.possibleMin, T.snow.possibleMax)) {
-          return `possible-snow-${daySuffix}`;
-        }
       }
       if (sleetCount >= T.sleet.minCount) {
         if (sleetFrac >= T.sleet.heavy) {
           return "sleet";
-        }
-        if (inPossibleRange(sleetFrac, T.sleet.possibleMin, T.sleet.possibleMax)) {
-          return `possible-sleet-${daySuffix}`;
         }
       }
       if (rainCount >= T.rain.minCount) {
         if (rainFrac >= T.rain.heavy) {
           return "rain";
         }
+      }
+      if (hasStrongWind) {
+        return "wind";
+      }
+      if (snowCount >= T.snow.minCount) {
+        if (inPossibleRange(snowFrac, T.snow.possibleMin, T.snow.possibleMax)) {
+          return `possible-snow-${daySuffix}`;
+        }
+      }
+      if (sleetCount >= T.sleet.minCount) {
+        if (inPossibleRange(sleetFrac, T.sleet.possibleMin, T.sleet.possibleMax)) {
+          return `possible-sleet-${daySuffix}`;
+        }
+      }
+      if (rainCount >= T.rain.minCount) {
         if (inPossibleRange(rainFrac, T.rain.possibleMin, T.rain.possibleMax)) {
           return `possible-rain-${daySuffix}`;
         }
@@ -845,9 +854,6 @@ class Brightsky extends utils.Adapter {
       }
       if (medianClouds > T.clouds.partly) {
         return `partly-cloudy-${daySuffix}`;
-      }
-      if (hasStrongWind) {
-        return "wind";
       }
       if (hasBreezyWind) {
         return "breezy";
