@@ -64,15 +64,28 @@ class Brightsky extends utils.Adapter {
         await this.setState('info.connection', false, true);
         if (!this.config.createDaily) {
             await this.delObjectAsync('daily', { recursive: true });
+        } else {
+            // Create the daily data folder
+            await this.library.writedp('daily', null, genericStateObjects.weather.daily._channel);
         }
         if (!this.config.createCurrently) {
             await this.delObjectAsync('current', { recursive: true });
+        } else {
+            // Create the currently data folder
+            await this.library.writedp('current', null, genericStateObjects.weather.current._channel);
         }
         if (!this.config.createHourly) {
             await this.delObjectAsync('hourly', { recursive: true });
+        } else {
+            // Create the hourly data folder
+            await this.library.writedp('hourly', null, genericStateObjects.weather.hourly._channel);
+            await this.library.writedp('hourly.sources', undefined, genericStateObjects.weather.sources._channel);
         }
         if (!this.config.createRadar) {
             await this.delObjectAsync('radar', { recursive: true });
+        } else {
+            // Create the radar data folder
+            await this.library.writedp('radar', null, genericStateObjects.weather.radar._channel);
         }
         if (
             !this.config.createCurrently &&

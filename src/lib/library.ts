@@ -151,11 +151,14 @@ export class Library extends BaseClass {
                               )
                             : null;
                         const defChannel = this.getChannelObject(objectDefinition2, true);
+                        const aName = k._index != null ? k._index : a;
                         if (defChannel.common?.name) {
-                            defChannel.common.name = `+ ${a}`;
+                            defChannel.common.name = `+ ${aName}`;
                         }
                         const newPrefix = prefix.split('.').slice(0, -1).join('.');
-                        const dp = `${newPrefix}.${`00${a++}`.slice(-2)}`;
+                        const n = `00${aName}`.slice(-2);
+                        a += 1;
+                        const dp = `${newPrefix}.${n}`;
                         // create folder
                         await this.writedp(dp, null, defChannel);
 
@@ -180,7 +183,7 @@ export class Library extends BaseClass {
                 }
             }
         } else {
-            if (!objectDefinition) {
+            if (!objectDefinition || prefix.endsWith('_index')) {
                 return;
             }
             if (
