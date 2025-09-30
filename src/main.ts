@@ -890,6 +890,42 @@ class Brightsky extends utils.Adapter {
         if (dataToWrite.length > 0) {
             await this.library.writeFromJson('radar.r', 'weather.radar', genericStateObjects, dataToWrite, true);
         }
+
+        // Calculate and write max precipitation forecasts
+        await this.writeMaxPrecipitationForecasts();
+    }
+
+    private async writeMaxPrecipitationForecasts(): Promise<void> {
+        const intervals = [5, 10, 15, 30, 45, 60, 90]; // minutes
+        const forecasts: { [key: string]: number } = {};
+
+        for (const interval of intervals) {
+            const numIntervals = Math.ceil(interval / 5); // How many 5-minute intervals to check
+            let maxPrecipitation = -1;
+
+            if (this.radarData.length > 0) {
+                // Get max from the next N intervals (starting from index 0 which is "now")
+                for (let i = 0; i < numIntervals && i < this.radarData.length; i++) {
+                    const item = this.radarData[i];
+                    if (item.precipitation_5_max !== undefined && item.precipitation_5_max > maxPrecipitation) {
+                        maxPrecipitation = item.precipitation_5_max;
+                    }
+                }
+            }
+
+            forecasts[`next_${interval}min`] = maxPrecipitation;
+        }
+
+        // Write forecasts to states
+        for (const [key, value] of Object.entries(forecasts)) {
+            await this.library.writedp(
+                `max_precipitation_forecast.${key}`,
+                value,
+                genericStateObjects.max_precipitation_forecast[
+                    key as keyof typeof genericStateObjects.max_precipitation_forecast
+                ],
+            );
+        }
     }
 
     private getWindBearingText(windBearing: number | undefined): string {

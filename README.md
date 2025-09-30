@@ -75,6 +75,7 @@ The data is as follows Provided:
 * current - the current weather (see also: https://brightsky.dev/docs/#/operations/getCurrentWeather )
 * daily - the current weather forecast for the next 8 days (created by the adapter and is not part of the API)
 * hourly - the current weather forecast for the next defined n hours (see also: https://brightsky.dev/docs/#/operations/getWeather )
+* radar - precipitation radar forecast for the next 2 hours in 5-minute intervals (see also: https://brightsky.dev/docs/#/operations/getRadar )
 
 ---
 
@@ -83,6 +84,13 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Added weather radar feature with 2-hour precipitation forecast
+- (ticaki) Radar data shows precipitation in mm with average, min, max, and median values
+- (ticaki) Configurable radar search area (1-50km radius from coordinates)
+- (ticaki) Configurable radar polling interval (5+ minutes, auto-rotates data every 5 min)
+- (ticaki) Added max precipitation forecast states for next 5, 10, 15, 30, 45, 60, 90 minutes
+
 ### 0.5.2 (2025-09-28)
 - (ticaki) New data point wind_gust_speed_max for role value.speed.max.wind
 - (ticaki) role checked
