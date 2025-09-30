@@ -1594,18 +1594,6 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
-            valid_time: {
-                _id: 'valid_time',
-                type: 'state',
-                common: {
-                    name: 'Valid For Time',
-                    type: 'string',
-                    role: 'date',
-                    read: true,
-                    write: false,
-                },
-                native: {},
-            },
         },
     },
 };
@@ -1802,5 +1790,4 @@ export type BrightskyRadarData = {
     source: string;
     precipitation_5: number; // Average precipitation in mm
     forecast_time: string; // When the forecast was issued
-    valid_time: string; // For what time the forecast is valid
 };

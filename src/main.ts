@@ -753,9 +753,11 @@ class Brightsky extends utils.Adapter {
                         source: item.source,
                         precipitation_5: Math.round(avgPrecipitation * 100) / 100, // Round to 2 decimal places
                         forecast_time: fetchTime,
-                        valid_time: item.timestamp,
                     };
                 });
+
+                // Sort by timestamp to ensure correct order (index 0 = now, index 1 = +5min, etc.)
+                this.radarData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
                 // Write initial data
                 await this.writeRadarData();
@@ -787,6 +789,21 @@ class Brightsky extends utils.Adapter {
 
             // Remove the first item (oldest)
             this.radarData.shift();
+
+            // Add a placeholder at the end to clear outdated values
+            // This ensures all time slots get updated properly
+            if (this.radarData.length > 0) {
+                const lastItem = this.radarData[this.radarData.length - 1];
+                const lastTime = new Date(lastItem.timestamp);
+                const nextTime = new Date(lastTime.getTime() + 5 * 60 * 1000); // +5 minutes
+
+                this.radarData.push({
+                    timestamp: nextTime.toISOString(),
+                    source: lastItem.source,
+                    precipitation_5: 0, // Placeholder value
+                    forecast_time: lastItem.forecast_time,
+                });
+            }
 
             // Write rotated data
             await this.writeRadarData();
