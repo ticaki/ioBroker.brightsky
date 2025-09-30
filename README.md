@@ -84,7 +84,7 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.6.0 (2025-09-30)
 - (ticaki) Added weather radar feature with 2-hour precipitation forecast
 - (ticaki) Radar data shows precipitation in mm with average, min, max, and median values
 - (ticaki) Configurable radar polling interval (5+ minutes, auto-rotates data every 5 min)
