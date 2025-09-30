@@ -10,6 +10,7 @@
     "createCurrently": "Erstellt aktuelle Wetterdatenübersicht",
     "createRadar": "Erstellt Wetterradar-Daten",
     "pollIntervalRadar": "Abfrageintervall für Radardaten (in Minuten, muss durch 5 teilbar sein)",
+    "radarDistance": "Radar-Suchbereich Entfernung (Rechteckige Fläche Kantenlänge, max 50km)",
     "wmo_station": "WMO Station ID (optional, Default ist leer)",
     "wmo_station_link": "Link zu WMO Stationsinformationen",
     "dwd_station_id": "DWD Station ID (optional, Default ist leer)",

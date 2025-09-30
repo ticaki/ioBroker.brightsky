@@ -30,6 +30,7 @@ declare global {
             createDaily: boolean;
             createRadar: boolean;
             pollIntervalRadar: number;
+            radarDistance: number;
             wmo_station: string;
             dwd_station_id: string;
 
