@@ -87,7 +87,6 @@ The data is as follows Provided:
 ### **WORK IN PROGRESS**
 - (ticaki) Added weather radar feature with 2-hour precipitation forecast
 - (ticaki) Radar data shows precipitation in mm with average, min, max, and median values
-- (ticaki) Configurable radar search area (1-50km radius from coordinates)
 - (ticaki) Configurable radar polling interval (5+ minutes, auto-rotates data every 5 min)
 - (ticaki) Added max precipitation forecast states for next 5, 10, 15, 30, 45, 60, 90 minutes
 

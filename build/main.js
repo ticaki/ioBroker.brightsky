@@ -82,6 +82,17 @@ class Brightsky extends utils.Adapter {
       await this.delObjectAsync("radar", { recursive: true });
     } else {
       await this.library.writedp("radar", null, import_definition.genericStateObjects.weather.radar._channel);
+      await this.library.writedp(
+        `radar.max_precipitation_forecast`,
+        null,
+        import_definition.genericStateObjects.max_precipitation_forecast._channel
+      );
+      await this.library.writedp(`radar.data`, null, {
+        _id: "",
+        type: "channel",
+        common: { name: "Radar Data" },
+        native: {}
+      });
     }
     if (!this.config.createCurrently && !this.config.createHourly && !this.config.createDaily && !this.config.createRadar) {
       this.log.error(
@@ -745,7 +756,7 @@ class Brightsky extends utils.Adapter {
       });
     }
     if (dataToWrite.length > 0) {
-      await this.library.writeFromJson("radar.r", "weather.radar", import_definition.genericStateObjects, dataToWrite, true);
+      await this.library.writeFromJson("radar.data.r", "weather.radar", import_definition.genericStateObjects, dataToWrite, true);
     }
     await this.writeMaxPrecipitationForecasts();
   }
@@ -767,7 +778,7 @@ class Brightsky extends utils.Adapter {
     }
     for (const [key, value] of Object.entries(forecasts)) {
       await this.library.writedp(
-        `max_precipitation_forecast.${key}`,
+        `radar.max_precipitation_forecast.${key}`,
         value,
         import_definition.genericStateObjects.max_precipitation_forecast[key]
       );

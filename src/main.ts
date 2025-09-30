@@ -86,6 +86,17 @@ class Brightsky extends utils.Adapter {
         } else {
             // Create the radar data folder
             await this.library.writedp('radar', null, genericStateObjects.weather.radar._channel);
+            await this.library.writedp(
+                `radar.max_precipitation_forecast`,
+                null,
+                genericStateObjects.max_precipitation_forecast._channel,
+            );
+            await this.library.writedp(`radar.data`, null, {
+                _id: '',
+                type: 'channel',
+                common: { name: 'Radar Data' },
+                native: {},
+            });
         }
         if (
             !this.config.createCurrently &&
@@ -888,7 +899,7 @@ class Brightsky extends utils.Adapter {
         }
 
         if (dataToWrite.length > 0) {
-            await this.library.writeFromJson('radar.r', 'weather.radar', genericStateObjects, dataToWrite, true);
+            await this.library.writeFromJson('radar.data.r', 'weather.radar', genericStateObjects, dataToWrite, true);
         }
 
         // Calculate and write max precipitation forecasts
@@ -919,7 +930,7 @@ class Brightsky extends utils.Adapter {
         // Write forecasts to states
         for (const [key, value] of Object.entries(forecasts)) {
             await this.library.writedp(
-                `max_precipitation_forecast.${key}`,
+                `radar.max_precipitation_forecast.${key}`,
                 value,
                 genericStateObjects.max_precipitation_forecast[
                     key as keyof typeof genericStateObjects.max_precipitation_forecast
