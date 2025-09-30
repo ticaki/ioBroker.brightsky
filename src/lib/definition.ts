@@ -1787,7 +1787,7 @@ export type BrightskyRadarResponse = {
 
 export type BrightskyRadarData = {
     timestamp: string;
-    source: string;
+    source?: string;
     precipitation_5: number; // Average precipitation in mm
     forecast_time: string; // When the forecast was issued
 };

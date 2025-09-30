@@ -152,11 +152,12 @@ export class Library extends BaseClass {
                             : null;
                         const defChannel = this.getChannelObject(objectDefinition2, true);
                         const aName = k._index != null ? k._index : a;
+                        const nameCount = k._index != null ? -3 : -2;
                         if (defChannel.common?.name) {
                             defChannel.common.name = `+ ${aName}`;
                         }
                         const newPrefix = prefix.split('.').slice(0, -1).join('.');
-                        const n = `00${aName}`.slice(-2);
+                        const n = `000${aName}`.slice(nameCount); // 001, 002, ... 099
                         a += 1;
                         const dp = `${newPrefix}.${n}`;
                         // create folder

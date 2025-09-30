@@ -750,7 +750,7 @@ class Brightsky extends utils.Adapter {
 
                     return {
                         timestamp: item.timestamp,
-                        source: item.source,
+                        //source: item.source,
                         precipitation_5: Math.round(avgPrecipitation * 100) / 100, // Round to 2 decimal places
                         forecast_time: fetchTime,
                     };
@@ -800,7 +800,7 @@ class Brightsky extends utils.Adapter {
                 this.radarData.push({
                     timestamp: nextTime.toISOString(),
                     source: lastItem.source,
-                    precipitation_5: 0, // Placeholder value
+                    precipitation_5: -1, // Placeholder value
                     forecast_time: lastItem.forecast_time,
                 });
             }
