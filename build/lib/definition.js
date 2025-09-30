@@ -1573,6 +1573,45 @@ const genericStateObjects = {
         },
         native: {}
       },
+      precipitation_5_min: {
+        _id: "precipitation_5_min",
+        type: "state",
+        common: {
+          name: "Precipitation Min (5 min)",
+          type: "number",
+          role: "value.precipitation",
+          read: true,
+          write: false,
+          unit: "mm"
+        },
+        native: {}
+      },
+      precipitation_5_max: {
+        _id: "precipitation_5_max",
+        type: "state",
+        common: {
+          name: "Precipitation Max (5 min)",
+          type: "number",
+          role: "value.precipitation",
+          read: true,
+          write: false,
+          unit: "mm"
+        },
+        native: {}
+      },
+      precipitation_5_median: {
+        _id: "precipitation_5_median",
+        type: "state",
+        common: {
+          name: "Precipitation Median (5 min)",
+          type: "number",
+          role: "value.precipitation",
+          read: true,
+          write: false,
+          unit: "mm"
+        },
+        native: {}
+      },
       forecast_time: {
         _id: "forecast_time",
         type: "state",

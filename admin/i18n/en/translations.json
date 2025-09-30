@@ -10,7 +10,7 @@
     "createCurrently": "Creates current weather data",
     "createRadar": "Creates weather radar data",
     "pollIntervalRadar": "Query interval for radar data (in minutes, must be divisible by 5)",
-    "radarDistance": "Radar search area distance (rectangular area edge length, max 50km)",
+    "radarDistance": "Radar search area radius (data extends this distance to each side from center, max 50km)",
     "wmo_station": "WMO station ID (optional, default is empty)",
     "wmo_station_link": "Link to WMO station information",
     "dwd_station_id": "DWD station ID (optional, default is empty)",

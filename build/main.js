@@ -157,6 +157,12 @@ class Brightsky extends utils.Adapter {
       );
       this.config.pollIntervalRadar = adjusted;
     }
+    if (this.config.radarDistance == void 0 || this.config.radarDistance < 1e3 || this.config.radarDistance > 5e4) {
+      this.log.warn(
+        `Invalid radar distance: ${this.config.radarDistance}. Using default value of 10000 meters (10 km).`
+      );
+      this.config.radarDistance = 1e4;
+    }
     if (this.config.createCurrently) {
       await this.delay(3e3);
       await this.weatherCurrentlyLoop();
@@ -609,6 +615,15 @@ class Brightsky extends utils.Adapter {
       void this.weatherRadarLoop();
     }, nextInterval);
   }
+  /**
+   * Fetches radar precipitation data from BrightSky API
+   *
+   * API Documentation: https://brightsky.dev/docs/#/operations/getRadar
+   * OpenAPI Spec: https://api.brightsky.dev/openapi.json
+   *
+   * The 'distance' parameter defines how far the data extends to each side of the center point.
+   * For example, distance=10000 (10km) creates a square area of ~20km × 20km total.
+   */
   async weatherRadarUpdate() {
     try {
       const coords = this.config.position.split(",").map(parseFloat);
@@ -616,7 +631,7 @@ class Brightsky extends utils.Adapter {
       const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1e3);
       const dateParam = now.toISOString();
       const response = await this.fetch(
-        `https://api.brightsky.dev/radar?lat=${coords[0]}&lon=${coords[1]}&distance=1000&date=${dateParam}&format=plain`
+        `https://api.brightsky.dev/radar?lat=${coords[0]}&lon=${coords[1]}&distance=${this.config.radarDistance}&date=${dateParam}&format=plain`
       );
       if (response.status !== 200) {
         throw new Error(`Error fetching radar data: ${response.status} ${response.statusText}`);
@@ -630,26 +645,39 @@ class Brightsky extends utils.Adapter {
         });
         const fetchTime = now.toISOString();
         this.radarData = filteredRadar.map((item) => {
-          let totalPrecipitation = 0;
-          let count = 0;
+          const values = [];
           if (Array.isArray(item.precipitation_5)) {
             for (const row of item.precipitation_5) {
               if (Array.isArray(row)) {
                 for (const value of row) {
                   if (typeof value === "number") {
-                    totalPrecipitation += value;
-                    count++;
+                    values.push(value);
                   }
                 }
               }
             }
           }
-          const avgPrecipitation = count > 0 ? totalPrecipitation / count : 0;
+          let avg = 0;
+          let min = 0;
+          let max = 0;
+          let median = 0;
+          if (values.length > 0) {
+            const sum = values.reduce((acc, val) => acc + val, 0);
+            avg = sum / values.length;
+            min = Math.min(...values);
+            max = Math.max(...values);
+            const sorted = [...values].sort((a, b) => a - b);
+            const mid = Math.floor(sorted.length / 2);
+            median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+          }
           return {
             timestamp: item.timestamp,
-            //source: item.source,
-            precipitation_5: Math.round(avgPrecipitation * 100) / 100,
+            source: item.source,
+            precipitation_5: Math.round(avg * 100) / 100,
             // Round to 2 decimal places
+            precipitation_5_min: Math.round(min * 100) / 100,
+            precipitation_5_max: Math.round(max * 100) / 100,
+            precipitation_5_median: Math.round(median * 100) / 100,
             forecast_time: fetchTime
           };
         });
@@ -683,6 +711,9 @@ class Brightsky extends utils.Adapter {
           source: lastItem.source,
           precipitation_5: -1,
           // Placeholder value
+          precipitation_5_min: -1,
+          precipitation_5_max: -1,
+          precipitation_5_median: -1,
           forecast_time: lastItem.forecast_time
         });
       }

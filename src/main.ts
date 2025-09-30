@@ -712,6 +712,15 @@ class Brightsky extends utils.Adapter {
         }, nextInterval);
     }
 
+    /**
+     * Fetches radar precipitation data from BrightSky API
+     *
+     * API Documentation: https://brightsky.dev/docs/#/operations/getRadar
+     * OpenAPI Spec: https://api.brightsky.dev/openapi.json
+     *
+     * The 'distance' parameter defines how far the data extends to each side of the center point.
+     * For example, distance=10000 (10km) creates a square area of ~20km × 20km total.
+     */
     async weatherRadarUpdate(): Promise<void> {
         try {
             const coords = this.config.position.split(',').map(parseFloat);
