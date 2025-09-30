@@ -1518,6 +1518,84 @@ const genericStateObjects = {
         },
         native: {}
       }
+    },
+    radar: {
+      _channel: {
+        _id: "",
+        type: "folder",
+        common: {
+          name: "Weather Radar"
+        },
+        native: {}
+      },
+      _array: {
+        _id: "",
+        type: "folder",
+        common: {
+          name: "Radar Forecast"
+        },
+        native: {}
+      },
+      timestamp: {
+        _id: "timestamp",
+        type: "state",
+        common: {
+          name: "Timestamp",
+          type: "string",
+          role: "date",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      source: {
+        _id: "source",
+        type: "state",
+        common: {
+          name: "Source",
+          type: "string",
+          role: "text",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      precipitation_5: {
+        _id: "precipitation_5",
+        type: "state",
+        common: {
+          name: "Precipitation (5 min)",
+          type: "string",
+          role: "text",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      forecast_time: {
+        _id: "forecast_time",
+        type: "state",
+        common: {
+          name: "Forecast Time",
+          type: "string",
+          role: "date",
+          read: true,
+          write: false
+        },
+        native: {}
+      },
+      valid_time: {
+        _id: "valid_time",
+        type: "state",
+        common: {
+          name: "Valid For Time",
+          type: "string",
+          role: "date",
+          read: true,
+          write: false
+        },
+        native: {}
+      }
     }
   }
 };

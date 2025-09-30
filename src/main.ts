@@ -9,7 +9,7 @@ type Panel = ioBroker.AdapterConfig['panels'][0];
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
 import { Library } from './lib/library';
-import type { BrightskyCurrently, BrightskyHourly } from './lib/definition';
+import type { BrightskyCurrently, BrightskyHourly, BrightskyRadarResponse, BrightskyRadarData } from './lib/definition';
 import {
     genericStateObjects,
     type BrightskyDailyData,
@@ -30,6 +30,8 @@ class Brightsky extends utils.Adapter {
     timeoutId: ioBroker.Timeout | undefined = undefined;
     groupArray: Panel[][] = [];
     wrArray: number[] = [];
+    radarData: BrightskyRadarData[] = [];
+    radarRotationTimeout: ioBroker.Timeout | null | undefined = undefined;
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
@@ -69,9 +71,17 @@ class Brightsky extends utils.Adapter {
         if (!this.config.createHourly) {
             await this.delObjectAsync('hourly', { recursive: true });
         }
-        if (!this.config.createCurrently && !this.config.createHourly && !this.config.createDaily) {
+        if (!this.config.createRadar) {
+            await this.delObjectAsync('radar', { recursive: true });
+        }
+        if (
+            !this.config.createCurrently &&
+            !this.config.createHourly &&
+            !this.config.createDaily &&
+            !this.config.createRadar
+        ) {
             this.log.error(
-                'No data creation is enabled in the adapter configuration. Please enable at least one of the options: Currently, Hourly, or Daily.',
+                'No data creation is enabled in the adapter configuration. Please enable at least one of the options: Currently, Hourly, Daily, or Radar.',
             );
             return;
         }
@@ -150,6 +160,27 @@ class Brightsky extends utils.Adapter {
             this.log.warn(`Invalid max distance: ${this.config.maxDistance}. Using default value of 50000 meters.`);
             this.config.maxDistance = 50000; // Default to 50 km if invalid
         }
+
+        if (
+            this.config.pollIntervalRadar == undefined ||
+            this.config.pollIntervalRadar < 5 ||
+            this.config.pollIntervalRadar >= 2 ** 31 / 60000
+        ) {
+            this.log.warn(
+                `Invalid poll interval radar: ${this.config.pollIntervalRadar}. Using default value of 10 minutes.`,
+            );
+            this.config.pollIntervalRadar = 10; // Default to 10 minutes if invalid
+        }
+
+        // Ensure radar interval is divisible by 5
+        if (this.config.pollIntervalRadar % 5 !== 0) {
+            const adjusted = Math.round(this.config.pollIntervalRadar / 5) * 5;
+            this.log.warn(
+                `Radar poll interval must be divisible by 5. Adjusting from ${this.config.pollIntervalRadar} to ${adjusted} minutes.`,
+            );
+            this.config.pollIntervalRadar = adjusted;
+        }
+
         if (this.config.createCurrently) {
             await this.delay(3000); // Wait for 1 second to ensure the adapter is ready
             await this.weatherCurrentlyLoop();
@@ -162,8 +193,12 @@ class Brightsky extends utils.Adapter {
             await this.delay(3000);
             await this.weatherDailyLoop();
         }
+        if (this.config.createRadar) {
+            await this.delay(3000);
+            await this.weatherRadarLoop();
+        }
         this.log.info(
-            `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours` : 'Hourly data disabled'} - ${this.config.createDaily ? 'Daily data enabled' : 'Daily data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
+            `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours` : 'Hourly data disabled'} - ${this.config.createDaily ? 'Daily data enabled' : 'Daily data disabled'} - ${this.config.createRadar ? `Radar data enabled. Poll interval: ${this.config.pollIntervalRadar} minutes` : 'Radar data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
         );
         this.log.info(
             `Using ${this.config.dwd_station_id ? `WMO Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`,
@@ -637,6 +672,132 @@ class Brightsky extends utils.Adapter {
             this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
         }
     }
+
+    async weatherRadarLoop(): Promise<void> {
+        if (this.weatherTimeout[3]) {
+            this.clearTimeout(this.weatherTimeout[3]);
+        }
+        await this.weatherRadarUpdate();
+
+        // Calculate next interval: configured minutes + 15s + random 0-5s
+        const nextInterval = this.config.pollIntervalRadar * 60000 + 15000 + Math.ceil(Math.random() * 5000);
+
+        this.weatherTimeout[3] = this.setTimeout(() => {
+            void this.weatherRadarLoop();
+        }, nextInterval);
+    }
+
+    async weatherRadarUpdate(): Promise<void> {
+        try {
+            const coords = this.config.position.split(',').map(parseFloat);
+            const now = new Date();
+            const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
+            // Format date for API (ISO 8601)
+            const dateParam = now.toISOString();
+
+            const response = await this.fetch(
+                `https://api.brightsky.dev/radar?lat=${coords[0]}&lon=${coords[1]}&distance=1000&date=${dateParam}`,
+            );
+
+            if (response.status !== 200) {
+                throw new Error(`Error fetching radar data: ${response.status} ${response.statusText}`);
+            }
+
+            const result = (await response.json()) as BrightskyRadarResponse;
+
+            if (result && result.radar && Array.isArray(result.radar)) {
+                this.log.debug(`Radar data fetched successfully: ${result.radar.length} items`);
+
+                // Filter data for now to +2 hours
+                const filteredRadar = result.radar.filter(item => {
+                    const itemTime = new Date(item.timestamp);
+                    return itemTime >= now && itemTime <= twoHoursLater;
+                });
+
+                // Store radar data with forecast metadata
+                const fetchTime = now.toISOString();
+                this.radarData = filteredRadar.map(item => ({
+                    timestamp: item.timestamp,
+                    source: item.source,
+                    precipitation_5: item.precipitation_5,
+                    forecast_time: fetchTime,
+                    valid_time: item.timestamp,
+                }));
+
+                // Write initial data
+                await this.writeRadarData();
+
+                // Setup rotation if poll interval > 5 minutes
+                if (this.config.pollIntervalRadar > 5) {
+                    this.setupRadarRotation();
+                }
+
+                await this.setState('info.connection', true, true);
+            }
+        } catch (error) {
+            await this.setState('info.connection', false, true);
+            this.log.error(`Error fetching radar data: ${JSON.stringify(error)}`);
+        }
+    }
+
+    private setupRadarRotation(): void {
+        // Clear any existing rotation timeout
+        if (this.radarRotationTimeout) {
+            this.clearTimeout(this.radarRotationTimeout);
+        }
+
+        // Set up rotation every 5 minutes
+        const rotateRadarData = async (): Promise<void> => {
+            if (this.radarData.length === 0) {
+                return;
+            }
+
+            // Remove the first item (oldest)
+            this.radarData.shift();
+
+            // Write rotated data
+            await this.writeRadarData();
+
+            // Schedule next rotation
+            if (this.radarData.length > 0) {
+                this.radarRotationTimeout = this.setTimeout(
+                    () => {
+                        void rotateRadarData();
+                    },
+                    5 * 60 * 1000,
+                ); // 5 minutes
+            }
+        };
+
+        // Schedule first rotation in 5 minutes
+        this.radarRotationTimeout = this.setTimeout(
+            () => {
+                void rotateRadarData();
+            },
+            5 * 60 * 1000,
+        );
+    }
+
+    private async writeRadarData(): Promise<void> {
+        // Create folders named 0, 5, 10, 15, etc. for each 5-minute interval
+        const dataToWrite: any[] = [];
+
+        for (let i = 0; i < this.radarData.length; i++) {
+            const item = this.radarData[i];
+            const minutesOffset = i * 5;
+
+            dataToWrite.push({
+                _index: minutesOffset,
+                ...item,
+            });
+        }
+
+        if (dataToWrite.length > 0) {
+            await this.library.writeFromJson('radar.r', 'weather.radar', genericStateObjects, dataToWrite, true);
+        }
+    }
+
     private getWindBearingText(windBearing: number | undefined): string {
         if (windBearing === undefined) {
             return '';
@@ -671,6 +832,9 @@ class Brightsky extends utils.Adapter {
                 if (timeout) {
                     this.clearTimeout(timeout);
                 }
+            }
+            if (this.radarRotationTimeout) {
+                this.clearTimeout(this.radarRotationTimeout);
             }
             if (this.timeoutId) {
                 this.clearTimeout(this.timeoutId);

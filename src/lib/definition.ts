@@ -1094,6 +1094,7 @@ export const genericStateObjects: {
 
         sources: customChannelType & ChangeTypeOfKeysForState<BrightskySource, ioBroker.StateObject>;
         current: customChannelType & ChangeTypeOfKeysForState<BrightskyCurrently, ioBroker.StateObject>;
+        radar: customChannelType & ChangeTypeOfKeysForState<BrightskyRadarData, ioBroker.StateObject>;
     };
 } = {
     default: {
@@ -1527,6 +1528,84 @@ export const genericStateObjects: {
                 native: {},
             },
         },
+        radar: {
+            _channel: {
+                _id: '',
+                type: 'folder',
+                common: {
+                    name: 'Weather Radar',
+                },
+                native: {},
+            },
+            _array: {
+                _id: '',
+                type: 'folder',
+                common: {
+                    name: 'Radar Forecast',
+                },
+                native: {},
+            },
+            timestamp: {
+                _id: 'timestamp',
+                type: 'state',
+                common: {
+                    name: 'Timestamp',
+                    type: 'string',
+                    role: 'date',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            source: {
+                _id: 'source',
+                type: 'state',
+                common: {
+                    name: 'Source',
+                    type: 'string',
+                    role: 'text',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            precipitation_5: {
+                _id: 'precipitation_5',
+                type: 'state',
+                common: {
+                    name: 'Precipitation (5 min)',
+                    type: 'string',
+                    role: 'text',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            forecast_time: {
+                _id: 'forecast_time',
+                type: 'state',
+                common: {
+                    name: 'Forecast Time',
+                    type: 'string',
+                    role: 'date',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            valid_time: {
+                _id: 'valid_time',
+                type: 'state',
+                common: {
+                    name: 'Valid For Time',
+                    type: 'string',
+                    role: 'date',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+        },
     },
 };
 
@@ -1704,4 +1783,23 @@ export type BrightskyCurrently = {
 export type BrightskyTestdata2 = {
     weather: BrightskyCurrently;
     sources: BrightskySource[];
+};
+
+// Weather Radar types
+export type BrightskyRadarItem = {
+    timestamp: string;
+    source: string;
+    precipitation_5: string;
+};
+
+export type BrightskyRadarResponse = {
+    radar: BrightskyRadarItem[];
+};
+
+export type BrightskyRadarData = {
+    timestamp: string;
+    source: string;
+    precipitation_5: string;
+    forecast_time: string; // When the forecast was issued
+    valid_time: string; // For what time the forecast is valid
 };

@@ -8,6 +8,8 @@
     "createDaily": "Erstellt Tagesübersichten (nach 0:00, 5:00 und 18:00 Uhr)",
     "createHourly": "Erstellt stündliche Übersichten",
     "createCurrently": "Erstellt aktuelle Wetterdatenübersicht",
+    "createRadar": "Erstellt Wetterradar-Daten",
+    "pollIntervalRadar": "Abfrageintervall für Radardaten (in Minuten, muss durch 5 teilbar sein)",
     "wmo_station": "WMO Station ID (optional, Default ist leer)",
     "wmo_station_link": "Link zu WMO Stationsinformationen",
     "dwd_station_id": "DWD Station ID (optional, Default ist leer)",
