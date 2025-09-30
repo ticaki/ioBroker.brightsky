@@ -710,7 +710,7 @@ class Brightsky extends utils.Adapter {
             const dateParam = now.toISOString();
 
             const response = await this.fetch(
-                `https://api.brightsky.dev/radar?lat=${coords[0]}&lon=${coords[1]}&distance=1000&date=${dateParam}`,
+                `https://api.brightsky.dev/radar?lat=${coords[0]}&lon=${coords[1]}&distance=1000&date=${dateParam}&format=plain`,
             );
 
             if (response.status !== 200) {
@@ -730,13 +730,32 @@ class Brightsky extends utils.Adapter {
 
                 // Store radar data with forecast metadata
                 const fetchTime = now.toISOString();
-                this.radarData = filteredRadar.map(item => ({
-                    timestamp: item.timestamp,
-                    source: item.source,
-                    precipitation_5: item.precipitation_5,
-                    forecast_time: fetchTime,
-                    valid_time: item.timestamp,
-                }));
+                this.radarData = filteredRadar.map(item => {
+                    // Calculate average precipitation from 2D array
+                    let totalPrecipitation = 0;
+                    let count = 0;
+                    if (Array.isArray(item.precipitation_5)) {
+                        for (const row of item.precipitation_5) {
+                            if (Array.isArray(row)) {
+                                for (const value of row) {
+                                    if (typeof value === 'number') {
+                                        totalPrecipitation += value;
+                                        count++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    const avgPrecipitation = count > 0 ? totalPrecipitation / count : 0;
+
+                    return {
+                        timestamp: item.timestamp,
+                        source: item.source,
+                        precipitation_5: Math.round(avgPrecipitation * 100) / 100, // Round to 2 decimal places
+                        forecast_time: fetchTime,
+                        valid_time: item.timestamp,
+                    };
+                });
 
                 // Write initial data
                 await this.writeRadarData();

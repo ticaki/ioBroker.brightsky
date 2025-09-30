@@ -1574,10 +1574,11 @@ export const genericStateObjects: {
                 type: 'state',
                 common: {
                     name: 'Precipitation (5 min)',
-                    type: 'string',
-                    role: 'text',
+                    type: 'number',
+                    role: 'value.precipitation',
                     read: true,
                     write: false,
+                    unit: 'mm',
                 },
                 native: {},
             },
@@ -1789,7 +1790,7 @@ export type BrightskyTestdata2 = {
 export type BrightskyRadarItem = {
     timestamp: string;
     source: string;
-    precipitation_5: string;
+    precipitation_5: number[][]; // 2D array of precipitation values in mm when using format=plain
 };
 
 export type BrightskyRadarResponse = {
@@ -1799,7 +1800,7 @@ export type BrightskyRadarResponse = {
 export type BrightskyRadarData = {
     timestamp: string;
     source: string;
-    precipitation_5: string;
+    precipitation_5: number; // Average precipitation in mm
     forecast_time: string; // When the forecast was issued
     valid_time: string; // For what time the forecast is valid
 };
