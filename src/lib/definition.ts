@@ -1094,6 +1094,16 @@ export const genericStateObjects: {
 
         sources: customChannelType & ChangeTypeOfKeysForState<BrightskySource, ioBroker.StateObject>;
         current: customChannelType & ChangeTypeOfKeysForState<BrightskyCurrently, ioBroker.StateObject>;
+        radar: customChannelType & ChangeTypeOfKeysForState<BrightskyRadarData, ioBroker.StateObject>;
+    };
+    max_precipitation_forecast: customChannelType & {
+        next_5min: ioBroker.StateObject;
+        next_10min: ioBroker.StateObject;
+        next_15min: ioBroker.StateObject;
+        next_30min: ioBroker.StateObject;
+        next_45min: ioBroker.StateObject;
+        next_60min: ioBroker.StateObject;
+        next_90min: ioBroker.StateObject;
     };
 } = {
     default: {
@@ -1527,6 +1537,213 @@ export const genericStateObjects: {
                 native: {},
             },
         },
+        radar: {
+            _channel: {
+                _id: '',
+                type: 'folder',
+                common: {
+                    name: 'Weather Radar',
+                },
+                native: {},
+            },
+            _array: {
+                _id: '',
+                type: 'folder',
+                common: {
+                    name: 'Radar Forecast',
+                },
+                native: {},
+            },
+            timestamp: {
+                _id: 'timestamp',
+                type: 'state',
+                common: {
+                    name: 'Timestamp',
+                    type: 'string',
+                    role: 'date',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            source: {
+                _id: 'source',
+                type: 'state',
+                common: {
+                    name: 'Source',
+                    type: 'string',
+                    role: 'text',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            precipitation_5: {
+                _id: 'precipitation_5',
+                type: 'state',
+                common: {
+                    name: 'Precipitation (5 min)',
+                    type: 'number',
+                    role: 'value.precipitation',
+                    read: true,
+                    write: false,
+                    unit: 'mm',
+                },
+                native: {},
+            },
+            precipitation_5_min: {
+                _id: 'precipitation_5_min',
+                type: 'state',
+                common: {
+                    name: 'Precipitation Min (5 min)',
+                    type: 'number',
+                    role: 'value.precipitation',
+                    read: true,
+                    write: false,
+                    unit: 'mm',
+                },
+                native: {},
+            },
+            precipitation_5_max: {
+                _id: 'precipitation_5_max',
+                type: 'state',
+                common: {
+                    name: 'Precipitation Max (5 min)',
+                    type: 'number',
+                    role: 'value.precipitation',
+                    read: true,
+                    write: false,
+                    unit: 'mm',
+                },
+                native: {},
+            },
+            precipitation_5_median: {
+                _id: 'precipitation_5_median',
+                type: 'state',
+                common: {
+                    name: 'Precipitation Median (5 min)',
+                    type: 'number',
+                    role: 'value.precipitation',
+                    read: true,
+                    write: false,
+                    unit: 'mm',
+                },
+                native: {},
+            },
+            forecast_time: {
+                _id: 'forecast_time',
+                type: 'state',
+                common: {
+                    name: 'Forecast Time',
+                    type: 'string',
+                    role: 'date',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+        },
+    },
+    max_precipitation_forecast: {
+        _channel: {
+            _id: 'max_precipitation_forecast',
+            type: 'folder',
+            common: {
+                name: 'Max Precipitation Forecast',
+            },
+            native: {},
+        },
+        next_5min: {
+            _id: 'next_5min',
+            type: 'state',
+            common: {
+                name: 'Max Precipitation Next 5 Minutes',
+                type: 'number',
+                role: 'value.precipitation.forecast',
+                read: true,
+                write: false,
+                unit: 'mm',
+            },
+            native: {},
+        },
+        next_10min: {
+            _id: 'next_10min',
+            type: 'state',
+            common: {
+                name: 'Max Precipitation Next 10 Minutes',
+                type: 'number',
+                role: 'value.precipitation.forecast',
+                read: true,
+                write: false,
+                unit: 'mm',
+            },
+            native: {},
+        },
+        next_15min: {
+            _id: 'next_15min',
+            type: 'state',
+            common: {
+                name: 'Max Precipitation Next 15 Minutes',
+                type: 'number',
+                role: 'value.precipitation.forecast',
+                read: true,
+                write: false,
+                unit: 'mm',
+            },
+            native: {},
+        },
+        next_30min: {
+            _id: 'next_30min',
+            type: 'state',
+            common: {
+                name: 'Max Precipitation Next 30 Minutes',
+                type: 'number',
+                role: 'value.precipitation.forecast',
+                read: true,
+                write: false,
+                unit: 'mm',
+            },
+            native: {},
+        },
+        next_45min: {
+            _id: 'next_45min',
+            type: 'state',
+            common: {
+                name: 'Max Precipitation Next 45 Minutes',
+                type: 'number',
+                role: 'value.precipitation.forecast',
+                read: true,
+                write: false,
+                unit: 'mm',
+            },
+            native: {},
+        },
+        next_60min: {
+            _id: 'next_60min',
+            type: 'state',
+            common: {
+                name: 'Max Precipitation Next 60 Minutes',
+                type: 'number',
+                role: 'value.precipitation.forecast',
+                read: true,
+                write: false,
+                unit: 'mm',
+            },
+            native: {},
+        },
+        next_90min: {
+            _id: 'next_90min',
+            type: 'state',
+            common: {
+                name: 'Max Precipitation Next 90 Minutes',
+                type: 'number',
+                role: 'value.precipitation.forecast',
+                read: true,
+                write: false,
+                unit: 'mm',
+            },
+            native: {},
+        },
     },
 };
 
@@ -1704,4 +1921,25 @@ export type BrightskyCurrently = {
 export type BrightskyTestdata2 = {
     weather: BrightskyCurrently;
     sources: BrightskySource[];
+};
+
+// Weather Radar types
+export type BrightskyRadarItem = {
+    timestamp: string;
+    source: string;
+    precipitation_5: number[][]; // 2D array of precipitation values in mm when using format=plain
+};
+
+export type BrightskyRadarResponse = {
+    radar: BrightskyRadarItem[];
+};
+
+export type BrightskyRadarData = {
+    timestamp: string;
+    source?: string;
+    precipitation_5: number; // Average precipitation in mm
+    precipitation_5_min: number; // Minimum precipitation in mm
+    precipitation_5_max: number; // Maximum precipitation in mm
+    precipitation_5_median: number; // Median precipitation in mm
+    forecast_time: string; // When the forecast was issued
 };

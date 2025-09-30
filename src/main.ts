@@ -9,7 +9,7 @@ type Panel = ioBroker.AdapterConfig['panels'][0];
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
 import { Library } from './lib/library';
-import type { BrightskyCurrently, BrightskyHourly } from './lib/definition';
+import type { BrightskyCurrently, BrightskyHourly, BrightskyRadarResponse, BrightskyRadarData } from './lib/definition';
 import {
     genericStateObjects,
     type BrightskyDailyData,
@@ -30,6 +30,8 @@ class Brightsky extends utils.Adapter {
     timeoutId: ioBroker.Timeout | undefined = undefined;
     groupArray: Panel[][] = [];
     wrArray: number[] = [];
+    radarData: BrightskyRadarData[] = [];
+    radarRotationTimeout: ioBroker.Timeout | null | undefined = undefined;
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
             ...options,
@@ -62,16 +64,48 @@ class Brightsky extends utils.Adapter {
         await this.setState('info.connection', false, true);
         if (!this.config.createDaily) {
             await this.delObjectAsync('daily', { recursive: true });
+        } else {
+            // Create the daily data folder
+            await this.library.writedp('daily', null, genericStateObjects.weather.daily._channel);
         }
         if (!this.config.createCurrently) {
             await this.delObjectAsync('current', { recursive: true });
+        } else {
+            // Create the currently data folder
+            await this.library.writedp('current', null, genericStateObjects.weather.current._channel);
         }
         if (!this.config.createHourly) {
             await this.delObjectAsync('hourly', { recursive: true });
+        } else {
+            // Create the hourly data folder
+            await this.library.writedp('hourly', null, genericStateObjects.weather.hourly._channel);
+            await this.library.writedp('hourly.sources', undefined, genericStateObjects.weather.sources._channel);
         }
-        if (!this.config.createCurrently && !this.config.createHourly && !this.config.createDaily) {
+        if (!this.config.createRadar) {
+            await this.delObjectAsync('radar', { recursive: true });
+        } else {
+            // Create the radar data folder
+            await this.library.writedp('radar', null, genericStateObjects.weather.radar._channel);
+            await this.library.writedp(
+                `radar.max_precipitation_forecast`,
+                null,
+                genericStateObjects.max_precipitation_forecast._channel,
+            );
+            await this.library.writedp(`radar.data`, null, {
+                _id: '',
+                type: 'channel',
+                common: { name: 'Radar Data' },
+                native: {},
+            });
+        }
+        if (
+            !this.config.createCurrently &&
+            !this.config.createHourly &&
+            !this.config.createDaily &&
+            !this.config.createRadar
+        ) {
             this.log.error(
-                'No data creation is enabled in the adapter configuration. Please enable at least one of the options: Currently, Hourly, or Daily.',
+                'No data creation is enabled in the adapter configuration. Please enable at least one of the options: Currently, Hourly, Daily, or Radar.',
             );
             return;
         }
@@ -150,6 +184,39 @@ class Brightsky extends utils.Adapter {
             this.log.warn(`Invalid max distance: ${this.config.maxDistance}. Using default value of 50000 meters.`);
             this.config.maxDistance = 50000; // Default to 50 km if invalid
         }
+
+        if (
+            this.config.pollIntervalRadar == undefined ||
+            this.config.pollIntervalRadar < 5 ||
+            this.config.pollIntervalRadar >= 2 ** 31 / 60000
+        ) {
+            this.log.warn(
+                `Invalid poll interval radar: ${this.config.pollIntervalRadar}. Using default value of 10 minutes.`,
+            );
+            this.config.pollIntervalRadar = 10; // Default to 10 minutes if invalid
+        }
+
+        // Ensure radar interval is divisible by 5
+        if (this.config.pollIntervalRadar % 5 !== 0) {
+            const adjusted = Math.round(this.config.pollIntervalRadar / 5) * 5;
+            this.log.warn(
+                `Radar poll interval must be divisible by 5. Adjusting from ${this.config.pollIntervalRadar} to ${adjusted} minutes.`,
+            );
+            this.config.pollIntervalRadar = adjusted;
+        }
+
+        // Validate radar distance (max 50km)
+        if (
+            this.config.radarDistance == undefined ||
+            this.config.radarDistance < 1000 ||
+            this.config.radarDistance > 50000
+        ) {
+            this.log.warn(
+                `Invalid radar distance: ${this.config.radarDistance}. Using default value of 10000 meters (10 km).`,
+            );
+            this.config.radarDistance = 10000; // Default to 10 km if invalid
+        }
+
         if (this.config.createCurrently) {
             await this.delay(3000); // Wait for 1 second to ensure the adapter is ready
             await this.weatherCurrentlyLoop();
@@ -162,8 +229,12 @@ class Brightsky extends utils.Adapter {
             await this.delay(3000);
             await this.weatherDailyLoop();
         }
+        if (this.config.createRadar) {
+            await this.delay(3000);
+            await this.weatherRadarLoop();
+        }
         this.log.info(
-            `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours` : 'Hourly data disabled'} - ${this.config.createDaily ? 'Daily data enabled' : 'Daily data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
+            `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours` : 'Hourly data disabled'} - ${this.config.createDaily ? 'Daily data enabled' : 'Daily data disabled'} - ${this.config.createRadar ? `Radar data enabled. Poll interval: ${this.config.pollIntervalRadar} minutes` : 'Radar data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
         );
         this.log.info(
             `Using ${this.config.dwd_station_id ? `WMO Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`,
@@ -637,6 +708,237 @@ class Brightsky extends utils.Adapter {
             this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
         }
     }
+
+    async weatherRadarLoop(): Promise<void> {
+        if (this.weatherTimeout[3]) {
+            this.clearTimeout(this.weatherTimeout[3]);
+        }
+        await this.weatherRadarUpdate();
+
+        // Calculate next interval: configured minutes + 15s + random 0-5s
+        const nextInterval = this.config.pollIntervalRadar * 60000 + 15000 + Math.ceil(Math.random() * 5000);
+
+        this.weatherTimeout[3] = this.setTimeout(() => {
+            void this.weatherRadarLoop();
+        }, nextInterval);
+    }
+
+    /**
+     * Fetches radar precipitation data from BrightSky API
+     *
+     * API Documentation: https://brightsky.dev/docs/#/operations/getRadar
+     * OpenAPI Spec: https://api.brightsky.dev/openapi.json
+     *
+     * The 'distance' parameter defines how far the data extends to each side of the center point.
+     * For example, distance=10000 (10km) creates a square area of ~20km × 20km total.
+     */
+    async weatherRadarUpdate(): Promise<void> {
+        try {
+            const coords = this.config.position.split(',').map(parseFloat);
+            const now = new Date();
+            const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
+            // Format date for API (ISO 8601)
+            const dateParam = now.toISOString();
+
+            const response = await this.fetch(
+                `https://api.brightsky.dev/radar?lat=${coords[0]}&lon=${coords[1]}&distance=${this.config.radarDistance}&date=${dateParam}&format=plain`,
+            );
+
+            if (response.status !== 200) {
+                throw new Error(`Error fetching radar data: ${response.status} ${response.statusText}`);
+            }
+
+            const result = (await response.json()) as BrightskyRadarResponse;
+
+            if (result && result.radar && Array.isArray(result.radar)) {
+                this.log.debug(`Radar data fetched successfully: ${result.radar.length} items`);
+
+                // Filter data for now to +2 hours
+                const filteredRadar = result.radar.filter(item => {
+                    const itemTime = new Date(item.timestamp);
+                    return itemTime >= now && itemTime <= twoHoursLater;
+                });
+
+                // Store radar data with forecast metadata
+                const fetchTime = now.toISOString();
+                this.radarData = filteredRadar.map(item => {
+                    // Collect all precipitation values from 2D array
+                    const values: number[] = [];
+                    if (Array.isArray(item.precipitation_5)) {
+                        for (const row of item.precipitation_5) {
+                            if (Array.isArray(row)) {
+                                for (const value of row) {
+                                    if (typeof value === 'number') {
+                                        values.push(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Calculate statistics
+                    let avg = 0;
+                    let min = 0;
+                    let max = 0;
+                    let median = 0;
+
+                    if (values.length > 0) {
+                        // Average
+                        const sum = values.reduce((acc, val) => acc + val, 0);
+                        avg = sum / values.length;
+
+                        // Min and Max
+                        min = Math.min(...values);
+                        max = Math.max(...values);
+
+                        // Median
+                        const sorted = [...values].sort((a, b) => a - b);
+                        const mid = Math.floor(sorted.length / 2);
+                        median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
+                    }
+
+                    return {
+                        timestamp: item.timestamp,
+                        source: item.source,
+                        precipitation_5: Math.round(avg * 100) / 100, // Round to 2 decimal places
+                        precipitation_5_min: Math.round(min * 100) / 100,
+                        precipitation_5_max: Math.round(max * 100) / 100,
+                        precipitation_5_median: Math.round(median * 100) / 100,
+                        forecast_time: fetchTime,
+                    };
+                });
+
+                // Sort by timestamp to ensure correct order (index 0 = now, index 1 = +5min, etc.)
+                this.radarData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+                // Write initial data
+                await this.writeRadarData();
+
+                // Setup rotation if poll interval > 5 minutes
+                if (this.config.pollIntervalRadar > 5) {
+                    this.setupRadarRotation();
+                }
+
+                await this.setState('info.connection', true, true);
+            }
+        } catch (error) {
+            await this.setState('info.connection', false, true);
+            this.log.error(`Error fetching radar data: ${JSON.stringify(error)}`);
+        }
+    }
+
+    private setupRadarRotation(): void {
+        // Clear any existing rotation timeout
+        if (this.radarRotationTimeout) {
+            this.clearTimeout(this.radarRotationTimeout);
+        }
+
+        // Set up rotation every 5 minutes
+        const rotateRadarData = async (): Promise<void> => {
+            if (this.radarData.length === 0) {
+                return;
+            }
+
+            // Remove the first item (oldest)
+            this.radarData.shift();
+
+            // Add a placeholder at the end to clear outdated values
+            // This ensures all time slots get updated properly
+            if (this.radarData.length > 0) {
+                const lastItem = this.radarData[this.radarData.length - 1];
+                const lastTime = new Date(lastItem.timestamp);
+                const nextTime = new Date(lastTime.getTime() + 5 * 60 * 1000); // +5 minutes
+
+                this.radarData.push({
+                    timestamp: nextTime.toISOString(),
+                    source: lastItem.source,
+                    precipitation_5: -1, // Placeholder value
+                    precipitation_5_min: -1,
+                    precipitation_5_max: -1,
+                    precipitation_5_median: -1,
+                    forecast_time: lastItem.forecast_time,
+                });
+            }
+
+            // Write rotated data
+            await this.writeRadarData();
+
+            // Schedule next rotation
+            if (this.radarData.length > 0) {
+                this.radarRotationTimeout = this.setTimeout(
+                    () => {
+                        void rotateRadarData();
+                    },
+                    5 * 60 * 1000,
+                ); // 5 minutes
+            }
+        };
+
+        // Schedule first rotation in 5 minutes
+        this.radarRotationTimeout = this.setTimeout(
+            () => {
+                void rotateRadarData();
+            },
+            5 * 60 * 1000,
+        );
+    }
+
+    private async writeRadarData(): Promise<void> {
+        // Create folders named 0, 5, 10, 15, etc. for each 5-minute interval
+        const dataToWrite: any[] = [];
+
+        for (let i = 0; i < this.radarData.length; i++) {
+            const item = this.radarData[i];
+            const minutesOffset = i * 5;
+
+            dataToWrite.push({
+                _index: minutesOffset,
+                ...item,
+            });
+        }
+
+        if (dataToWrite.length > 0) {
+            await this.library.writeFromJson('radar.data.r', 'weather.radar', genericStateObjects, dataToWrite, true);
+        }
+
+        // Calculate and write max precipitation forecasts
+        await this.writeMaxPrecipitationForecasts();
+    }
+
+    private async writeMaxPrecipitationForecasts(): Promise<void> {
+        const intervals = [5, 10, 15, 30, 45, 60, 90]; // minutes
+        const forecasts: { [key: string]: number } = {};
+
+        for (const interval of intervals) {
+            const numIntervals = Math.ceil(interval / 5); // How many 5-minute intervals to check
+            let maxPrecipitation = -1;
+
+            if (this.radarData.length > 0) {
+                // Get max from the next N intervals (starting from index 0 which is "now")
+                for (let i = 0; i < numIntervals && i < this.radarData.length; i++) {
+                    const item = this.radarData[i];
+                    if (item.precipitation_5_max !== undefined && item.precipitation_5_max > maxPrecipitation) {
+                        maxPrecipitation = item.precipitation_5_max;
+                    }
+                }
+            }
+
+            forecasts[`next_${interval}min`] = maxPrecipitation;
+        }
+
+        // Write forecasts to states
+        for (const [key, value] of Object.entries(forecasts)) {
+            await this.library.writedp(
+                `radar.max_precipitation_forecast.${key}`,
+                value,
+                genericStateObjects.max_precipitation_forecast[
+                    key as keyof typeof genericStateObjects.max_precipitation_forecast
+                ],
+            );
+        }
+    }
+
     private getWindBearingText(windBearing: number | undefined): string {
         if (windBearing === undefined) {
             return '';
@@ -671,6 +973,9 @@ class Brightsky extends utils.Adapter {
                 if (timeout) {
                     this.clearTimeout(timeout);
                 }
+            }
+            if (this.radarRotationTimeout) {
+                this.clearTimeout(this.radarRotationTimeout);
             }
             if (this.timeoutId) {
                 this.clearTimeout(this.timeoutId);

@@ -150,11 +150,15 @@ class Library extends BaseClass {
               data
             ) : null;
             const defChannel = this.getChannelObject(objectDefinition2, true);
+            const aName = k._index != null ? k._index : a;
+            const nameCount = k._index != null ? -3 : -2;
             if ((_a = defChannel.common) == null ? void 0 : _a.name) {
-              defChannel.common.name = `+ ${a}`;
+              defChannel.common.name = `+ ${aName}`;
             }
             const newPrefix = prefix.split(".").slice(0, -1).join(".");
-            const dp = `${newPrefix}.${`00${a++}`.slice(-2)}`;
+            const n = `000${aName}`.slice(nameCount);
+            a += 1;
+            const dp = `${newPrefix}.${n}`;
             await this.writedp(dp, null, defChannel);
             await this.writeFromJson(dp, `${objNode}`, def, k, expandTree);
           }
@@ -174,7 +178,7 @@ class Library extends BaseClass {
         }
       }
     } else {
-      if (!objectDefinition) {
+      if (!objectDefinition || prefix.endsWith("_index")) {
         return;
       }
       if (objectDefinition.type === "state" && objectDefinition.common.role && objectDefinition.common.role !== "value" && objectDefinition.common.role !== "text" && prefix.startsWith("daily")) {

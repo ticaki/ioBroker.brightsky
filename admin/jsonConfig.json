@@ -168,6 +168,48 @@
                     "md": 6,
                     "lg": 4,
                     "xl": 4
+                },
+                "createRadar": {
+                    "type": "checkbox",
+                    "label": "createRadar",
+                    "default": false,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "pollIntervalRadar": {
+                    "type": "number",
+                    "label": "pollIntervalRadar",
+                    "default": 10,
+                    "min": 5,
+                    "step": 5,
+                    "unit": "minutes",
+                    "disabled": "!data.createRadar",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "radarDistance": {
+                    "type": "number",
+                    "label": "radarDistance",
+                    "default": 10000,
+                    "min": 1000,
+                    "max": 50000,
+                    "step": 1000,
+                    "unit": "meters",
+                    "disabled": "!data.createRadar",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
                 }
             }
         },

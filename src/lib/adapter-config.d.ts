@@ -28,6 +28,9 @@ declare global {
             createCurrently: boolean;
             createHourly: boolean;
             createDaily: boolean;
+            createRadar: boolean;
+            pollIntervalRadar: number;
+            radarDistance: number;
             wmo_station: string;
             dwd_station_id: string;
 
