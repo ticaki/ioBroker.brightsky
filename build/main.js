@@ -765,7 +765,13 @@ class Brightsky extends utils.Adapter {
         });
       }
       if (dataToWrite.length > 0) {
-        await this.library.writeFromJson("radar.data.r", "weather.radar", import_definition.genericStateObjects, dataToWrite, true);
+        await this.library.writeFromJson(
+          "radar.data.r",
+          "weather.radar",
+          import_definition.genericStateObjects,
+          dataToWrite,
+          true
+        );
       }
     }
     await this.writeMaxPrecipitationForecasts();
