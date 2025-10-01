@@ -983,6 +983,30 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         },
         native: {},
     },
+    dayName_short: {
+        _id: 'dayName_short',
+        type: 'state',
+        common: {
+            name: 'Day of Week (short)',
+            type: 'string',
+            role: 'text',
+            read: true,
+            write: false,
+        },
+        native: {},
+    },
+    dayName_long: {
+        _id: 'dayName_long',
+        type: 'state',
+        common: {
+            name: 'Day of Week (long)',
+            type: 'string',
+            role: 'text',
+            read: true,
+            write: false,
+        },
+        native: {},
+    },
     day: {
         _channel: {
             _id: 'day',
@@ -1798,6 +1822,8 @@ export type BrightskyDailyData = BrightskyWeather & {
     iconUrl?: string | null;
     day?: Partial<BrightskyDayNightData>;
     night?: Partial<BrightskyDayNightData>;
+    dayName_short?: string | null;
+    dayName_long?: string | null;
 };
 
 export type BrightskyDayNightData = BrightskyWeather & {

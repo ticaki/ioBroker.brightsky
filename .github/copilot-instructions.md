@@ -11,6 +11,14 @@ This is an ioBroker adapter for the [BrightSky API](https://brightsky.dev/docs/#
 - Automatic fallback to nearest weather stations
 - Multilingual support for all user-facing content
 
+## IMPORTANT: Communication & Commit Rules
+### Always do the following:
+✅ Add fixes #xy to the changelogs in the README if this PR resolves an issue.
+
+### Never do the following:
+❌ Never use fixes #xy except in the readme file.
+❌ Never use fixes #xy in commits or pull requests.
+
 ## Development Guidelines
 
 ### Follow ioBroker Standards

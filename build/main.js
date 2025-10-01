@@ -447,6 +447,10 @@ class Brightsky extends utils.Adapter {
             );
             dailyData.sunset = times.sunset.getTime();
             dailyData.sunrise = times.sunrise.getTime();
+            const date = new Date(dailyData.timestamp);
+            const systemLanguage = this.library.getLocalLanguage();
+            dailyData.dayName_short = date.toLocaleString(systemLanguage, { weekday: "short" });
+            dailyData.dayName_long = date.toLocaleString(systemLanguage, { weekday: "long" });
             const { dayData, nightData } = this.calculateDayNightData(
               weatherArr[i],
               times.sunrise,
