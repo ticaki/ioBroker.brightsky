@@ -329,5 +329,199 @@ tests.integration(path.join(__dirname, '..'), {
                 });
             }).timeout(40000);
         });
+
+        // Test suite for radar.data when createRadar is enabled but createRadarData is disabled
+        suite('should NOT create radar.data folder when createRadarData is disabled', (getHarness) => {
+            let harness;
+
+            before(() => {
+                harness = getHarness();
+            });
+
+            it('should create radar but NOT radar.data when createRadarData is disabled', () => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        harness = getHarness();
+                        const obj = await harness.objects.getObject('system.adapter.brightsky.0');
+
+                        console.log('🧪 Test: createRadar=true, createRadarData=false');
+                        
+                        // Configure with radar enabled but radar data disabled
+                        Object.assign(obj.native, {
+                            position: GERMAN_COORDINATES,
+                            createCurrently: false,
+                            createHourly: false,
+                            createDaily: false,
+                            createRadar: true,
+                            createRadarData: false,  // DISABLED
+                            pollIntervalRadar: 10,
+                            radarDistance: 10000,
+                        });
+
+                        harness.objects.setObject(obj._id, obj);
+                        await harness.startAdapterAndWait();
+                        console.log('✅ Step 1: Adapter started');
+
+                        await wait(20000);
+                        console.log('✅ Step 2: Wait completed');
+
+                        const stateIds = await harness.dbConnection.getStateIDs('brightsky.0.*');
+                        console.log(`📊 Found ${stateIds.length} total states`);
+
+                        // Check that radar folder exists
+                        const radarStates = stateIds.filter(key => key.includes('radar') && !key.includes('radar.data'));
+                        if (radarStates.length === 0) {
+                            console.log('❌ No radar states found - test failed');
+                            reject(new Error('Expected radar states but found none'));
+                            return;
+                        } else {
+                            console.log(`✅ Found ${radarStates.length} radar states (excluding radar.data)`);
+                        }
+
+                        // Check that radar.data folder does NOT exist
+                        const radarDataStates = stateIds.filter(key => key.includes('radar.data'));
+                        if (radarDataStates.length > 0) {
+                            console.log(`❌ Found ${radarDataStates.length} radar.data states when none were expected - test failed`);
+                            reject(new Error('Expected no radar.data states but found some'));
+                            return;
+                        } else {
+                            console.log('✅ No radar.data states found as expected');
+                        }
+
+                        await harness.stopAdapter();
+                        console.log('✅ Test passed: radar exists, radar.data does not exist');
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }).timeout(40000);
+        });
+
+        // Test suite for radar.data when both createRadar and createRadarData are enabled
+        suite('should create radar.data folder when createRadarData is enabled', (getHarness) => {
+            let harness;
+
+            before(() => {
+                harness = getHarness();
+            });
+
+            it('should create both radar and radar.data when createRadarData is enabled', () => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        harness = getHarness();
+                        const obj = await harness.objects.getObject('system.adapter.brightsky.0');
+
+                        console.log('🧪 Test: createRadar=true, createRadarData=true');
+                        
+                        // Configure with both radar and radar data enabled
+                        Object.assign(obj.native, {
+                            position: GERMAN_COORDINATES,
+                            createCurrently: false,
+                            createHourly: false,
+                            createDaily: false,
+                            createRadar: true,
+                            createRadarData: true,  // ENABLED
+                            pollIntervalRadar: 10,
+                            radarDistance: 10000,
+                        });
+
+                        harness.objects.setObject(obj._id, obj);
+                        await harness.startAdapterAndWait();
+                        console.log('✅ Step 1: Adapter started');
+
+                        await wait(20000);
+                        console.log('✅ Step 2: Wait completed');
+
+                        const stateIds = await harness.dbConnection.getStateIDs('brightsky.0.*');
+                        console.log(`📊 Found ${stateIds.length} total states`);
+
+                        // Check that radar folder exists
+                        const radarStates = stateIds.filter(key => key.includes('radar'));
+                        if (radarStates.length === 0) {
+                            console.log('❌ No radar states found - test failed');
+                            reject(new Error('Expected radar states but found none'));
+                            return;
+                        } else {
+                            console.log(`✅ Found ${radarStates.length} radar states`);
+                        }
+
+                        // Check that radar.data folder DOES exist
+                        const radarDataStates = stateIds.filter(key => key.includes('radar.data'));
+                        if (radarDataStates.length === 0) {
+                            console.log('❌ No radar.data states found when they were expected - test failed');
+                            reject(new Error('Expected radar.data states but found none'));
+                            return;
+                        } else {
+                            console.log(`✅ Found ${radarDataStates.length} radar.data states as expected`);
+                        }
+
+                        await harness.stopAdapter();
+                        console.log('✅ Test passed: both radar and radar.data exist');
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }).timeout(40000);
+        });
+
+        // Test suite for radar.data when createRadar is disabled
+        suite('should NOT create radar or radar.data when createRadar is disabled', (getHarness) => {
+            let harness;
+
+            before(() => {
+                harness = getHarness();
+            });
+
+            it('should not create any radar states when createRadar is disabled', () => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        harness = getHarness();
+                        const obj = await harness.objects.getObject('system.adapter.brightsky.0');
+
+                        console.log('🧪 Test: createRadar=false, createRadarData=true (should still not create anything)');
+                        
+                        // Configure with radar disabled (createRadarData value shouldn't matter)
+                        Object.assign(obj.native, {
+                            position: GERMAN_COORDINATES,
+                            createCurrently: false,
+                            createHourly: true,  // Enable at least one to start adapter
+                            createDaily: false,
+                            createRadar: false,  // DISABLED
+                            createRadarData: true,  // This should be ignored
+                            pollIntervalRadar: 10,
+                            radarDistance: 10000,
+                        });
+
+                        harness.objects.setObject(obj._id, obj);
+                        await harness.startAdapterAndWait();
+                        console.log('✅ Step 1: Adapter started');
+
+                        await wait(20000);
+                        console.log('✅ Step 2: Wait completed');
+
+                        const stateIds = await harness.dbConnection.getStateIDs('brightsky.0.*');
+                        console.log(`📊 Found ${stateIds.length} total states`);
+
+                        // Check that NO radar states exist
+                        const radarStates = stateIds.filter(key => key.includes('radar'));
+                        if (radarStates.length > 0) {
+                            console.log(`❌ Found ${radarStates.length} radar states when none were expected - test failed`);
+                            reject(new Error('Expected no radar states but found some'));
+                            return;
+                        } else {
+                            console.log('✅ No radar states found as expected');
+                        }
+
+                        await harness.stopAdapter();
+                        console.log('✅ Test passed: no radar or radar.data states exist');
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }).timeout(40000);
+        });
     }
 });

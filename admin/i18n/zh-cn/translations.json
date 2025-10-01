@@ -28,6 +28,7 @@
     "createDaily": "创建每日概述（5:00和18:00之后）",
     "createHourly": "创建每小时的概述",
     "createRadar": "创建气象雷达数据",
+    "createRadarData": "创建详细的雷达数据文件夹（时间序列数据）",
     "dwd_station_id": "DWD站ID（可选，默认为空）",
     "dwd_station_id_link": "链接到DWD站信息",
     "efficiency": "效率（0-1）",

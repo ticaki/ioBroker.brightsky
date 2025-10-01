@@ -28,6 +28,7 @@
     "createDaily": "Crée des aperçus quotidiens (après 5h00 et 18h00)",
     "createHourly": "Crée des aperçus horaires",
     "createRadar": "Crée des données radar météorologiques",
+    "createRadarData": "Crée un dossier de données radar détaillées (données de séries temporelles)",
     "dwd_station_id": "ID de station DWD (facultatif, la valeur par défaut est vide)",
     "dwd_station_id_link": "Lien vers les informations de la station DWD",
     "efficiency": "Efficacité (0-1)",

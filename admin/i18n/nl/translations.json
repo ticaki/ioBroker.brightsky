@@ -28,6 +28,7 @@
     "createDaily": "Maak dagelijkse weergegevens",
     "createHourly": "Creëert uur overzichten",
     "createRadar": "Creëert weerradargegevens",
+    "createRadarData": "Creëert gedetailleerde radargegevensmap (tijdreeksgegevens)",
     "dwd_station_id": "DWD Station ID (optioneel, standaard is leeg)",
     "dwd_station_id_link": "Link naar DWD -stationinformatie",
     "efficiency": "Efficiëntie (0-1)",

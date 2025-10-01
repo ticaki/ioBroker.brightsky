@@ -9,6 +9,7 @@
     "createHourly": "Creates hourly overviews",
     "createCurrently": "Creates current weather data",
     "createRadar": "Creates weather radar data",
+    "createRadarData": "Creates detailed radar data folder (time-series data)",
     "pollIntervalRadar": "Query interval for radar data (in minutes, must be divisible by 5)",
     "radarDistance": "Radar search area radius (data extends this distance to each side from center, max 50km)",
     "wmo_station": "WMO station ID (optional, default is empty)",

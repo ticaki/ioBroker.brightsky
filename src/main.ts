@@ -91,12 +91,17 @@ class Brightsky extends utils.Adapter {
                 null,
                 genericStateObjects.max_precipitation_forecast._channel,
             );
-            await this.library.writedp(`radar.data`, null, {
-                _id: '',
-                type: 'channel',
-                common: { name: 'Radar Data' },
-                native: {},
-            });
+            // Create radar.data folder only if createRadarData is enabled
+            if (!this.config.createRadarData) {
+                await this.delObjectAsync('radar.data', { recursive: true });
+            } else {
+                await this.library.writedp(`radar.data`, null, {
+                    _id: '',
+                    type: 'channel',
+                    common: { name: 'Radar Data' },
+                    native: {},
+                });
+            }
         }
         if (
             !this.config.createCurrently &&
@@ -891,21 +896,30 @@ class Brightsky extends utils.Adapter {
     }
 
     private async writeRadarData(): Promise<void> {
-        // Create folders named 0, 5, 10, 15, etc. for each 5-minute interval
-        const dataToWrite: any[] = [];
+        // Only write detailed radar data if createRadarData is enabled
+        if (this.config.createRadarData) {
+            // Create folders named 0, 5, 10, 15, etc. for each 5-minute interval
+            const dataToWrite: any[] = [];
 
-        for (let i = 0; i < this.radarData.length; i++) {
-            const item = this.radarData[i];
-            const minutesOffset = i * 5;
+            for (let i = 0; i < this.radarData.length; i++) {
+                const item = this.radarData[i];
+                const minutesOffset = i * 5;
 
-            dataToWrite.push({
-                _index: minutesOffset,
-                ...item,
-            });
-        }
+                dataToWrite.push({
+                    _index: minutesOffset,
+                    ...item,
+                });
+            }
 
-        if (dataToWrite.length > 0) {
-            await this.library.writeFromJson('radar.data.r', 'weather.radar', genericStateObjects, dataToWrite, true);
+            if (dataToWrite.length > 0) {
+                await this.library.writeFromJson(
+                    'radar.data.r',
+                    'weather.radar',
+                    genericStateObjects,
+                    dataToWrite,
+                    true,
+                );
+            }
         }
 
         // Calculate and write max precipitation forecasts

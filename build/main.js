@@ -87,12 +87,16 @@ class Brightsky extends utils.Adapter {
         null,
         import_definition.genericStateObjects.max_precipitation_forecast._channel
       );
-      await this.library.writedp(`radar.data`, null, {
-        _id: "",
-        type: "channel",
-        common: { name: "Radar Data" },
-        native: {}
-      });
+      if (!this.config.createRadarData) {
+        await this.delObjectAsync("radar.data", { recursive: true });
+      } else {
+        await this.library.writedp(`radar.data`, null, {
+          _id: "",
+          type: "channel",
+          common: { name: "Radar Data" },
+          native: {}
+        });
+      }
     }
     if (!this.config.createCurrently && !this.config.createHourly && !this.config.createDaily && !this.config.createRadar) {
       this.log.error(
@@ -750,17 +754,25 @@ class Brightsky extends utils.Adapter {
     );
   }
   async writeRadarData() {
-    const dataToWrite = [];
-    for (let i = 0; i < this.radarData.length; i++) {
-      const item = this.radarData[i];
-      const minutesOffset = i * 5;
-      dataToWrite.push({
-        _index: minutesOffset,
-        ...item
-      });
-    }
-    if (dataToWrite.length > 0) {
-      await this.library.writeFromJson("radar.data.r", "weather.radar", import_definition.genericStateObjects, dataToWrite, true);
+    if (this.config.createRadarData) {
+      const dataToWrite = [];
+      for (let i = 0; i < this.radarData.length; i++) {
+        const item = this.radarData[i];
+        const minutesOffset = i * 5;
+        dataToWrite.push({
+          _index: minutesOffset,
+          ...item
+        });
+      }
+      if (dataToWrite.length > 0) {
+        await this.library.writeFromJson(
+          "radar.data.r",
+          "weather.radar",
+          import_definition.genericStateObjects,
+          dataToWrite,
+          true
+        );
+      }
     }
     await this.writeMaxPrecipitationForecasts();
   }

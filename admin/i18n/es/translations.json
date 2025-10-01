@@ -9,6 +9,7 @@
     "createHourly": "Crea vistas generales por hora",
     "createCurrently": "Crea datos meteorológicos actuales",
     "createRadar": "Crea datos de radar meteorológico",
+    "createRadarData": "Crea carpeta de datos de radar detallados (datos de series temporales)",
     "pollIntervalRadar": "Intervalo de consulta para datos de radar (en minutos, debe ser divisible por 5)",
     "radarDistance": "Radio del área de búsqueda del radar (los datos se extienden esta distancia a cada lado desde el centro, máx. 50km)",
     "wmo_station": "ID de estación WMO (opcional, predeterminado está vacío)",
