@@ -147,6 +147,50 @@ tests.integration(path.join(__dirname, '..'), {
                             console.log(`✅ Found ${dailyStates.length} daily weather datapoints`);
                         }
 
+                        // Check for weekday name datapoints - MUST exist in daily data
+                        const dayNameShortState = stateIds.find(key => key === 'brightsky.0.daily.00.dayName_short');
+                        const dayNameLongState = stateIds.find(key => key === 'brightsky.0.daily.00.dayName_long');
+                        
+                        if (!dayNameShortState) {
+                            console.log('❌ dayName_short datapoint not found in daily.00 - test failed');
+                            reject(new Error('Expected brightsky.0.daily.00.dayName_short but it was not found'));
+                            return;
+                        }
+                        
+                        if (!dayNameLongState) {
+                            console.log('❌ dayName_long datapoint not found in daily.00 - test failed');
+                            reject(new Error('Expected brightsky.0.daily.00.dayName_long but it was not found'));
+                            return;
+                        }
+                        
+                        // Get the actual values of the weekday name states
+                        const dayNameShortIndex = stateIds.indexOf(dayNameShortState);
+                        const dayNameLongIndex = stateIds.indexOf(dayNameLongState);
+                        const dayNameShortValue = allStates[dayNameShortIndex]?.val;
+                        const dayNameLongValue = allStates[dayNameLongIndex]?.val;
+                        
+                        // Verify values are strings and not empty
+                        if (typeof dayNameShortValue !== 'string' || dayNameShortValue.length === 0) {
+                            console.log(`❌ dayName_short has invalid value: ${dayNameShortValue} - test failed`);
+                            reject(new Error(`Expected dayName_short to be a non-empty string but got: ${dayNameShortValue}`));
+                            return;
+                        }
+                        
+                        if (typeof dayNameLongValue !== 'string' || dayNameLongValue.length === 0) {
+                            console.log(`❌ dayName_long has invalid value: ${dayNameLongValue} - test failed`);
+                            reject(new Error(`Expected dayName_long to be a non-empty string but got: ${dayNameLongValue}`));
+                            return;
+                        }
+                        
+                        console.log(`✅ Found weekday name datapoints with valid values:`);
+                        console.log(`   📊 dayName_short: "${dayNameShortValue}"`);
+                        console.log(`   📊 dayName_long: "${dayNameLongValue}"`);
+                        
+                        // Verify that short name is actually shorter than long name
+                        if (dayNameShortValue.length >= dayNameLongValue.length) {
+                            console.log(`⚠️  Warning: dayName_short ("${dayNameShortValue}") is not shorter than dayName_long ("${dayNameLongValue}")`);
+                        }
+
                         // Check for source information
                         const sourceStates = stateIds.filter(key => key.includes('sources'));
                         if (sourceStates.length > 0) {
