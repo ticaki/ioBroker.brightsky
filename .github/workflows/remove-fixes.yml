@@ -9,6 +9,7 @@ permissions:
 
 jobs:
   clean-pr-body:
+    if: github.actor == 'copilot[bot]' || github.actor == 'github-copilot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Remove "Fixes owner/repo#123" from PR body
