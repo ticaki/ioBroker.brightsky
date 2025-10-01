@@ -1,0 +1,49 @@
+name: sanitize-pr-body
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  clean-pr-body:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove "Fixes owner/repo#123" from PR body
+        uses: actions/github-script@v6
+        with:
+          script: |
+            /**
+             * Remove phrases like "Fixes owner/repo#123" (owner/repo can vary).
+             * Trigger on every PR edit event.
+             */
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const prNumber = context.payload.pull_request.number;
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner, repo, pull_number: prNumber
+            });
+
+            const body = pr.body || "";
+
+            // Remove patterns like: Fixes ticaki/ioBroker.brightsky#45
+            // Matches: word "Fixes" (case-insensitive), whitespace, owner/repo (alphanum, _, ., -), '#' and digits
+            const cleaned = body
+              .replace(/\bFixes\s+[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+#\d+\b/gi, "")
+              .replace(/\n{3,}/g, "\n\n")
+              .trim();
+
+            if (cleaned !== body) {
+              await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: prNumber,
+                body: cleaned
+              });
+              core.info(`PR #${prNumber} body cleaned.`);
+            } else {
+              core.info("No changes required to PR body.");
+            }
