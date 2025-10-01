@@ -9,6 +9,7 @@
     "createHourly": "Erstellt stündliche Übersichten",
     "createCurrently": "Erstellt aktuelle Wetterdatenübersicht",
     "createRadar": "Erstellt Wetterradar-Daten",
+    "createRadarData": "Erstellt detaillierten Radardaten-Ordner (Zeitreihendaten)",
     "pollIntervalRadar": "Abfrageintervall für Radardaten (in Minuten, muss durch 5 teilbar sein)",
     "radarDistance": "Radar-Suchbereich Radius (Daten erstrecken sich diese Entfernung zu jeder Seite vom Mittelpunkt, max 50km)",
     "wmo_station": "WMO Station ID (optional, Default ist leer)",

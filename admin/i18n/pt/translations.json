@@ -27,6 +27,7 @@
     "createDaily": "Cria uma visão geral diária (após as 17:00 e 18:00)",
     "createHourly": "Cria uma visão geral por hora",
     "createRadar": "Cria dados de radar meteorológico",
+    "createRadarData": "Cria pasta de dados de radar detalhados (dados de séries temporais)",
     "dwd_station_id": "ID da estação DWD (opcional, o padrão está vazio)",
     "dwd_station_id_link": "Link para informações da estação DWD",
     "efficiency": "Eficiência (0-1)",

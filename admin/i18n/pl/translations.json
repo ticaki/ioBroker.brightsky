@@ -27,6 +27,7 @@
     "createDaily": "Tworzy codzienne przegląd (po 5:00 i 18:00)",
     "createHourly": "Tworzy przegląd godzin",
     "createRadar": "Tworzy dane radarowe pogody",
+    "createRadarData": "Tworzy folder szczegółowych danych radarowych (dane szeregów czasowych)",
     "dwd_station_id": "Identyfikator stacji DWD (opcjonalnie, domyślnie jest pusty)",
     "dwd_station_id_link": "Link do informacji o stacji DWD",
     "efficiency": "Wydajność (0-1)",

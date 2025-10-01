@@ -180,6 +180,18 @@
                     "lg": 4,
                     "xl": 4
                 },
+                "createRadarData": {
+                    "type": "checkbox",
+                    "label": "createRadarData",
+                    "default": false,
+                    "disabled": "!data.createRadar",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
                 "pollIntervalRadar": {
                     "type": "number",
                     "label": "pollIntervalRadar",
