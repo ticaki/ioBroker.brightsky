@@ -51,7 +51,7 @@ jobs:
             }
 
   label-fixed-issues:
-    if: github.event.pull_request.merged
+    if: github.event.pull_request.merged && (github.event.pull_request.user.login == 'copilot[bot]' || github.event.pull_request.user.login == 'github-copilot[bot]')
     runs-on: ubuntu-latest
     steps:
       - name: Add "fixed" label to linked issues
@@ -103,28 +103,28 @@ jobs:
               return;
             }
 
-            // Ensure the "fixed" label exists
+            // Ensure the "resolved" label exists
             let labelExists = false;
             try {
               await github.rest.issues.getLabel({
                 owner,
                 repo,
-                name: 'fixed'
+                name: 'resolved'
               });
               labelExists = true;
-              core.info("Label 'fixed' already exists.");
+              core.info("Label 'resolved' already exists.");
             } catch (error) {
               if (error.status === 404) {
-                core.info("Label 'fixed' does not exist. Creating it...");
+                core.info("Label 'resolved' does not exist. Creating it...");
                 try {
                   await github.rest.issues.createLabel({
                     owner,
                     repo,
-                    name: 'fixed',
+                    name: 'resolved',
                     color: '28a745', // Friendly green color
-                    description: 'Issue has been fixed in a merged PR'
+                    description: 'Issue has been resolved in a merged PR'
                   });
-                  core.info("Label 'fixed' created successfully.");
+                  core.info("Label 'resolved' created successfully.");
                   labelExists = true;
                 } catch (createError) {
                   core.error(`Failed to create label: ${createError.message}`);
@@ -135,11 +135,11 @@ jobs:
             }
 
             if (!labelExists) {
-              core.error("Cannot add label 'fixed' because it doesn't exist and couldn't be created.");
+              core.error("Cannot add label 'resolved' because it doesn't exist and couldn't be created.");
               return;
             }
 
-            // Add the "fixed" label to each linked issue
+            // Add the "resolved" label to each linked issue
             for (const issueRef of issueRefs) {
               try {
                 // Check if this is an issue in the same repo or a different repo
@@ -158,9 +158,9 @@ jobs:
                         owner: issueRef.owner,
                         repo: issueRef.repo,
                         issue_number: issueRef.issue_number,
-                        labels: ['fixed']
+                        labels: ['resolved']
                       });
-                      core.info(`Added "fixed" label to issue #${issueRef.issue_number}`);
+                      core.info(`Added "resolved" label to issue #${issueRef.issue_number}`);
                     } else {
                       core.info(`#${issueRef.issue_number} is a PR, not an issue. Skipping.`);
                     }
