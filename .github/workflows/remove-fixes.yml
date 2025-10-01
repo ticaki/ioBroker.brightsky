@@ -2,7 +2,7 @@ name: sanitize-pr-body
 
 on:
   pull_request_target:
-    types: [opened, edited, synchronize, reopened, ready_for_review, closed]
+    types: [edited, ready_for_review, closed]
 
 permissions:
   pull-requests: write
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   clean-pr-body:
-    if: github.event.action != 'closed' && (github.actor == 'copilot[bot]' || github.actor == 'github-copilot[bot]')
+    if: github.event.action != 'closed' && (github.event.pull_request.user.login == 'copilot[bot]' || github.event.pull_request.user.login == 'github-copilot[bot]')
     runs-on: ubuntu-latest
     steps:
       - name: Replace "Fixes owner/repo#123" with "Related issue"
