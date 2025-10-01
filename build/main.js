@@ -38,6 +38,7 @@ class Brightsky extends utils.Adapter {
   radarRotationTimeout = void 0;
   /**
    * Creates a new instance of the Brightsky adapter
+   *
    * @param options Adapter configuration options
    */
   constructor(options = {}) {
@@ -669,7 +670,7 @@ class Brightsky extends utils.Adapter {
   /**
    * Fetches and processes radar precipitation data from BrightSky API
    * Updates radar states with precipitation measurements and forecasts
-   * 
+   *
    * API Documentation: https://brightsky.dev/docs/#/operations/getRadar
    * OpenAPI Spec: https://api.brightsky.dev/openapi.json
    *
@@ -847,6 +848,7 @@ class Brightsky extends utils.Adapter {
   }
   /**
    * Converts wind direction in degrees to compass direction text
+   *
    * @param windBearing Wind direction in degrees (0-360)
    * @returns Compass direction abbreviation (e.g., "N", "NNE", "NE")
    */
@@ -877,6 +879,7 @@ class Brightsky extends utils.Adapter {
   }
   /**
    * Called when adapter shuts down - cleanup timers and connections
+   *
    * @param callback Callback to invoke after cleanup
    */
   onUnload(callback) {
@@ -1510,7 +1513,7 @@ class Brightsky extends utils.Adapter {
   /**
    * Estimates generated electrical energy (Wh) for the upcoming hour
    * Samples four 15-minute intervals to calculate average hourly production
-   * 
+   *
    * @param valueWhPerM2 GHI for the hour (Wh/m²) on horizontal plane
    * @param time Timestamp for this hour (Date | number | string)
    * @param coords Coordinates { lat, lon }
@@ -1528,7 +1531,7 @@ class Brightsky extends utils.Adapter {
   /**
    * Calculates photovoltaic energy production for a specific time
    * Uses sun position, panel orientation, and inverter limits to estimate output
-   * 
+   *
    * @param valueWhPerM2 Global Horizontal Irradiance (Wh/m²)
    * @param time Timestamp for calculation
    * @param coords Geographic coordinates { lat, lon }
@@ -1588,7 +1591,7 @@ class Brightsky extends utils.Adapter {
   /**
    * Wrapper for fetch with automatic 30-second timeout and abort controller
    * Ensures API requests don't hang indefinitely
-   * 
+   *
    * @param url URL to fetch
    * @param init Optional fetch initialization options
    * @returns Promise resolving to Response object
