@@ -987,6 +987,30 @@ const daily = {
     },
     native: {}
   },
+  dayName_short: {
+    _id: "dayName_short",
+    type: "state",
+    common: {
+      name: "Day of Week (short)",
+      type: "string",
+      role: "text",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
+  dayName_long: {
+    _id: "dayName_long",
+    type: "state",
+    common: {
+      name: "Day of Week (long)",
+      type: "string",
+      role: "text",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
   day: {
     _channel: {
       _id: "day",

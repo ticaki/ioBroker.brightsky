@@ -106,3 +106,31 @@ describe('Day/Night Data Calculation', () => {
         expect(Math.round(avg * 10) / 10).to.equal(4.0);
     });
 });
+
+describe('Weekday Name Formatting', () => {
+    it('should format weekday names in different locales', () => {
+        const testDate = new Date('2023-12-01T12:00:00Z'); // Friday, December 1, 2023
+
+        // Test English locale
+        const shortEn = testDate.toLocaleString('en', { weekday: 'short' });
+        const longEn = testDate.toLocaleString('en', { weekday: 'long' });
+        expect(shortEn).to.equal('Fri');
+        expect(longEn).to.equal('Friday');
+
+        // Test German locale
+        const shortDe = testDate.toLocaleString('de', { weekday: 'short' });
+        const longDe = testDate.toLocaleString('de', { weekday: 'long' });
+        expect(shortDe).to.equal('Fr');
+        expect(longDe).to.equal('Freitag');
+    });
+
+    it('should handle different days of the week', () => {
+        const monday = new Date('2023-12-04T12:00:00Z');
+        const wednesday = new Date('2023-12-06T12:00:00Z');
+        const sunday = new Date('2023-12-03T12:00:00Z');
+
+        expect(monday.toLocaleString('en', { weekday: 'short' })).to.equal('Mon');
+        expect(wednesday.toLocaleString('en', { weekday: 'short' })).to.equal('Wed');
+        expect(sunday.toLocaleString('en', { weekday: 'short' })).to.equal('Sun');
+    });
+});
