@@ -51,7 +51,7 @@ jobs:
             }
 
   label-fixed-issues:
-    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged
     runs-on: ubuntu-latest
     steps:
       - name: Add "fixed" label to linked issues
