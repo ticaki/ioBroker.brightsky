@@ -84,7 +84,18 @@ jobs:
             // Match simple "#123" references (same repo)
             const simpleRefMatches = body.matchAll(/#(\d+)\b/g);
             for (const match of simpleRefMatches) {
-              issueRefs.push({ owner, repo, issue_number: parseInt(match[1]) });
+              // Check if the referenced number is an actual issue in this repo
+              try {
+                await github.rest.issues.get({
+                  owner,
+                  repo,
+                  issue_number: parseInt(match[1])
+                });
+                issueRefs.push({ owner, repo, issue_number: parseInt(match[1]) });
+              } catch (error) {
+                // Not an issue, skip
+                core.info(`Reference #${match[1]} is not a valid issue in ${owner}/${repo}, skipping.`);
+              }
             }
 
             if (issueRefs.length === 0) {
