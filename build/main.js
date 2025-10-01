@@ -36,6 +36,10 @@ class Brightsky extends utils.Adapter {
   wrArray = [];
   radarData = [];
   radarRotationTimeout = void 0;
+  /**
+   * Creates a new instance of the Brightsky adapter
+   * @param options Adapter configuration options
+   */
   constructor(options = {}) {
     super({
       ...options,
@@ -201,6 +205,10 @@ class Brightsky extends utils.Adapter {
       `Using ${this.config.dwd_station_id ? `WMO Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`
     );
   }
+  /**
+   * Manages the daily weather data update loop
+   * Schedules updates at specific times: 5:00, 18:00, and midnight with random delay
+   */
   async weatherDailyLoop() {
     if (this.weatherTimeout[2]) {
       this.clearTimeout(this.weatherTimeout[2]);
@@ -222,6 +230,10 @@ class Brightsky extends utils.Adapter {
       void this.weatherDailyLoop();
     }, loopTime);
   }
+  /**
+   * Fetches and processes daily weather forecast data from BrightSky API
+   * Retrieves weather data for the next 8 days and creates aggregated daily values
+   */
   async weatherDailyUpdate() {
     var _a;
     const startTime = new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0)).toISOString();
@@ -473,6 +485,10 @@ class Brightsky extends utils.Adapter {
       this.log.error(`Error fetching daily weather data: ${JSON.stringify(error)}`);
     }
   }
+  /**
+   * Manages the current weather data update loop
+   * Automatically adjusts polling interval around sunrise/sunset times
+   */
   async weatherCurrentlyLoop() {
     if (this.weatherTimeout[0]) {
       this.clearTimeout(this.weatherTimeout[0]);
@@ -490,6 +506,10 @@ class Brightsky extends utils.Adapter {
       void this.weatherCurrentlyLoop();
     }, nextInterval);
   }
+  /**
+   * Manages the hourly weather data update loop
+   * Schedules updates based on configured poll interval with random delay
+   */
   async weatherHourlyLoop() {
     if (this.weatherTimeout[1]) {
       this.clearTimeout(this.weatherTimeout[1]);
@@ -500,6 +520,10 @@ class Brightsky extends utils.Adapter {
       void this.weatherHourlyLoop();
     }, loopTime - Date.now());
   }
+  /**
+   * Fetches and processes hourly weather forecast data from BrightSky API
+   * Retrieves weather data for the configured number of hours ahead
+   */
   async weatherHourlyUpdate() {
     var _a, _b;
     const startTime = new Date((/* @__PURE__ */ new Date()).setMinutes(0, 0, 0)).toISOString();
@@ -576,6 +600,10 @@ class Brightsky extends utils.Adapter {
       this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
     }
   }
+  /**
+   * Fetches and processes current weather data from BrightSky API
+   * Updates current weather states with latest observations
+   */
   async weatherCurrentlyUpdate() {
     var _a;
     try {
@@ -624,6 +652,10 @@ class Brightsky extends utils.Adapter {
       this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
     }
   }
+  /**
+   * Manages the radar data update loop
+   * Schedules updates based on configured radar poll interval
+   */
   async weatherRadarLoop() {
     if (this.weatherTimeout[3]) {
       this.clearTimeout(this.weatherTimeout[3]);
@@ -635,8 +667,9 @@ class Brightsky extends utils.Adapter {
     }, nextInterval);
   }
   /**
-   * Fetches radar precipitation data from BrightSky API
-   *
+   * Fetches and processes radar precipitation data from BrightSky API
+   * Updates radar states with precipitation measurements and forecasts
+   * 
    * API Documentation: https://brightsky.dev/docs/#/operations/getRadar
    * OpenAPI Spec: https://api.brightsky.dev/openapi.json
    *
@@ -712,6 +745,10 @@ class Brightsky extends utils.Adapter {
       this.log.error(`Error fetching radar data: ${JSON.stringify(error)}`);
     }
   }
+  /**
+   * Sets up automatic rotation of radar data every 5 minutes
+   * Used when poll interval is greater than 5 minutes to maintain continuous data
+   */
   setupRadarRotation() {
     if (this.radarRotationTimeout) {
       this.clearTimeout(this.radarRotationTimeout);
@@ -753,6 +790,10 @@ class Brightsky extends utils.Adapter {
       5 * 60 * 1e3
     );
   }
+  /**
+   * Writes radar data to ioBroker states
+   * Creates detailed time-based states if createRadarData is enabled
+   */
   async writeRadarData() {
     if (this.config.createRadarData) {
       const dataToWrite = [];
@@ -776,6 +817,10 @@ class Brightsky extends utils.Adapter {
     }
     await this.writeMaxPrecipitationForecasts();
   }
+  /**
+   * Calculates and writes maximum precipitation forecasts for various time intervals
+   * Analyzes radar data to determine max precipitation in 5, 10, 15, 30, 45, 60, and 90 minute windows
+   */
   async writeMaxPrecipitationForecasts() {
     const intervals = [5, 10, 15, 30, 45, 60, 90];
     const forecasts = {};
@@ -800,6 +845,11 @@ class Brightsky extends utils.Adapter {
       );
     }
   }
+  /**
+   * Converts wind direction in degrees to compass direction text
+   * @param windBearing Wind direction in degrees (0-360)
+   * @returns Compass direction abbreviation (e.g., "N", "NNE", "NE")
+   */
   getWindBearingText(windBearing) {
     if (windBearing === void 0) {
       return "";
@@ -825,6 +875,10 @@ class Brightsky extends utils.Adapter {
     const index = Math.round(windBearing % 360 / 22.5) % 16;
     return this.library.getTranslation(directions[index]);
   }
+  /**
+   * Called when adapter shuts down - cleanup timers and connections
+   * @param callback Callback to invoke after cleanup
+   */
   onUnload(callback) {
     this.unload = true;
     try {
@@ -1454,13 +1508,14 @@ class Brightsky extends utils.Adapter {
     return result;
   }
   /**
-   * Schätzt die erzeugte elektrische Energie (Wh) für die kommende Stunde.
-   *
-   * @param valueWhPerM2 GHI für die Stunde (Wh/m²) auf horizontaler Ebene
-   * @param time Zeitstempel dieser Stunde (Date | number | string)
-   * @param coords { lat, lon }
-   * @param panels Array von Panels (azimuth, tilt, area, efficiency in %)
-   * @returns Wh (elektrisch) für alle Panels zusammen
+   * Estimates generated electrical energy (Wh) for the upcoming hour
+   * Samples four 15-minute intervals to calculate average hourly production
+   * 
+   * @param valueWhPerM2 GHI for the hour (Wh/m²) on horizontal plane
+   * @param time Timestamp for this hour (Date | number | string)
+   * @param coords Coordinates { lat, lon }
+   * @param panels Array of panels (azimuth, tilt, area, efficiency in %)
+   * @returns Wh (electrical) for all panels combined
    */
   estimatePVEnergyForHour(valueWhPerM2, time, coords, panels) {
     let quarterHoursValueSum = 0;
@@ -1470,6 +1525,17 @@ class Brightsky extends utils.Adapter {
     }
     return quarterHoursValueSum / 4;
   }
+  /**
+   * Calculates photovoltaic energy production for a specific time
+   * Uses sun position, panel orientation, and inverter limits to estimate output
+   * 
+   * @param valueWhPerM2 Global Horizontal Irradiance (Wh/m²)
+   * @param time Timestamp for calculation
+   * @param coords Geographic coordinates { lat, lon }
+   * @param panels Array of solar panel configurations
+   * @param wrArray Array of inverter power limits (Wh)
+   * @returns Estimated electrical energy production (Wh)
+   */
   estimatePvEnergy(valueWhPerM2, time, coords, panels, wrArray) {
     var _a;
     const toRad = (d) => d * Math.PI / 180;
@@ -1519,6 +1585,15 @@ class Brightsky extends utils.Adapter {
     }
     return totalWh;
   }
+  /**
+   * Wrapper for fetch with automatic 30-second timeout and abort controller
+   * Ensures API requests don't hang indefinitely
+   * 
+   * @param url URL to fetch
+   * @param init Optional fetch initialization options
+   * @returns Promise resolving to Response object
+   * @throws Error if request fails or times out
+   */
   async fetch(url, init) {
     var _a;
     this.controller = new AbortController();
