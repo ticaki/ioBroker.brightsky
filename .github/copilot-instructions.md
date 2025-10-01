@@ -87,6 +87,7 @@ All changelog entries must follow this exact format:
 - Reference issue numbers when applicable: `fixes [#11](https://github.com/ticaki/ioBroker.brightsky/issues/11)`
 - Group related changes together
 - Always use `(ticaki)` as the author prefix
+- **Always add user-relevant changes to the README changelog**: For any changes that affect the adapter's functionality, configuration, or user experience, add a brief and concise entry to the "### **WORK IN PROGRESS**" section in README.md
 
 ### Translation Requirements
 
