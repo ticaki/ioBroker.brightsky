@@ -84,6 +84,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Added weekday name datapoints (short and long) to daily weather data fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)
+
 ### 0.6.0 (2025-09-30)
 - (ticaki) Added weather radar feature with 2-hour precipitation forecast
 - (ticaki) Radar data shows precipitation in mm with average, min, max, and median values

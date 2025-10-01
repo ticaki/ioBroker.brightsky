@@ -5,6 +5,9 @@ require('./test-setup');
 const path = require('path');
 const { tests } = require('@iobroker/testing');
 
+// Load test data to verify expected values
+const dailyWeatherData = require('./data/daily_weather.json');
+
 // German coordinates for testing (Berlin)
 const GERMAN_COORDINATES = '52.520008,13.404954';
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -169,27 +172,43 @@ tests.integration(path.join(__dirname, '..'), {
                         const dayNameShortValue = allStates[dayNameShortIndex]?.val;
                         const dayNameLongValue = allStates[dayNameLongIndex]?.val;
                         
-                        // Verify values are strings and not empty
-                        if (typeof dayNameShortValue !== 'string' || dayNameShortValue.length === 0) {
-                            console.log(`❌ dayName_short has invalid value: ${dayNameShortValue} - test failed`);
-                            reject(new Error(`Expected dayName_short to be a non-empty string but got: ${dayNameShortValue}`));
+                        // Get the timestamp state to determine which day daily.00 represents
+                        const timestampState = stateIds.find(key => key === 'brightsky.0.daily.00.timestamp');
+                        if (!timestampState) {
+                            console.log('❌ timestamp datapoint not found in daily.00 - cannot determine expected weekday');
+                            reject(new Error('Expected brightsky.0.daily.00.timestamp but it was not found'));
                             return;
                         }
                         
-                        if (typeof dayNameLongValue !== 'string' || dayNameLongValue.length === 0) {
-                            console.log(`❌ dayName_long has invalid value: ${dayNameLongValue} - test failed`);
-                            reject(new Error(`Expected dayName_long to be a non-empty string but got: ${dayNameLongValue}`));
+                        const timestampIndex = stateIds.indexOf(timestampState);
+                        const timestampValue = allStates[timestampIndex]?.val;
+                        
+                        // Calculate expected values from the actual timestamp
+                        const daily00Date = new Date(timestampValue);
+                        const expectedShort = daily00Date.toLocaleString('en', { weekday: 'short' });
+                        const expectedLong = daily00Date.toLocaleString('en', { weekday: 'long' });
+                        
+                        console.log(`📅 Daily.00 timestamp: ${timestampValue}`);
+                        console.log(`📅 Daily.00 date: ${daily00Date.toISOString().split('T')[0]} (${expectedLong})`);
+                        console.log(`📅 Expected dayName_short: "${expectedShort}", dayName_long: "${expectedLong}"`);
+                        
+                        // Verify exact values match expected from the timestamp
+                        if (dayNameShortValue !== expectedShort) {
+                            console.log(`❌ dayName_short has wrong value: "${dayNameShortValue}" (expected: "${expectedShort}") - test failed`);
+                            reject(new Error(`Expected dayName_short to be "${expectedShort}" but got: "${dayNameShortValue}"`));
                             return;
                         }
                         
-                        console.log(`✅ Found weekday name datapoints with valid values:`);
-                        console.log(`   📊 dayName_short: "${dayNameShortValue}"`);
-                        console.log(`   📊 dayName_long: "${dayNameLongValue}"`);
-                        
-                        // Verify that short name is actually shorter than long name
-                        if (dayNameShortValue.length >= dayNameLongValue.length) {
-                            console.log(`⚠️  Warning: dayName_short ("${dayNameShortValue}") is not shorter than dayName_long ("${dayNameLongValue}")`);
+                        if (dayNameLongValue !== expectedLong) {
+                            console.log(`❌ dayName_long has wrong value: "${dayNameLongValue}" (expected: "${expectedLong}") - test failed`);
+                            reject(new Error(`Expected dayName_long to be "${expectedLong}" but got: "${dayNameLongValue}"`));
+                            return;
                         }
+                        
+                        console.log(`✅ Found weekday name datapoints with correct values:`);
+                        console.log(`   📊 dayName_short: "${dayNameShortValue}" (matches expected: "${expectedShort}")`);
+                        console.log(`   📊 dayName_long: "${dayNameLongValue}" (matches expected: "${expectedLong}")`);
+
 
                         // Check for source information
                         const sourceStates = stateIds.filter(key => key.includes('sources'));
