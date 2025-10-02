@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "news": {
+      "0.6.1": {
+        "en": "Added optional createRadarData configuration to make detailed radar.data folder optional fixes [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nAdded weekday name datapoints (short and long) to daily weather data fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
+        "de": "Optionale createRadarData-Konfiguration hinzugefügt, um den detaillierten Ordner radar.data optional zu machen (behebt [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45))\nWochentags-Datenpunkte (kurz und lang) zu den täglichen Wetterdaten hinzugefügt (fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41))",
+        "ru": "Добавлена опциональная конфигурация createRadarData, чтобы сделать детальную папку radar.data необязательным исправлением [#45] (https://github.com/ticaki/ioBroker.brightsky/issues/45)\nДобавлены будние данные (короткие и длинные) в ежедневные данные о погоде [#41] (https://github.com/ticaki/ioBroker.brightsky/issues/41)",
+        "pt": "Adicionado opcional createRadarConfiguração de dados para fazer correções detalhadas da pasta radar.data opcional [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nPontos de dados do nome do dia da semana adicionados (curto e longo) às correções diárias de dados meteorológicos [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
+        "nl": "Toegevoegd optionele createRadarData configuratie om gedetailleerde radar.data map optionele fixes [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nToegevoegd weekdag naam datapoints (kort en lang) aan dagelijkse weergegevens fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
+        "fr": "Ajout de la configuration optionnelle createRadarData pour faire des corrections détaillées du dossier radar.data [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nAjout de points de données nominatives en semaine (courts et longs) aux corrections de données météorologiques quotidiennes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
+        "it": "Aggiunta la configurazione opzionale di creareRadarData per rendere il radar dettagliato.data cartella correzioni opzionali [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nAggiunto il nome del giorno della settimana datapoints (breve e lungo) alle correzioni di dati meteo giornalieri [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
+        "es": "Añadido la configuración opcional CrearRadarData para hacer correcciones opcionales detalladas de la carpeta radar.data [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nPuntos de datos del nombre del día de semana (cortados y largos) para fijar datos meteorológicos diarios [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
+        "pl": "Dodano opcjonalną konfigurację RadarData, aby utworzyć szczegółowy folder radar.data opcjonalne poprawki [# 45] (https: / / github.com / ticaki / ioBroker.brightsky / issues / 45)\nDodano weekday name datapoints (krótki i długi) do dziennych poprawek danych pogodowych [# 41] (https: / / github.com / ticaki / ioBroker.brightsky / issues / 41)",
+        "uk": "Додано додаткові можливості створення конфігураціїRadarData для детального радіолокатора. Текстові виправлення даних [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nДодано тижневі іменні точки (короткий і довгий) до щоденних погодних умов [#41] (https://github.com/ticaki/ioBroker.brightsky/issues/41)",
+        "zh-cn": "添加可选创建 RadarData 配置, 以制作详细的 radar.data 文件夹可选修正 [# 45] (https://github.com/ticaki/ioBroker.brightsky/issues/45)\n在日常天气数据修补[#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)中增加了周日名称数据点(短和长)"
+      },
       "0.6.0": {
         "en": "Added weather radar feature with 2-hour precipitation forecast\nRadar data shows precipitation in mm with average, min, max, and median values\nConfigurable radar polling interval (5+ minutes, auto-rotates data every 5 min)\nAdded max precipitation forecast states for next 5, 10, 15, 30, 45, 60, 90 minutes",
         "de": "Wetterradar-Funktion mit 2-stündiger Niederschlagsvorhersage hinzugefügt. Radardaten zeigen Niederschlag in mm mit Mittelwert, Minimum, Maximum und Median. Konfigurierbares Radar-Abfrageintervall (5+ Minuten, Daten automatisch alle 5 Minuten aktualisiert). Maximal-Niederschlagsvorhersage für die nächsten 5, 10, 15, 30, 45, 60 und 90 Minuten hinzugefügt.",
@@ -80,19 +93,6 @@
         "pl": "Poprawione role dla wizualizacji (Lovelace) naprawia #28",
         "uk": "Виправлені ролі для візуалізації (lovelace) виправляють #28",
         "zh-cn": "为可视化（lovelace）修正了角色（修复＃28）"
-      },
-      "0.3.4": {
-        "en": "fixed too low limit for currently updates",
-        "de": "zu niedriges Limit für 'currently'-Aktualisierungen korrigiert",
-        "ru": "исправлено слишком низкое ограничение для обновлений 'currently'",
-        "pt": "corrigido limite muito baixo para atualizações de 'currently'",
-        "nl": "te lage limiet voor 'currently'-updates gecorrigeerd",
-        "fr": "correction d'une limite trop basse pour les mises à jour 'currently'",
-        "it": "corretto limite troppo basso per gli aggiornamenti 'currently'",
-        "es": "corregido límite demasiado bajo para actualizaciones de 'currently'",
-        "pl": "naprawiono zbyt niski limit dla aktualizacji 'currently'",
-        "uk": "виправлено занадто низький ліміт для оновлень 'currently'",
-        "zh-cn": "修复了“currently”更新的限制过低问题"
       }
     },
     "titleLang": {
