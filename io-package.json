@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "news": {
+      "0.6.2": {
+        "en": "Flag set to activate language",
+        "de": "Schalter zum Aktivieren der Sprache gesetzt",
+        "ru": "Флаг активирует язык",
+        "pt": "Bandeira definida para ativar a linguagem",
+        "nl": "Vlag om taal te activeren",
+        "fr": "Flag défini pour activer la langue",
+        "it": "Bandiera impostata per attivare la lingua",
+        "es": "Juego de bandera para activar el idioma",
+        "pl": "Flaga ustawiona do aktywacji języka",
+        "uk": "Прапор встановлюється для активації мови",
+        "zh-cn": "启用语言的旗帜集"
+      },
       "0.6.1": {
         "en": "Added optional createRadarData configuration to make detailed radar.data folder optional fixes [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nAdded weekday name datapoints (short and long) to daily weather data fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
         "de": "Optionale createRadarData-Konfiguration hinzugefügt, um den detaillierten Ordner radar.data optional zu machen (behebt [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45))\nWochentags-Datenpunkte (kurz und lang) zu den täglichen Wetterdaten hinzugefügt (fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41))",
@@ -80,19 +93,6 @@
         "pl": "Kod migracji z aksjozów do węzła: pobrać",
         "uk": "Переміщення коду з аксіосу в вузол:fetch",
         "zh-cn": "代码从轴移到节点: fatch"
-      },
-      "0.3.5": {
-        "en": "Corrected roles for visualisation (lovelance) fixes #28",
-        "de": "Korrigierte Rollen für Visualisierung (Lovelance) behoben #28",
-        "ru": "Исправлены роли для визуализации (Lovelace) исправление #28.",
-        "pt": "Corrigidos papéis para visualização (Lovelace) corrige #28",
-        "nl": "Gecorrigeerde rollen voor visualisatie (Lovelace) opgelost #28",
-        "fr": "Rôles corrigés pour la visualisation (lovelace) corrections #28",
-        "it": "Ruoli corretti per la visualizzazione (Lovelace) risolve #28",
-        "es": "Roles corregidos para visualización (Lovelace) soluciona #28",
-        "pl": "Poprawione role dla wizualizacji (Lovelace) naprawia #28",
-        "uk": "Виправлені ролі для візуалізації (lovelace) виправляють #28",
-        "zh-cn": "为可视化（lovelace）修正了角色（修复＃28）"
       }
     },
     "titleLang": {

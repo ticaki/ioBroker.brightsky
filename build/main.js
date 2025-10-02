@@ -44,7 +44,8 @@ class Brightsky extends utils.Adapter {
   constructor(options = {}) {
     super({
       ...options,
-      name: "brightsky"
+      name: "brightsky",
+      useFormatDate: true
     });
     this.on("ready", this.onReady.bind(this));
     this.on("unload", this.onUnload.bind(this));
