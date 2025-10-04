@@ -822,7 +822,7 @@ class Brightsky extends utils.Adapter {
                 const fetchTime = now.toISOString();
                 this.radarData = filteredRadar.map(item => {
                     // Collect all precipitation values from 2D array
-                    // API values are in 0.01mm per 5 minutes, convert to mm by dividing by 100
+                    // Precipitation values from the API (item.precipitation_5) are in 0.01mm per 5 minutes, convert to mm by dividing by 100
                     const values: number[] = [];
 
                     if (Array.isArray(item.precipitation_5)) {
