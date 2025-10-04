@@ -46,5 +46,18 @@
     "wr2": "Inversor 2 máx. poder (KW)",
     "wr3": "Inversor 3 máx. poder (KW)",
     "wr4": "Inversor 4 max. poder (KW)",
-    "__wr": "Inversor"
+    "__wr": "Inversor",
+    "BF0": "Calma",
+    "BF1": "Ventolina",
+    "BF2": "Brisa muy débil",
+    "BF3": "Brisa débil",
+    "BF4": "Brisa moderada",
+    "BF5": "Brisa fresca",
+    "BF6": "Brisa fuerte",
+    "BF7": "Viento fuerte",
+    "BF8": "Temporal",
+    "BF9": "Temporal fuerte",
+    "BF10": "Temporal muy fuerte",
+    "BF11": "Tormenta",
+    "BF12": "Huracán"
 }

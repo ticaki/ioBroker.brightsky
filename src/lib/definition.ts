@@ -1415,6 +1415,30 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
+            wind_force: {
+                _id: 'wind_force',
+                type: 'state',
+                common: {
+                    name: 'Wind Force (Beaufort)',
+                    type: 'number',
+                    role: 'value',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
+            wind_force_desc: {
+                _id: 'wind_force_desc',
+                type: 'state',
+                common: {
+                    name: 'Wind Force Description',
+                    type: 'string',
+                    role: 'text',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
             source_id: {
                 _id: 'source_id',
                 type: 'state',
@@ -2043,6 +2067,8 @@ export type BrightskyCurrently = {
 
     pressure_msl: number;
     wind_bearing_text?: string;
+    wind_force?: number;
+    wind_force_desc?: string;
     wind_direction_10: number;
     wind_direction_30: number;
     wind_direction_60: number;
