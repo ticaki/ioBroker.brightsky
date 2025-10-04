@@ -35,8 +35,9 @@ class Brightsky extends utils.Adapter {
   groupArray = [];
   wrArray = [];
   radarData = [];
+  // Stores unprocessed radar data (before unit conversion) specifically for cumulative calculations.
+  // This is distinct from the processed radarData array, which contains converted/processed values.
   rawRadarData = [];
-  // Store raw radar data for cumulative calculations
   radarRotationTimeout = void 0;
   /**
    * Creates a new instance of the Brightsky adapter
