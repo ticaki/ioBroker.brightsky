@@ -624,6 +624,8 @@ class Brightsky extends utils.Adapter {
         if (result.data.weather) {
           const weather = result.data.weather;
           weather.wind_bearing_text = this.getWindBearingText((_a = weather.wind_direction_10) != null ? _a : void 0);
+          weather.wind_force = this.getBeaufortScale(weather.wind_speed_10);
+          weather.wind_force_desc = this.getBeaufortDescription(weather.wind_force);
           const coords = this.config.position.split(",").map(parseFloat);
           const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
           const now = /* @__PURE__ */ new Date();
@@ -924,6 +926,92 @@ class Brightsky extends utils.Adapter {
     ];
     const index = Math.round(windBearing % 360 / 22.5) % 16;
     return this.library.getTranslation(directions[index]);
+  }
+  /**
+   * Converts wind speed in km/h to Beaufort scale (0-12)
+   * Based on DWD wind warning scale: https://www.wettergefahren.de/warnungen/windwarnskala.html
+   *
+   * @param windSpeed Wind speed in km/h
+   * @returns Beaufort scale number (0-12)
+   */
+  getBeaufortScale(windSpeed) {
+    if (windSpeed === void 0 || windSpeed === null) {
+      return 0;
+    }
+    if (windSpeed < 1) {
+      return 0;
+    }
+    if (windSpeed < 6) {
+      return 1;
+    }
+    if (windSpeed < 12) {
+      return 2;
+    }
+    if (windSpeed < 20) {
+      return 3;
+    }
+    if (windSpeed < 29) {
+      return 4;
+    }
+    if (windSpeed < 39) {
+      return 5;
+    }
+    if (windSpeed < 50) {
+      return 6;
+    }
+    if (windSpeed < 62) {
+      return 7;
+    }
+    if (windSpeed < 75) {
+      return 8;
+    }
+    if (windSpeed < 89) {
+      return 9;
+    }
+    if (windSpeed < 103) {
+      return 10;
+    }
+    if (windSpeed < 118) {
+      return 11;
+    }
+    return 12;
+  }
+  /**
+   * Gets the translated description for a Beaufort scale value
+   *
+   * @param beaufortScale Beaufort scale number (0-12)
+   * @returns Translated description of wind force
+   */
+  getBeaufortDescription(beaufortScale) {
+    const descriptions = [
+      "BF0",
+      // Calm
+      "BF1",
+      // Light air
+      "BF2",
+      // Light breeze
+      "BF3",
+      // Gentle breeze
+      "BF4",
+      // Moderate breeze
+      "BF5",
+      // Fresh breeze
+      "BF6",
+      // Strong breeze
+      "BF7",
+      // Near gale
+      "BF8",
+      // Gale
+      "BF9",
+      // Strong gale
+      "BF10",
+      // Storm
+      "BF11",
+      // Violent storm
+      "BF12"
+      // Hurricane
+    ];
+    return this.library.getTranslation(descriptions[beaufortScale] || "BF0");
   }
   /**
    * Called when adapter shuts down - cleanup timers and connections

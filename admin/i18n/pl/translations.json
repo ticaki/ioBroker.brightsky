@@ -45,5 +45,18 @@
     "wr1": "Falownik 1 maks. Power (KW)",
     "wr2": "Falownik 2 maks. Power (KW)",
     "wr3": "Falownik 3 maks. Power (KW)",
-    "wr4": "Falownik 4 maks. Power (KW)"
+    "wr4": "Falownik 4 maks. Power (KW)",
+    "BF0": "Cisza",
+    "BF1": "Powiew",
+    "BF2": "Słaby wiatr",
+    "BF3": "Łagodny wiatr",
+    "BF4": "Umiarkowany wiatr",
+    "BF5": "Dość silny wiatr",
+    "BF6": "Silny wiatr",
+    "BF7": "Bardzo silny wiatr",
+    "BF8": "Wichura",
+    "BF9": "Silna wichura",
+    "BF10": "Sztorm",
+    "BF11": "Gwałtowny sztorm",
+    "BF12": "Huragan"
 }

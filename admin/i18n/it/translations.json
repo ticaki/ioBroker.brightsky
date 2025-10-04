@@ -46,5 +46,18 @@
     "wr1": "Inverter 1 Max. Potenza (KW)",
     "wr2": "Inverter 2 Max. Potenza (KW)",
     "wr3": "Inverter 3 Max. Potenza (KW)",
-    "wr4": "Inverter 4 Max. Potenza (KW)"
+    "wr4": "Inverter 4 Max. Potenza (KW)",
+    "BF0": "Calma",
+    "BF1": "Bava di vento",
+    "BF2": "Brezza leggera",
+    "BF3": "Brezza tesa",
+    "BF4": "Vento moderato",
+    "BF5": "Vento teso",
+    "BF6": "Vento fresco",
+    "BF7": "Vento forte",
+    "BF8": "Burrasca",
+    "BF9": "Burrasca forte",
+    "BF10": "Tempesta",
+    "BF11": "Tempesta violenta",
+    "BF12": "Uragano"
 }
