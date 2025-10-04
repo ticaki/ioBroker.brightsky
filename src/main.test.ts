@@ -149,28 +149,33 @@ describe('Radar Precipitation Unit Conversion', () => {
 
     it('should calculate cumulative precipitation sum correctly', () => {
         // Simulate a 2D grid of precipitation values (in 0.01mm)
+        // Each column represents a specific geographical area
         const precipitationGrid = [
-            [20, 10], // Row 1: 0.20 + 0.10 = 0.30 mm
-            [10, 40], // Row 2: 0.10 + 0.40 = 0.50 mm
-            [5, 5], // Row 3: 0.05 + 0.05 = 0.10 mm
+            [20, 10], // Row 1: Column 0 gets 0.20mm, Column 1 gets 0.10mm
+            [10, 40], // Row 2: Column 0 gets 0.10mm, Column 1 gets 0.40mm
+            [5, 5], // Row 3: Column 0 gets 0.05mm, Column 1 gets 0.05mm
         ];
 
-        // Convert to mm and calculate sum for each row
-        const rowSums: number[] = [];
+        // Convert to mm and calculate sum for each column
+        const numCols = 2;
+        const columnSums: number[] = [0, 0];
+
         for (const row of precipitationGrid) {
-            let sum = 0;
-            for (const value of row) {
-                sum += value / 100; // Convert from 0.01mm to mm
+            for (let col = 0; col < numCols; col++) {
+                columnSums[col] += row[col] / 100; // Convert from 0.01mm to mm
             }
-            // Round to 2 decimal places to avoid floating point issues
-            rowSums.push(Math.round(sum * 100) / 100);
         }
 
-        // Maximum sum across all rows should be 0.50
-        const maxSum = Math.max(...rowSums);
+        // Round to 2 decimal places to avoid floating point issues
+        const roundedSums = columnSums.map(sum => Math.round(sum * 100) / 100);
 
-        expect(rowSums).to.deep.equal([0.3, 0.5, 0.1]);
-        expect(maxSum).to.equal(0.5);
+        // Column 0 sum: 0.20 + 0.10 + 0.05 = 0.35mm
+        // Column 1 sum: 0.10 + 0.40 + 0.05 = 0.55mm
+        // Maximum sum across all columns should be 0.55
+        const maxSum = Math.max(...roundedSums);
+
+        expect(roundedSums).to.deep.equal([0.35, 0.55]);
+        expect(maxSum).to.equal(0.55);
     });
 
     it('should round values to 2 decimal places', () => {

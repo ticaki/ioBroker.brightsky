@@ -700,20 +700,26 @@ class Brightsky extends utils.Adapter {
         const fetchTime = now.toISOString();
         this.radarData = filteredRadar.map((item) => {
           const values = [];
-          const areaSums = [];
+          const columnSums = [];
           if (Array.isArray(item.precipitation_5)) {
+            let numCols = 0;
+            for (const row of item.precipitation_5) {
+              if (Array.isArray(row) && row.length > numCols) {
+                numCols = row.length;
+              }
+            }
+            for (let i = 0; i < numCols; i++) {
+              columnSums.push(0);
+            }
             for (const row of item.precipitation_5) {
               if (Array.isArray(row)) {
-                let rowSum = 0;
-                for (const value of row) {
+                for (let col = 0; col < row.length; col++) {
+                  const value = row[col];
                   if (typeof value === "number") {
                     const convertedValue = value / 100;
                     values.push(convertedValue);
-                    rowSum += convertedValue;
+                    columnSums[col] += convertedValue;
                   }
-                }
-                if (rowSum > 0) {
-                  areaSums.push(rowSum);
                 }
               }
             }
@@ -732,8 +738,8 @@ class Brightsky extends utils.Adapter {
             const mid = Math.floor(sorted.length / 2);
             median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
           }
-          if (areaSums.length > 0) {
-            cumulative = Math.max(...areaSums);
+          if (columnSums.length > 0) {
+            cumulative = Math.max(...columnSums);
           }
           return {
             timestamp: item.timestamp,

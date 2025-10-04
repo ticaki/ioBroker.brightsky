@@ -812,21 +812,32 @@ class Brightsky extends utils.Adapter {
                     // Collect all precipitation values from 2D array
                     // API values are in 0.01mm per 5 minutes, convert to mm by dividing by 100
                     const values: number[] = [];
-                    const areaSums: number[] = []; // Sum for each grid area (each row)
+                    const columnSums: number[] = []; // Sum for each grid column (each geographical area)
 
                     if (Array.isArray(item.precipitation_5)) {
+                        // First pass: collect all values and determine number of columns
+                        let numCols = 0;
+                        for (const row of item.precipitation_5) {
+                            if (Array.isArray(row) && row.length > numCols) {
+                                numCols = row.length;
+                            }
+                        }
+
+                        // Initialize column sums
+                        for (let i = 0; i < numCols; i++) {
+                            columnSums.push(0);
+                        }
+
+                        // Second pass: sum each column and collect all values
                         for (const row of item.precipitation_5) {
                             if (Array.isArray(row)) {
-                                let rowSum = 0;
-                                for (const value of row) {
+                                for (let col = 0; col < row.length; col++) {
+                                    const value = row[col];
                                     if (typeof value === 'number') {
                                         const convertedValue = value / 100; // Convert from 0.01mm to mm
                                         values.push(convertedValue);
-                                        rowSum += convertedValue;
+                                        columnSums[col] += convertedValue;
                                     }
-                                }
-                                if (rowSum > 0) {
-                                    areaSums.push(rowSum);
                                 }
                             }
                         }
@@ -854,9 +865,9 @@ class Brightsky extends utils.Adapter {
                         median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
                     }
 
-                    // Calculate cumulative (max sum across all grid areas)
-                    if (areaSums.length > 0) {
-                        cumulative = Math.max(...areaSums);
+                    // Calculate cumulative (max sum across all grid columns/areas)
+                    if (columnSums.length > 0) {
+                        cumulative = Math.max(...columnSums);
                     }
 
                     return {
