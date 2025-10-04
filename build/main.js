@@ -1005,7 +1005,7 @@ class Brightsky extends utils.Adapter {
       // Near gale
       "BF8",
       // Gale
-      "BF19",
+      "BF9",
       // Strong gale
       "BF10",
       // Storm
