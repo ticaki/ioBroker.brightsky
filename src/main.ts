@@ -9,7 +9,13 @@ type Panel = ioBroker.AdapterConfig['panels'][0];
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
 import { Library } from './lib/library';
-import type { BrightskyCurrently, BrightskyHourly, BrightskyRadarResponse, BrightskyRadarData } from './lib/definition';
+import type {
+    BrightskyCurrently,
+    BrightskyHourly,
+    BrightskyRadarResponse,
+    BrightskyRadarData,
+    BrightskyRadarItem,
+} from './lib/definition';
 import {
     genericStateObjects,
     type BrightskyDailyData,
@@ -31,6 +37,7 @@ class Brightsky extends utils.Adapter {
     groupArray: Panel[][] = [];
     wrArray: number[] = [];
     radarData: BrightskyRadarData[] = [];
+    rawRadarData: BrightskyRadarItem[] = []; // Store raw radar data for cumulative calculations
     radarRotationTimeout: ioBroker.Timeout | null | undefined = undefined;
 
     /**
@@ -806,6 +813,9 @@ class Brightsky extends utils.Adapter {
                     return itemTime >= now && itemTime <= twoHoursLater;
                 });
 
+                // Store raw radar data for cumulative calculations
+                this.rawRadarData = filteredRadar;
+
                 // Store radar data with forecast metadata
                 const fetchTime = now.toISOString();
                 this.radarData = filteredRadar.map(item => {
@@ -1012,14 +1022,53 @@ class Brightsky extends utils.Adapter {
             let maxCumulative = -1;
 
             if (this.radarData.length > 0) {
-                // Get max from the next N intervals (starting from index 0 which is "now")
+                // Get max precipitation_5_max from the next N intervals
                 for (let i = 0; i < numIntervals && i < this.radarData.length; i++) {
                     const item = this.radarData[i];
                     if (item.precipitation_5_max !== undefined && item.precipitation_5_max > maxPrecipitation) {
                         maxPrecipitation = item.precipitation_5_max;
                     }
-                    if (item.precipitation_5_sum !== undefined && item.precipitation_5_sum > maxCumulative) {
-                        maxCumulative = item.precipitation_5_sum;
+                }
+            }
+
+            // Calculate cumulative sum across columns for this time window
+            if (this.rawRadarData.length > 0) {
+                // Determine number of columns from first interval
+                let numCols = 0;
+                if (this.rawRadarData[0] && Array.isArray(this.rawRadarData[0].precipitation_5)) {
+                    for (const row of this.rawRadarData[0].precipitation_5) {
+                        if (Array.isArray(row) && row.length > numCols) {
+                            numCols = row.length;
+                        }
+                    }
+                }
+
+                if (numCols > 0) {
+                    // Initialize column sums for this time window
+                    const columnSums: number[] = new Array(numCols).fill(0);
+
+                    // Sum across all intervals in this time window
+                    for (let i = 0; i < numIntervals && i < this.rawRadarData.length; i++) {
+                        const item = this.rawRadarData[i];
+                        if (Array.isArray(item.precipitation_5)) {
+                            for (const row of item.precipitation_5) {
+                                if (Array.isArray(row)) {
+                                    for (let col = 0; col < row.length && col < numCols; col++) {
+                                        const value = row[col];
+                                        if (typeof value === 'number') {
+                                            columnSums[col] += value / 100; // Convert from 0.01mm to mm
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Find maximum column sum
+                    if (columnSums.length > 0) {
+                        maxCumulative = Math.max(...columnSums);
+                        // Round to 2 decimal places
+                        maxCumulative = Math.round(maxCumulative * 100) / 100;
                     }
                 }
             }
