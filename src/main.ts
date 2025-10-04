@@ -234,13 +234,13 @@ class Brightsky extends utils.Adapter {
         // Validate radar distance (max 50km)
         if (
             this.config.radarDistance == undefined ||
-            this.config.radarDistance < 1000 ||
+            this.config.radarDistance < 400 ||
             this.config.radarDistance > 50000
         ) {
             this.log.warn(
-                `Invalid radar distance: ${this.config.radarDistance}. Using default value of 10000 meters (10 km).`,
+                `Invalid radar distance: ${this.config.radarDistance}. Using default value of 2000 meters (2 km).`,
             );
-            this.config.radarDistance = 10000; // Default to 10 km if invalid
+            this.config.radarDistance = 2000; // Default to 2 km if invalid
         }
 
         if (this.config.createCurrently) {
@@ -972,9 +972,11 @@ class Brightsky extends utils.Adapter {
             for (let i = 0; i < this.radarData.length; i++) {
                 const item = this.radarData[i];
                 const minutesOffset = i * 5;
+                // Use a zero-padded label for nicer sorting/labels (e.g., "00", "05", "10", ...)
+                const indexLabel = minutesOffset.toString().padStart(2, '0');
 
                 dataToWrite.push({
-                    _index: minutesOffset,
+                    _index: indexLabel,
                     ...item,
                 });
             }
@@ -1059,9 +1061,9 @@ class Brightsky extends utils.Adapter {
                     }
                 }
             }
-
-            forecasts[`next_${interval}min`] = maxPrecipitation;
-            cumulativeForecasts[`next_${interval}min_sum`] = maxCumulative;
+            const key = interval.toString().padStart(2, '0');
+            forecasts[`next_${key}min`] = maxPrecipitation;
+            cumulativeForecasts[`next_${key}min_sum`] = maxCumulative;
         }
 
         // Write forecasts to states

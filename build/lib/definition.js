@@ -1683,8 +1683,8 @@ const genericStateObjects = {
       },
       native: {}
     },
-    next_5min: {
-      _id: "next_5min",
+    next_05min: {
+      _id: "next_05min",
       type: "state",
       common: {
         name: "Max Precipitation Next 5 Minutes",
@@ -1781,8 +1781,8 @@ const genericStateObjects = {
       },
       native: {}
     },
-    next_5min_sum: {
-      _id: "next_5min_sum",
+    next_05min_sum: {
+      _id: "next_05min_sum",
       type: "state",
       common: {
         name: "Max Cumulative Precipitation Next 5 Minutes",

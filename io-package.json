@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.6.2",
+    "version": "0.6.3",
     "news": {
+      "0.6.3": {
+        "en": "Added Beaufort wind force scale datapoints (wind_force and wind_force_desc) based on wind_speed_10\nFixed radar precipitation unit conversion - API values are in 0.01mm per 5 minutes, now correctly converted to mm\nAdded cumulative precipitation states (next_Xmin_sum) showing maximum precipitation sum across all grid areas\nAdded descriptions to max_precipitation_forecast states indicating \"mm per 5 minutes\"",
+        "de": "Beaufort-Windstärkeskala-Datenpunkte (wind_force und wind_force_desc) basierend auf wind_speed_10 hinzugefügt\nFehler bei der Umrechnung der Radar-Niederschlagseinheit behoben – API-Werte sind in 0,01 mm pro 5 Minuten und werden nun korrekt in mm umgerechnet\nKumulative Niederschlagszustände (next_Xmin_sum) hinzugefügt, die die maximale Niederschlagssumme über alle Rasterbereiche anzeigen\nBeschreibungen zu max_precipitation_forecast-Zuständen hinzugefügt, die \"mm pro 5 Minuten\" angeben",
+        "ru": "Добавлены точки измерения силы ветра Бофорта (wind_force и wind_force_desc) на основе скорости ветра_10\nПреобразование фиксированной радиолокационной установки осадков - значения API составляют 0,01 мм в течение 5 минут, теперь правильно преобразованы в мм\nДобавленные кумулятивные состояния осадков (next_Xmin_sum), показывающие максимальную сумму осадков во всех областях сети\nДобавлены описания состояний max_precipitation_forecast с указанием \"мм на 5 минут\"",
+        "pt": "Pontos de dados da escala de força de vento de Beaufort (força de vento e força de vento) baseados em velocidade de vento_10\nConversão fixa da unidade de precipitação do radar - os valores da API estão em 0,01mm por 5 minutos, agora convertidos corretamente em mm\nAdicionados estados cumulativos de precipitação (próximo_Xmin_sum) mostrando a soma máxima de precipitação em todas as áreas da grade\nDescrições adicionadas aos estados max_precipitação_precast indicando \"mm por 5 minutos\"",
+        "nl": "Toegevoegd Beaufort windkracht schaal datapoints (wind_force en wind_force_desc) op basis van wind_speed_10\nConversie van vaste radarprecipitatie-eenheid - API-waarden worden in 0,01 mm per 5 minuten, nu correct omgezet in mm\nToegevoegd cumulatieve neerslagtoestanden (next_Xmin_sum) met maximale neerslagsom over alle rastergebieden\nBeschrijvingen toegevoegd aan max_ Neerslag_forecast toestanden die \"mm per 5 minuten\" aangeven",
+        "fr": "Ajout de points de données de l'échelle de la force éolienne de Beaufort (force éolienne et force éolienne) basés sur la vitesse du vent_10\nConversion de l'unité de précipitation radar fixe - Les valeurs de l'API sont en 0,01 mm par 5 minutes, maintenant correctement converties en mm\nAjout d'états cumulatifs des précipitations (next_Xmin_sum) montrant la somme maximale des précipitations dans toutes les zones de grille\nAjout de descriptions à max_precipitation_forcast en indiquant \"mm par 5 minutes\"",
+        "it": "Aggiunti i datapoint della scala di Beaufort (wind_force e wind_force_desc) basati su wind_speed_10\nConversione unità di precipitazione radar fissa - I valori API sono in 0,01mm per 5 minuti, ora correttamente convertiti in mm\nAggiunti stati di precipitazioni cumulative (next_Xmin_sum) che mostrano la somma massima di precipitazioni in tutte le aree della griglia\nAggiunte descrizioni a max_precipitation_forecast stati che indicano \"mm per 5 minuti\"",
+        "es": "Puntos de datos de la escala del viento Beaufort (wind_force y wind_force_desc) basados en wind_speed_10\nConversión de unidad de precipitación de radar fijo - Los valores de API están en 0.01mm por 5 minutos, ahora correctamente convertido a mm\nEstados de precipitación acumulada (next_Xmin_sum) que muestran la suma máxima de precipitación en todas las áreas de la red\nDescripciónes agregadas a estados max_precipitation_forecast indicando \"mm por 5 minutos\"",
+        "pl": "Dodano Beaufort wind force scale datapoints (wind _ force and wind _ force _ desc) w oparciu o wind _ speed _ 10\nStała konwersja jednostki opadów radarowych - wartości API są w 0,01mm na 5 minut, teraz poprawnie przeliczane na mm\nDodano skumulowane stany opadów (następna _ Xmin _ sum) pokazujące maksymalną sumę opadów we wszystkich obszarach siatki\nDodano opisy do maks. _ prognoza opadów _ ze wskazaniem \"mm na 5 minut\"",
+        "uk": "Додана потужність вітру Beaufort вагові точки (wind_force and Wind_force_desc) на основі вітру_speed_10\nВиправлено перетворення радіолокаційних пристроїв - значення API в 0.01mm за 5 хвилин, тепер правильно перетворюються на мм\nДодані накопичувальні стани опадів (next_Xmin_sum) демонструють максимальну кількість опадів по всій площі сітки\nДодано опис до max_precipitation_forecast із зазначенням стану \"мм за 5 хвилин\"",
+        "zh-cn": "根据风速_10 添加了 Beaufort 风力规模数据点(wind_force和wind_force_desc)\n固定雷达降水单位转换 -- -- API值为每5分钟0.01毫米,现在正确转换为毫米\n增量累积降水状态(next__Xmin_sum),显示所有网格区域的最大降水总量\n添加到最大_ 降水_ 前置状态的描述, 表示“ 每5分钟mm”"
+      },
       "0.6.2": {
         "en": "Flag set to activate language",
         "de": "Schalter zum Aktivieren der Sprache gesetzt",
@@ -80,19 +93,6 @@
         "pl": "Ikony dostarczone przez icebear dodane poprawki # 31",
         "uk": "Ікона, надана льодом, додається фіксація #31",
         "zh-cn": "冰熊提供的图标添加了修正#31"
-      },
-      "0.4.0": {
-        "en": "Code migration from axios to node:fetch",
-        "de": "Code Migration von axios zu node:fetch",
-        "ru": "Код миграции из аксиоса в узел: прим",
-        "pt": "Migração de código de axios para nó:fetch",
-        "nl": "Code migratie van axios naar node:fetch",
-        "fr": "Migration de code de l'axios vers le noeud:fetch",
-        "it": "Codice di migrazione da assios a nodo:fetch",
-        "es": "Migración de códigos desde el eje hasta el nodo:fetch",
-        "pl": "Kod migracji z aksjozów do węzła: pobrać",
-        "uk": "Переміщення коду з аксіосу в вузол:fetch",
-        "zh-cn": "代码从轴移到节点: fatch"
       }
     },
     "titleLang": {
