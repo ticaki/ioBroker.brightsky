@@ -999,7 +999,7 @@ class Brightsky extends utils.Adapter {
             let maxCumulative = -1;
 
             if (this.radarData.length > 0) {
-                // Get max precipitation_5_max from the next N intervals
+                // Get maximum precipitation per 5-minute interval from the next N time intervals
                 for (let i = 0; i < numIntervals && i < this.radarData.length; i++) {
                     const item = this.radarData[i];
                     if (item.precipitation_5_max !== undefined && item.precipitation_5_max > maxPrecipitation) {
