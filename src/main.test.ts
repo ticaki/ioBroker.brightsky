@@ -134,3 +134,49 @@ describe('Weekday Name Formatting', () => {
         expect(sunday.toLocaleString('en', { weekday: 'short' })).to.equal('Sun');
     });
 });
+
+describe('Radar Precipitation Unit Conversion', () => {
+    it('should correctly convert API values from 0.01mm to mm', () => {
+        // Simulate API data: values like 16, 19, 21 represent 0.16mm, 0.19mm, 0.21mm
+        const apiValues = [16, 19, 21, 100, 0];
+        const expectedMm = [0.16, 0.19, 0.21, 1.0, 0];
+
+        for (let i = 0; i < apiValues.length; i++) {
+            const converted = apiValues[i] / 100;
+            expect(converted).to.equal(expectedMm[i]);
+        }
+    });
+
+    it('should calculate cumulative precipitation sum correctly', () => {
+        // Simulate a 2D grid of precipitation values (in 0.01mm)
+        const precipitationGrid = [
+            [20, 10], // Row 1: 0.20 + 0.10 = 0.30 mm
+            [10, 40], // Row 2: 0.10 + 0.40 = 0.50 mm
+            [5, 5], // Row 3: 0.05 + 0.05 = 0.10 mm
+        ];
+
+        // Convert to mm and calculate sum for each row
+        const rowSums: number[] = [];
+        for (const row of precipitationGrid) {
+            let sum = 0;
+            for (const value of row) {
+                sum += value / 100; // Convert from 0.01mm to mm
+            }
+            // Round to 2 decimal places to avoid floating point issues
+            rowSums.push(Math.round(sum * 100) / 100);
+        }
+
+        // Maximum sum across all rows should be 0.50
+        const maxSum = Math.max(...rowSums);
+
+        expect(rowSums).to.deep.equal([0.3, 0.5, 0.1]);
+        expect(maxSum).to.equal(0.5);
+    });
+
+    it('should round values to 2 decimal places', () => {
+        const value = 0.123456;
+        const rounded = Math.round(value * 100) / 100;
+
+        expect(rounded).to.equal(0.12);
+    });
+});

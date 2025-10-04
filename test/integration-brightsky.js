@@ -523,5 +523,104 @@ tests.integration(path.join(__dirname, '..'), {
                 });
             }).timeout(40000);
         });
+
+        // Test suite to verify radar unit conversion and cumulative values
+        suite('should create radar states with correct unit conversion and cumulative values', (getHarness) => {
+            let harness;
+
+            before(() => {
+                harness = getHarness();
+            });
+
+            it('should create radar states with cumulative precipitation values', () => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        harness = getHarness();
+                        const obj = await harness.objects.getObject('system.adapter.brightsky.0');
+
+                        console.log('🧪 Test: Verifying radar unit conversion and cumulative values');
+
+                        // Configure with radar enabled
+                        Object.assign(obj.native, {
+                            position: GERMAN_COORDINATES,
+                            createCurrently: false,
+                            createHourly: false,
+                            createDaily: false,
+                            createRadar: true,
+                            createRadarData: true,
+                            pollIntervalRadar: 10,
+                            radarDistance: 10000,
+                        });
+
+                        harness.objects.setObject(obj._id, obj);
+                        await harness.startAdapterAndWait();
+                        console.log('✅ Step 1: Adapter started');
+
+                        await wait(20000);
+                        console.log('✅ Step 2: Wait completed');
+
+                        const stateIds = await harness.dbConnection.getStateIDs('brightsky.0.*');
+                        console.log(`📊 Found ${stateIds.length} total states`);
+
+                        // Check for max_precipitation_forecast states
+                        const maxPrecipStates = stateIds.filter(key => key.includes('max_precipitation_forecast'));
+                        if (maxPrecipStates.length === 0) {
+                            console.log('❌ No max_precipitation_forecast states found - test failed');
+                            reject(new Error('Expected max_precipitation_forecast states but found none'));
+                            return;
+                        } else {
+                            console.log(`✅ Found ${maxPrecipStates.length} max_precipitation_forecast states`);
+                        }
+
+                        // Check for cumulative states (_sum)
+                        const cumulativeStates = stateIds.filter(key => key.includes('max_precipitation_forecast') && key.includes('_sum'));
+                        if (cumulativeStates.length === 0) {
+                            console.log('❌ No cumulative precipitation states (_sum) found - test failed');
+                            reject(new Error('Expected cumulative precipitation states but found none'));
+                            return;
+                        } else {
+                            console.log(`✅ Found ${cumulativeStates.length} cumulative precipitation states (_sum)`);
+                        }
+
+                        // Check for precipitation_5_sum state in radar data
+                        const precipSumState = stateIds.find(key => key.includes('radar.data') && key.includes('precipitation_5_sum'));
+                        if (!precipSumState) {
+                            console.log('❌ precipitation_5_sum state not found in radar.data - test failed');
+                            reject(new Error('Expected precipitation_5_sum state in radar.data but not found'));
+                            return;
+                        } else {
+                            console.log(`✅ Found precipitation_5_sum state: ${precipSumState}`);
+                        }
+
+                        // Verify that expected cumulative forecast states exist
+                        const expectedCumulative = [
+                            'next_5min_sum',
+                            'next_10min_sum',
+                            'next_15min_sum',
+                            'next_30min_sum',
+                            'next_45min_sum',
+                            'next_60min_sum',
+                            'next_90min_sum'
+                        ];
+
+                        for (const cumKey of expectedCumulative) {
+                            const fullKey = `brightsky.0.radar.max_precipitation_forecast.${cumKey}`;
+                            if (!stateIds.includes(fullKey)) {
+                                console.log(`❌ Expected cumulative state ${cumKey} not found - test failed`);
+                                reject(new Error(`Expected cumulative state ${cumKey} but not found`));
+                                return;
+                            }
+                        }
+                        console.log(`✅ All ${expectedCumulative.length} cumulative forecast states exist`);
+
+                        await harness.stopAdapter();
+                        console.log('✅ Test passed: radar states include cumulative values');
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }).timeout(40000);
+        });
     }
 });
