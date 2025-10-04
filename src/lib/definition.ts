@@ -1661,20 +1661,6 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
-            precipitation_5_sum: {
-                _id: 'precipitation_5_sum',
-                type: 'state',
-                common: {
-                    name: 'Precipitation Sum across areas (5 min)',
-                    type: 'number',
-                    role: 'value.precipitation',
-                    read: true,
-                    write: false,
-                    unit: 'mm',
-                    desc: 'Maximum cumulative precipitation across all grid areas per 5 minutes',
-                },
-                native: {},
-            },
             forecast_time: {
                 _id: 'forecast_time',
                 type: 'state',
@@ -2093,6 +2079,5 @@ export type BrightskyRadarData = {
     precipitation_5_min: number; // Minimum precipitation in mm per 5 minutes
     precipitation_5_max: number; // Maximum precipitation in mm per 5 minutes
     precipitation_5_median: number; // Median precipitation in mm per 5 minutes
-    precipitation_5_sum: number; // Cumulative max across grid areas in mm per 5 minutes
     forecast_time: string; // When the forecast was issued
 };

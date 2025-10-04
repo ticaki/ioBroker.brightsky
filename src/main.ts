@@ -822,31 +822,14 @@ class Brightsky extends utils.Adapter {
                     // Collect all precipitation values from 2D array
                     // API values are in 0.01mm per 5 minutes, convert to mm by dividing by 100
                     const values: number[] = [];
-                    const columnSums: number[] = []; // Sum for each grid column (each geographical area)
 
                     if (Array.isArray(item.precipitation_5)) {
-                        // First pass: collect all values and determine number of columns
-                        let numCols = 0;
-                        for (const row of item.precipitation_5) {
-                            if (Array.isArray(row) && row.length > numCols) {
-                                numCols = row.length;
-                            }
-                        }
-
-                        // Initialize column sums
-                        for (let i = 0; i < numCols; i++) {
-                            columnSums.push(0);
-                        }
-
-                        // Second pass: sum each column and collect all values
                         for (const row of item.precipitation_5) {
                             if (Array.isArray(row)) {
-                                for (let col = 0; col < row.length; col++) {
-                                    const value = row[col];
+                                for (const value of row) {
                                     if (typeof value === 'number') {
                                         const convertedValue = value / 100; // Convert from 0.01mm to mm
                                         values.push(convertedValue);
-                                        columnSums[col] += convertedValue;
                                     }
                                 }
                             }
@@ -858,7 +841,6 @@ class Brightsky extends utils.Adapter {
                     let min = 0;
                     let max = 0;
                     let median = 0;
-                    let cumulative = 0;
 
                     if (values.length > 0) {
                         // Average
@@ -875,11 +857,6 @@ class Brightsky extends utils.Adapter {
                         median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
                     }
 
-                    // Calculate cumulative (max sum across all grid columns/areas)
-                    if (columnSums.length > 0) {
-                        cumulative = Math.max(...columnSums);
-                    }
-
                     return {
                         timestamp: item.timestamp,
                         source: item.source,
@@ -887,7 +864,6 @@ class Brightsky extends utils.Adapter {
                         precipitation_5_min: Math.round(min * 100) / 100,
                         precipitation_5_max: Math.round(max * 100) / 100,
                         precipitation_5_median: Math.round(median * 100) / 100,
-                        precipitation_5_sum: Math.round(cumulative * 100) / 100,
                         forecast_time: fetchTime,
                     };
                 });
@@ -944,7 +920,6 @@ class Brightsky extends utils.Adapter {
                     precipitation_5_min: -1,
                     precipitation_5_max: -1,
                     precipitation_5_median: -1,
-                    precipitation_5_sum: -1,
                     forecast_time: lastItem.forecast_time,
                 });
             }

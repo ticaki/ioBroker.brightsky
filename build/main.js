@@ -703,25 +703,13 @@ class Brightsky extends utils.Adapter {
         const fetchTime = now.toISOString();
         this.radarData = filteredRadar.map((item) => {
           const values = [];
-          const columnSums = [];
           if (Array.isArray(item.precipitation_5)) {
-            let numCols = 0;
-            for (const row of item.precipitation_5) {
-              if (Array.isArray(row) && row.length > numCols) {
-                numCols = row.length;
-              }
-            }
-            for (let i = 0; i < numCols; i++) {
-              columnSums.push(0);
-            }
             for (const row of item.precipitation_5) {
               if (Array.isArray(row)) {
-                for (let col = 0; col < row.length; col++) {
-                  const value = row[col];
+                for (const value of row) {
                   if (typeof value === "number") {
                     const convertedValue = value / 100;
                     values.push(convertedValue);
-                    columnSums[col] += convertedValue;
                   }
                 }
               }
@@ -731,7 +719,6 @@ class Brightsky extends utils.Adapter {
           let min = 0;
           let max = 0;
           let median = 0;
-          let cumulative = 0;
           if (values.length > 0) {
             const sum = values.reduce((acc, val) => acc + val, 0);
             avg = sum / values.length;
@@ -741,9 +728,6 @@ class Brightsky extends utils.Adapter {
             const mid = Math.floor(sorted.length / 2);
             median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
           }
-          if (columnSums.length > 0) {
-            cumulative = Math.max(...columnSums);
-          }
           return {
             timestamp: item.timestamp,
             source: item.source,
@@ -752,7 +736,6 @@ class Brightsky extends utils.Adapter {
             precipitation_5_min: Math.round(min * 100) / 100,
             precipitation_5_max: Math.round(max * 100) / 100,
             precipitation_5_median: Math.round(median * 100) / 100,
-            precipitation_5_sum: Math.round(cumulative * 100) / 100,
             forecast_time: fetchTime
           };
         });
@@ -793,7 +776,6 @@ class Brightsky extends utils.Adapter {
           precipitation_5_min: -1,
           precipitation_5_max: -1,
           precipitation_5_median: -1,
-          precipitation_5_sum: -1,
           forecast_time: lastItem.forecast_time
         });
       }

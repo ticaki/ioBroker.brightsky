@@ -582,16 +582,6 @@ tests.integration(path.join(__dirname, '..'), {
                             console.log(`✅ Found ${cumulativeStates.length} cumulative precipitation states (_sum)`);
                         }
 
-                        // Check for precipitation_5_sum state in radar data
-                        const precipSumState = stateIds.find(key => key.includes('radar.data') && key.includes('precipitation_5_sum'));
-                        if (!precipSumState) {
-                            console.log('❌ precipitation_5_sum state not found in radar.data - test failed');
-                            reject(new Error('Expected precipitation_5_sum state in radar.data but not found'));
-                            return;
-                        } else {
-                            console.log(`✅ Found precipitation_5_sum state: ${precipSumState}`);
-                        }
-
                         // Verify that expected cumulative forecast states exist
                         const expectedCumulative = [
                             'next_5min_sum',

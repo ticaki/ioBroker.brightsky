@@ -1636,20 +1636,6 @@ const genericStateObjects = {
         },
         native: {}
       },
-      precipitation_5_sum: {
-        _id: "precipitation_5_sum",
-        type: "state",
-        common: {
-          name: "Precipitation Sum across areas (5 min)",
-          type: "number",
-          role: "value.precipitation",
-          read: true,
-          write: false,
-          unit: "mm",
-          desc: "Maximum cumulative precipitation across all grid areas per 5 minutes"
-        },
-        native: {}
-      },
       forecast_time: {
         _id: "forecast_time",
         type: "state",
