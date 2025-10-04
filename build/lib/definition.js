@@ -1636,6 +1636,20 @@ const genericStateObjects = {
         },
         native: {}
       },
+      precipitation_5_sum: {
+        _id: "precipitation_5_sum",
+        type: "state",
+        common: {
+          name: "Precipitation Sum across areas (5 min)",
+          type: "number",
+          role: "value.precipitation",
+          read: true,
+          write: false,
+          unit: "mm",
+          desc: "Maximum cumulative precipitation across all grid areas per 5 minutes"
+        },
+        native: {}
+      },
       forecast_time: {
         _id: "forecast_time",
         type: "state",
@@ -1668,7 +1682,8 @@ const genericStateObjects = {
         role: "value.precipitation.forecast",
         read: true,
         write: false,
-        unit: "mm"
+        unit: "mm",
+        desc: "Maximum precipitation per 5 minutes"
       },
       native: {}
     },
@@ -1681,7 +1696,8 @@ const genericStateObjects = {
         role: "value.precipitation.forecast",
         read: true,
         write: false,
-        unit: "mm"
+        unit: "mm",
+        desc: "Maximum precipitation per 5 minutes in next 10 minutes"
       },
       native: {}
     },
@@ -1694,7 +1710,8 @@ const genericStateObjects = {
         role: "value.precipitation.forecast",
         read: true,
         write: false,
-        unit: "mm"
+        unit: "mm",
+        desc: "Maximum precipitation per 5 minutes in next 15 minutes"
       },
       native: {}
     },
@@ -1707,7 +1724,8 @@ const genericStateObjects = {
         role: "value.precipitation.forecast",
         read: true,
         write: false,
-        unit: "mm"
+        unit: "mm",
+        desc: "Maximum precipitation per 5 minutes in next 30 minutes"
       },
       native: {}
     },
@@ -1720,7 +1738,8 @@ const genericStateObjects = {
         role: "value.precipitation.forecast",
         read: true,
         write: false,
-        unit: "mm"
+        unit: "mm",
+        desc: "Maximum precipitation per 5 minutes in next 45 minutes"
       },
       native: {}
     },
@@ -1733,7 +1752,8 @@ const genericStateObjects = {
         role: "value.precipitation.forecast",
         read: true,
         write: false,
-        unit: "mm"
+        unit: "mm",
+        desc: "Maximum precipitation per 5 minutes in next 60 minutes"
       },
       native: {}
     },
@@ -1746,7 +1766,106 @@ const genericStateObjects = {
         role: "value.precipitation.forecast",
         read: true,
         write: false,
-        unit: "mm"
+        unit: "mm",
+        desc: "Maximum precipitation per 5 minutes in next 90 minutes"
+      },
+      native: {}
+    },
+    next_5min_sum: {
+      _id: "next_5min_sum",
+      type: "state",
+      common: {
+        name: "Max Cumulative Precipitation Next 5 Minutes",
+        type: "number",
+        role: "value.precipitation.forecast",
+        read: true,
+        write: false,
+        unit: "mm",
+        desc: "Maximum cumulative precipitation across grid areas per 5 minutes"
+      },
+      native: {}
+    },
+    next_10min_sum: {
+      _id: "next_10min_sum",
+      type: "state",
+      common: {
+        name: "Max Cumulative Precipitation Next 10 Minutes",
+        type: "number",
+        role: "value.precipitation.forecast",
+        read: true,
+        write: false,
+        unit: "mm",
+        desc: "Maximum cumulative precipitation across grid areas per 5 minutes in next 10 minutes"
+      },
+      native: {}
+    },
+    next_15min_sum: {
+      _id: "next_15min_sum",
+      type: "state",
+      common: {
+        name: "Max Cumulative Precipitation Next 15 Minutes",
+        type: "number",
+        role: "value.precipitation.forecast",
+        read: true,
+        write: false,
+        unit: "mm",
+        desc: "Maximum cumulative precipitation across grid areas per 5 minutes in next 15 minutes"
+      },
+      native: {}
+    },
+    next_30min_sum: {
+      _id: "next_30min_sum",
+      type: "state",
+      common: {
+        name: "Max Cumulative Precipitation Next 30 Minutes",
+        type: "number",
+        role: "value.precipitation.forecast",
+        read: true,
+        write: false,
+        unit: "mm",
+        desc: "Maximum cumulative precipitation across grid areas per 5 minutes in next 30 minutes"
+      },
+      native: {}
+    },
+    next_45min_sum: {
+      _id: "next_45min_sum",
+      type: "state",
+      common: {
+        name: "Max Cumulative Precipitation Next 45 Minutes",
+        type: "number",
+        role: "value.precipitation.forecast",
+        read: true,
+        write: false,
+        unit: "mm",
+        desc: "Maximum cumulative precipitation across grid areas per 5 minutes in next 45 minutes"
+      },
+      native: {}
+    },
+    next_60min_sum: {
+      _id: "next_60min_sum",
+      type: "state",
+      common: {
+        name: "Max Cumulative Precipitation Next 60 Minutes",
+        type: "number",
+        role: "value.precipitation.forecast",
+        read: true,
+        write: false,
+        unit: "mm",
+        desc: "Maximum cumulative precipitation across grid areas per 5 minutes in next 60 minutes"
+      },
+      native: {}
+    },
+    next_90min_sum: {
+      _id: "next_90min_sum",
+      type: "state",
+      common: {
+        name: "Max Cumulative Precipitation Next 90 Minutes",
+        type: "number",
+        role: "value.precipitation.forecast",
+        read: true,
+        write: false,
+        unit: "mm",
+        desc: "Maximum cumulative precipitation across grid areas per 5 minutes in next 90 minutes"
       },
       native: {}
     }

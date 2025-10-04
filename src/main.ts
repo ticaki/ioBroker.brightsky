@@ -810,14 +810,23 @@ class Brightsky extends utils.Adapter {
                 const fetchTime = now.toISOString();
                 this.radarData = filteredRadar.map(item => {
                     // Collect all precipitation values from 2D array
+                    // API values are in 0.01mm per 5 minutes, convert to mm by dividing by 100
                     const values: number[] = [];
+                    const areaSums: number[] = []; // Sum for each grid area (each row)
+
                     if (Array.isArray(item.precipitation_5)) {
                         for (const row of item.precipitation_5) {
                             if (Array.isArray(row)) {
+                                let rowSum = 0;
                                 for (const value of row) {
                                     if (typeof value === 'number') {
-                                        values.push(value);
+                                        const convertedValue = value / 100; // Convert from 0.01mm to mm
+                                        values.push(convertedValue);
+                                        rowSum += convertedValue;
                                     }
+                                }
+                                if (rowSum > 0) {
+                                    areaSums.push(rowSum);
                                 }
                             }
                         }
@@ -828,6 +837,7 @@ class Brightsky extends utils.Adapter {
                     let min = 0;
                     let max = 0;
                     let median = 0;
+                    let cumulative = 0;
 
                     if (values.length > 0) {
                         // Average
@@ -844,6 +854,11 @@ class Brightsky extends utils.Adapter {
                         median = sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
                     }
 
+                    // Calculate cumulative (max sum across all grid areas)
+                    if (areaSums.length > 0) {
+                        cumulative = Math.max(...areaSums);
+                    }
+
                     return {
                         timestamp: item.timestamp,
                         source: item.source,
@@ -851,6 +866,7 @@ class Brightsky extends utils.Adapter {
                         precipitation_5_min: Math.round(min * 100) / 100,
                         precipitation_5_max: Math.round(max * 100) / 100,
                         precipitation_5_median: Math.round(median * 100) / 100,
+                        precipitation_5_sum: Math.round(cumulative * 100) / 100,
                         forecast_time: fetchTime,
                     };
                 });
@@ -907,6 +923,7 @@ class Brightsky extends utils.Adapter {
                     precipitation_5_min: -1,
                     precipitation_5_max: -1,
                     precipitation_5_median: -1,
+                    precipitation_5_sum: -1,
                     forecast_time: lastItem.forecast_time,
                 });
             }
@@ -976,10 +993,12 @@ class Brightsky extends utils.Adapter {
     private async writeMaxPrecipitationForecasts(): Promise<void> {
         const intervals = [5, 10, 15, 30, 45, 60, 90]; // minutes
         const forecasts: { [key: string]: number } = {};
+        const cumulativeForecasts: { [key: string]: number } = {};
 
         for (const interval of intervals) {
             const numIntervals = Math.ceil(interval / 5); // How many 5-minute intervals to check
             let maxPrecipitation = -1;
+            let maxCumulative = -1;
 
             if (this.radarData.length > 0) {
                 // Get max from the next N intervals (starting from index 0 which is "now")
@@ -988,14 +1007,29 @@ class Brightsky extends utils.Adapter {
                     if (item.precipitation_5_max !== undefined && item.precipitation_5_max > maxPrecipitation) {
                         maxPrecipitation = item.precipitation_5_max;
                     }
+                    if (item.precipitation_5_sum !== undefined && item.precipitation_5_sum > maxCumulative) {
+                        maxCumulative = item.precipitation_5_sum;
+                    }
                 }
             }
 
             forecasts[`next_${interval}min`] = maxPrecipitation;
+            cumulativeForecasts[`next_${interval}min_sum`] = maxCumulative;
         }
 
         // Write forecasts to states
         for (const [key, value] of Object.entries(forecasts)) {
+            await this.library.writedp(
+                `radar.max_precipitation_forecast.${key}`,
+                value,
+                genericStateObjects.max_precipitation_forecast[
+                    key as keyof typeof genericStateObjects.max_precipitation_forecast
+                ],
+            );
+        }
+
+        // Write cumulative forecasts to states
+        for (const [key, value] of Object.entries(cumulativeForecasts)) {
             await this.library.writedp(
                 `radar.max_precipitation_forecast.${key}`,
                 value,
