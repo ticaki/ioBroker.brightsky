@@ -84,7 +84,7 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 0.6.4 (2025-10-04)
+### **WORK IN PROGRESS**
 - (ticaki) Added leading zero to 5-minute radar datapoint folders for correct sorting in UI
 
 ### 0.6.3 (2025-10-04)

@@ -584,7 +584,7 @@ tests.integration(path.join(__dirname, '..'), {
 
                         // Verify that expected cumulative forecast states exist
                         const expectedCumulative = [
-                            'next_5min_sum',
+                            'next_05min_sum',
                             'next_10min_sum',
                             'next_15min_sum',
                             'next_30min_sum',

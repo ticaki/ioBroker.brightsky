@@ -3,7 +3,7 @@
     "name": "brightsky",
     "version": "0.6.4",
     "news": {
-      "0.6.4": {
+      "0.6.5": {
         "en": "Added leading zero to 5-minute radar datapoint folders for correct sorting in UI",
         "de": "Führende Null zu 5-Minuten-Radar-Datenpunktordnern hinzugefügt, um die korrekte Sortierung in der Benutzeroberfläche sicherzustellen",
         "ru": "Добавлены ведущие нулевые к 5-минутным папкам радиолокационных точек данных для правильной сортировки в пользовательском интерфейсе",
