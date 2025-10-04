@@ -18,8 +18,6 @@ This is an ioBroker adapter for the [BrightSky API](https://brightsky.dev/docs/#
 ### Never do the following:
 ❌ Never use fixes #xy except in the readme file.
 ❌ Never use fixes #xy in commits or pull requests.
-❌ Never use fixes #xy or Fixes #xy in the body of a pull request - the mention of "fixes" is only allowed in the changelog of the README, otherwise it is prohibited everywhere.
-❌ If you see "Fixes #xy" or "fixes #xy" anywhere in a PR description, commit message, or any location other than the README changelog, you MUST remove it immediately.
 
 ## Development Guidelines
 
