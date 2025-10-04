@@ -71,6 +71,7 @@ class Brightsky extends utils.Adapter {
       native: {}
     });
     await this.setState("info.connection", false, true);
+    await this.library.init();
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
     } else {
@@ -107,6 +108,8 @@ class Brightsky extends utils.Adapter {
         });
       }
     }
+    const states = await this.getStatesAsync("*");
+    await this.library.initStates(states);
     if (!this.config.createCurrently && !this.config.createHourly && !this.config.createDaily && !this.config.createRadar) {
       this.log.error(
         "No data creation is enabled in the adapter configuration. Please enable at least one of the options: Currently, Hourly, Daily, or Radar."
@@ -1002,7 +1005,7 @@ class Brightsky extends utils.Adapter {
       // Near gale
       "BF8",
       // Gale
-      "BF9",
+      "BF19",
       // Strong gale
       "BF10",
       // Storm

@@ -74,7 +74,11 @@ class Brightsky extends utils.Adapter {
             },
             native: {},
         });
+
         await this.setState('info.connection', false, true);
+
+        await this.library.init();
+
         if (!this.config.createDaily) {
             await this.delObjectAsync('daily', { recursive: true });
         } else {
@@ -116,6 +120,10 @@ class Brightsky extends utils.Adapter {
                 });
             }
         }
+
+        const states = await this.getStatesAsync('*');
+        await this.library.initStates(states);
+
         if (
             !this.config.createCurrently &&
             !this.config.createHourly &&
@@ -1179,7 +1187,7 @@ class Brightsky extends utils.Adapter {
             'BF6', // Strong breeze
             'BF7', // Near gale
             'BF8', // Gale
-            'BF9', // Strong gale
+            'BF19', // Strong gale
             'BF10', // Storm
             'BF11', // Violent storm
             'BF12', // Hurricane
