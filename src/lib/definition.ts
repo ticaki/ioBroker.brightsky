@@ -1121,14 +1121,14 @@ export const genericStateObjects: {
         radar: customChannelType & ChangeTypeOfKeysForState<BrightskyRadarData, ioBroker.StateObject>;
     };
     max_precipitation_forecast: customChannelType & {
-        next_5min: ioBroker.StateObject;
+        next_05min: ioBroker.StateObject;
         next_10min: ioBroker.StateObject;
         next_15min: ioBroker.StateObject;
         next_30min: ioBroker.StateObject;
         next_45min: ioBroker.StateObject;
         next_60min: ioBroker.StateObject;
         next_90min: ioBroker.StateObject;
-        next_5min_sum: ioBroker.StateObject;
+        next_05min_sum: ioBroker.StateObject;
         next_10min_sum: ioBroker.StateObject;
         next_15min_sum: ioBroker.StateObject;
         next_30min_sum: ioBroker.StateObject;
@@ -1708,8 +1708,8 @@ export const genericStateObjects: {
             },
             native: {},
         },
-        next_5min: {
-            _id: 'next_5min',
+        next_05min: {
+            _id: 'next_05min',
             type: 'state',
             common: {
                 name: 'Max Precipitation Next 5 Minutes',
@@ -1806,8 +1806,8 @@ export const genericStateObjects: {
             },
             native: {},
         },
-        next_5min_sum: {
-            _id: 'next_5min_sum',
+        next_05min_sum: {
+            _id: 'next_05min_sum',
             type: 'state',
             common: {
                 name: 'Max Cumulative Precipitation Next 5 Minutes',

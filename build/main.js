@@ -812,8 +812,9 @@ class Brightsky extends utils.Adapter {
       for (let i = 0; i < this.radarData.length; i++) {
         const item = this.radarData[i];
         const minutesOffset = i * 5;
+        const indexLabel = minutesOffset.toString().padStart(2, "0");
         dataToWrite.push({
-          _index: minutesOffset,
+          _index: indexLabel,
           ...item
         });
       }
@@ -881,8 +882,9 @@ class Brightsky extends utils.Adapter {
           }
         }
       }
-      forecasts[`next_${interval}min`] = maxPrecipitation;
-      cumulativeForecasts[`next_${interval}min_sum`] = maxCumulative;
+      const key = interval.toString().padStart(2, "0");
+      forecasts[`next_${key}min`] = maxPrecipitation;
+      cumulativeForecasts[`next_${key}min_sum`] = maxCumulative;
     }
     for (const [key, value] of Object.entries(forecasts)) {
       await this.library.writedp(
