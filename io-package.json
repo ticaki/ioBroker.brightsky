@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "news": {
+      "0.6.4": {
+        "en": "Added leading zero to 5-minute radar datapoint folders for correct sorting in UI",
+        "de": "Führende Null zu 5-Minuten-Radar-Datenpunktordnern hinzugefügt, um die korrekte Sortierung in der Benutzeroberfläche sicherzustellen",
+        "ru": "Добавлены ведущие нулевые к 5-минутным папкам радиолокационных точек данных для правильной сортировки в пользовательском интерфейсе",
+        "pt": "Adicionado pastas de ponto de dados de radar de zero a 5 minutos para classificação correta em UI",
+        "nl": "Toegevoegd leading zero to 5 minute radar datapoint mappen voor het juiste sorteren in UI",
+        "fr": "Ajout de zéro à 5 minutes de dossiers de points de données radar pour un tri correct en UI",
+        "it": "Aggiunto che porta zero a 5 minuti radar datapoint cartelle per la corretta selezione in UI",
+        "es": "Añadido llevando carpetas de punto de datos de radar de cero a 5 minutos para clasificar correctamente en UI",
+        "pl": "Dodano 0 do 5-minutowych folderów radarowych do poprawnego sortowania w UI",
+        "uk": "Додано провідні нульові до 5-хвилинні радіолокаційні папки для коректного сортування в UI",
+        "zh-cn": "在 UI 中将引导 0 至 5 分钟的雷达数据点文件夹进行正确排序"
+      },
       "0.6.3": {
         "en": "Added Beaufort wind force scale datapoints (wind_force and wind_force_desc) based on wind_speed_10\nFixed radar precipitation unit conversion - API values are in 0.01mm per 5 minutes, now correctly converted to mm\nAdded cumulative precipitation states (next_Xmin_sum) showing maximum precipitation sum across all grid areas\nAdded descriptions to max_precipitation_forecast states indicating \"mm per 5 minutes\"",
         "de": "Beaufort-Windstärkeskala-Datenpunkte (wind_force und wind_force_desc) basierend auf wind_speed_10 hinzugefügt\nFehler bei der Umrechnung der Radar-Niederschlagseinheit behoben – API-Werte sind in 0,01 mm pro 5 Minuten und werden nun korrekt in mm umgerechnet\nKumulative Niederschlagszustände (next_Xmin_sum) hinzugefügt, die die maximale Niederschlagssumme über alle Rasterbereiche anzeigen\nBeschreibungen zu max_precipitation_forecast-Zuständen hinzugefügt, die \"mm pro 5 Minuten\" angeben",
@@ -80,19 +93,6 @@
         "pl": "bardziej solidne użycie pobierania",
         "uk": "більш надійний використання fetch",
         "zh-cn": "更坚固的获取使用"
-      },
-      "0.5.0": {
-        "en": "Icons provided by icebear added fixes #31",
-        "de": "Icons von icebear hinzugefügt Fixes #31",
-        "ru": "Иконки, предоставленные ледяным медведем, добавлены исправления #31",
-        "pt": "Ícones fornecidos pelo icebear adicionados correções #31",
-        "nl": "Pictogrammen geleverd door ijsbeer toegevoegd fixes #31",
-        "fr": "Icônes fournies par des correctifs ajoutés à l'ours à glace #31",
-        "it": "Icone fornite da icebear aggiunte correzioni #31",
-        "es": "Iconos proporcionados por icebear añadidos correcciones #31",
-        "pl": "Ikony dostarczone przez icebear dodane poprawki # 31",
-        "uk": "Ікона, надана льодом, додається фіксація #31",
-        "zh-cn": "冰熊提供的图标添加了修正#31"
       }
     },
     "titleLang": {
