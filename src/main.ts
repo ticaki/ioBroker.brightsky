@@ -74,11 +74,7 @@ class Brightsky extends utils.Adapter {
             },
             native: {},
         });
-
         await this.setState('info.connection', false, true);
-
-        await this.library.init();
-
         if (!this.config.createDaily) {
             await this.delObjectAsync('daily', { recursive: true });
         } else {
@@ -120,10 +116,6 @@ class Brightsky extends utils.Adapter {
                 });
             }
         }
-
-        const states = await this.getStatesAsync('*');
-        await this.library.initStates(states);
-
         if (
             !this.config.createCurrently &&
             !this.config.createHourly &&
@@ -731,8 +723,6 @@ class Brightsky extends utils.Adapter {
                 if (result.data.weather) {
                     const weather = result.data.weather as BrightskyCurrently;
                     weather.wind_bearing_text = this.getWindBearingText(weather.wind_direction_10 ?? undefined);
-                    weather.wind_force = this.getBeaufortScale(weather.wind_speed_10);
-                    weather.wind_force_desc = this.getBeaufortDescription(weather.wind_force);
 
                     const coords = this.config.position.split(',').map(parseFloat);
                     const { sunrise, sunset } = suncalc.getTimes(new Date(), coords[0], coords[1]);
@@ -1117,82 +1107,6 @@ class Brightsky extends utils.Adapter {
         ];
         const index = Math.round((windBearing % 360) / 22.5) % 16;
         return this.library.getTranslation(directions[index]);
-    }
-
-    /**
-     * Converts wind speed in km/h to Beaufort scale (0-12)
-     * Based on DWD wind warning scale: https://www.wettergefahren.de/warnungen/windwarnskala.html
-     *
-     * @param windSpeed Wind speed in km/h
-     * @returns Beaufort scale number (0-12)
-     */
-    private getBeaufortScale(windSpeed: number | undefined | null): number {
-        if (windSpeed === undefined || windSpeed === null) {
-            return 0;
-        }
-        // Beaufort scale thresholds in km/h
-        if (windSpeed < 1) {
-            return 0; // Calm
-        }
-        if (windSpeed < 6) {
-            return 1; // Light air
-        }
-        if (windSpeed < 12) {
-            return 2; // Light breeze
-        }
-        if (windSpeed < 20) {
-            return 3; // Gentle breeze
-        }
-        if (windSpeed < 29) {
-            return 4; // Moderate breeze
-        }
-        if (windSpeed < 39) {
-            return 5; // Fresh breeze
-        }
-        if (windSpeed < 50) {
-            return 6; // Strong breeze
-        }
-        if (windSpeed < 62) {
-            return 7; // Near gale
-        }
-        if (windSpeed < 75) {
-            return 8; // Gale
-        }
-        if (windSpeed < 89) {
-            return 9; // Strong gale
-        }
-        if (windSpeed < 103) {
-            return 10; // Storm
-        }
-        if (windSpeed < 118) {
-            return 11; // Violent storm
-        }
-        return 12; // Hurricane
-    }
-
-    /**
-     * Gets the translated description for a Beaufort scale value
-     *
-     * @param beaufortScale Beaufort scale number (0-12)
-     * @returns Translated description of wind force
-     */
-    private getBeaufortDescription(beaufortScale: number): string {
-        const descriptions = [
-            'BF0', // Calm
-            'BF1', // Light air
-            'BF2', // Light breeze
-            'BF3', // Gentle breeze
-            'BF4', // Moderate breeze
-            'BF5', // Fresh breeze
-            'BF6', // Strong breeze
-            'BF7', // Near gale
-            'BF8', // Gale
-            'BF9', // Strong gale
-            'BF10', // Storm
-            'BF11', // Violent storm
-            'BF12', // Hurricane
-        ];
-        return this.library.getTranslation(descriptions[beaufortScale] || 'BF0');
     }
 
     /**

@@ -1390,30 +1390,6 @@ const genericStateObjects = {
         },
         native: {}
       },
-      wind_force: {
-        _id: "wind_force",
-        type: "state",
-        common: {
-          name: "Wind Force (Beaufort)",
-          type: "number",
-          role: "value",
-          read: true,
-          write: false
-        },
-        native: {}
-      },
-      wind_force_desc: {
-        _id: "wind_force_desc",
-        type: "state",
-        common: {
-          name: "Wind Force Description",
-          type: "string",
-          role: "text",
-          read: true,
-          write: false
-        },
-        native: {}
-      },
       source_id: {
         _id: "source_id",
         type: "state",

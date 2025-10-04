@@ -48,18 +48,5 @@
     "wr1": "Omvormer 1 max. Power (kW)",
     "wr2": "Omvormer 2 max. Power (kW)",
     "wr3": "Omvormer 3 max. Power (kW)",
-    "wr4": "Omvormer 4 max. Power (kW)",
-    "BF0": "Windstil",
-    "BF1": "Flauw",
-    "BF2": "Zwak",
-    "BF3": "Matig",
-    "BF4": "Matige wind",
-    "BF5": "Vrij krachtig",
-    "BF6": "Krachtig",
-    "BF7": "Hard",
-    "BF8": "Stormachtig",
-    "BF9": "Storm",
-    "BF10": "Zware storm",
-    "BF11": "Zeer zware storm",
-    "BF12": "Orkaan"
+    "wr4": "Omvormer 4 max. Power (kW)"
 }
