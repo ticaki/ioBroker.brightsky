@@ -210,10 +210,10 @@
                 "radarDistance": {
                     "type": "number",
                     "label": "radarDistance",
-                    "default": 10000,
-                    "min": 1000,
+                    "default": 2000,
+                    "min": 500,
                     "max": 50000,
-                    "step": 1000,
+                    "step": 500,
                     "unit": "meters",
                     "disabled": "!data.createRadar",
                     "newLine": true,

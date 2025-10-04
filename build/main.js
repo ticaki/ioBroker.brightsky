@@ -184,11 +184,11 @@ class Brightsky extends utils.Adapter {
       );
       this.config.pollIntervalRadar = adjusted;
     }
-    if (this.config.radarDistance == void 0 || this.config.radarDistance < 1e3 || this.config.radarDistance > 5e4) {
+    if (this.config.radarDistance == void 0 || this.config.radarDistance < 400 || this.config.radarDistance > 5e4) {
       this.log.warn(
-        `Invalid radar distance: ${this.config.radarDistance}. Using default value of 10000 meters (10 km).`
+        `Invalid radar distance: ${this.config.radarDistance}. Using default value of 2000 meters (2 km).`
       );
-      this.config.radarDistance = 1e4;
+      this.config.radarDistance = 2e3;
     }
     if (this.config.createCurrently) {
       await this.delay(3e3);

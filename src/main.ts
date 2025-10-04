@@ -234,13 +234,13 @@ class Brightsky extends utils.Adapter {
         // Validate radar distance (max 50km)
         if (
             this.config.radarDistance == undefined ||
-            this.config.radarDistance < 1000 ||
+            this.config.radarDistance < 400 ||
             this.config.radarDistance > 50000
         ) {
             this.log.warn(
-                `Invalid radar distance: ${this.config.radarDistance}. Using default value of 10000 meters (10 km).`,
+                `Invalid radar distance: ${this.config.radarDistance}. Using default value of 2000 meters (2 km).`,
             );
-            this.config.radarDistance = 10000; // Default to 10 km if invalid
+            this.config.radarDistance = 2000; // Default to 10 km if invalid
         }
 
         if (this.config.createCurrently) {
