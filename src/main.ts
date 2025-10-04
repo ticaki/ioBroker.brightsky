@@ -9,7 +9,13 @@ type Panel = ioBroker.AdapterConfig['panels'][0];
 // you need to create an adapter
 import * as utils from '@iobroker/adapter-core';
 import { Library } from './lib/library';
-import type { BrightskyCurrently, BrightskyHourly, BrightskyRadarResponse, BrightskyRadarData } from './lib/definition';
+import type {
+    BrightskyCurrently,
+    BrightskyHourly,
+    BrightskyRadarResponse,
+    BrightskyRadarData,
+    BrightskyRadarItem,
+} from './lib/definition';
 import {
     genericStateObjects,
     type BrightskyDailyData,
@@ -31,6 +37,9 @@ class Brightsky extends utils.Adapter {
     groupArray: Panel[][] = [];
     wrArray: number[] = [];
     radarData: BrightskyRadarData[] = [];
+    // Stores unprocessed radar data (before unit conversion) specifically for cumulative calculations.
+    // This is distinct from the processed radarData array, which contains converted/processed values.
+    rawRadarData: BrightskyRadarItem[] = [];
     radarRotationTimeout: ioBroker.Timeout | null | undefined = undefined;
 
     /**
@@ -806,17 +815,23 @@ class Brightsky extends utils.Adapter {
                     return itemTime >= now && itemTime <= twoHoursLater;
                 });
 
+                // Store raw radar data for cumulative calculations
+                this.rawRadarData = filteredRadar;
+
                 // Store radar data with forecast metadata
                 const fetchTime = now.toISOString();
                 this.radarData = filteredRadar.map(item => {
                     // Collect all precipitation values from 2D array
+                    // Precipitation values from the API (item.precipitation_5) are in 0.01mm per 5 minutes, convert to mm by dividing by 100
                     const values: number[] = [];
+
                     if (Array.isArray(item.precipitation_5)) {
                         for (const row of item.precipitation_5) {
                             if (Array.isArray(row)) {
                                 for (const value of row) {
                                     if (typeof value === 'number') {
-                                        values.push(value);
+                                        const convertedValue = value / 100; // Convert from 0.01mm to mm
+                                        values.push(convertedValue);
                                     }
                                 }
                             }
@@ -976,13 +991,15 @@ class Brightsky extends utils.Adapter {
     private async writeMaxPrecipitationForecasts(): Promise<void> {
         const intervals = [5, 10, 15, 30, 45, 60, 90]; // minutes
         const forecasts: { [key: string]: number } = {};
+        const cumulativeForecasts: { [key: string]: number } = {};
 
         for (const interval of intervals) {
             const numIntervals = Math.ceil(interval / 5); // How many 5-minute intervals to check
             let maxPrecipitation = -1;
+            let maxCumulative = -1;
 
             if (this.radarData.length > 0) {
-                // Get max from the next N intervals (starting from index 0 which is "now")
+                // Get maximum precipitation per 5-minute interval from the next N time intervals
                 for (let i = 0; i < numIntervals && i < this.radarData.length; i++) {
                     const item = this.radarData[i];
                     if (item.precipitation_5_max !== undefined && item.precipitation_5_max > maxPrecipitation) {
@@ -991,11 +1008,65 @@ class Brightsky extends utils.Adapter {
                 }
             }
 
+            // Calculate cumulative sum across columns for this time window
+            if (this.rawRadarData.length > 0) {
+                // Determine number of columns from first interval
+                let numCols = 0;
+                if (this.rawRadarData[0] && Array.isArray(this.rawRadarData[0].precipitation_5)) {
+                    for (const row of this.rawRadarData[0].precipitation_5) {
+                        if (Array.isArray(row) && row.length > numCols) {
+                            numCols = row.length;
+                        }
+                    }
+                }
+
+                if (numCols > 0) {
+                    // Initialize column sums for this time window
+                    const columnSums: number[] = new Array(numCols).fill(0);
+
+                    // Sum across all intervals in this time window
+                    for (let i = 0; i < numIntervals && i < this.rawRadarData.length; i++) {
+                        const item = this.rawRadarData[i];
+                        if (Array.isArray(item.precipitation_5)) {
+                            for (const row of item.precipitation_5) {
+                                if (Array.isArray(row)) {
+                                    for (let col = 0; col < row.length && col < numCols; col++) {
+                                        const value = row[col];
+                                        if (typeof value === 'number') {
+                                            columnSums[col] += value / 100; // Convert from 0.01mm to mm
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Find maximum column sum
+                    if (columnSums.length > 0) {
+                        maxCumulative = Math.max(...columnSums);
+                        // Round to 2 decimal places
+                        maxCumulative = Math.round(maxCumulative * 100) / 100;
+                    }
+                }
+            }
+
             forecasts[`next_${interval}min`] = maxPrecipitation;
+            cumulativeForecasts[`next_${interval}min_sum`] = maxCumulative;
         }
 
         // Write forecasts to states
         for (const [key, value] of Object.entries(forecasts)) {
+            await this.library.writedp(
+                `radar.max_precipitation_forecast.${key}`,
+                value,
+                genericStateObjects.max_precipitation_forecast[
+                    key as keyof typeof genericStateObjects.max_precipitation_forecast
+                ],
+            );
+        }
+
+        // Write cumulative forecasts to states
+        for (const [key, value] of Object.entries(cumulativeForecasts)) {
             await this.library.writedp(
                 `radar.max_precipitation_forecast.${key}`,
                 value,

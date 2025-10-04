@@ -75,7 +75,7 @@ The data is as follows Provided:
 * current - the current weather (see also: https://brightsky.dev/docs/#/operations/getCurrentWeather )
 * daily - the current weather forecast for the next 8 days (created by the adapter and is not part of the API)
 * hourly - the current weather forecast for the next defined n hours (see also: https://brightsky.dev/docs/#/operations/getWeather )
-* radar - precipitation radar forecast for the next 2 hours in 5-minute intervals (see also: https://brightsky.dev/docs/#/operations/getRadar )
+* radar - precipitation radar forecast for the next 2 hours in 5-minute intervals with values in mm per 5 minutes. Includes maximum values across grid cells and cumulative sums across all grid areas (see also: https://brightsky.dev/docs/#/operations/getRadar )
 
 ---
 
@@ -84,6 +84,11 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Fixed radar precipitation unit conversion - API values are in 0.01mm per 5 minutes, now correctly converted to mm
+- (ticaki) Added cumulative precipitation states (next_Xmin_sum) showing maximum precipitation sum across all grid areas
+- (ticaki) Added descriptions to max_precipitation_forecast states indicating "mm per 5 minutes"
+
 ### 0.6.2 (2025-10-02)
 - (ticaki) Flag set to activate language
 

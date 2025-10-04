@@ -35,6 +35,8 @@ class Brightsky extends utils.Adapter {
   groupArray = [];
   wrArray = [];
   radarData = [];
+  rawRadarData = [];
+  // Store raw radar data for cumulative calculations
   radarRotationTimeout = void 0;
   /**
    * Creates a new instance of the Brightsky adapter
@@ -697,6 +699,7 @@ class Brightsky extends utils.Adapter {
           const itemTime = new Date(item.timestamp);
           return itemTime >= now && itemTime <= twoHoursLater;
         });
+        this.rawRadarData = filteredRadar;
         const fetchTime = now.toISOString();
         this.radarData = filteredRadar.map((item) => {
           const values = [];
@@ -705,7 +708,8 @@ class Brightsky extends utils.Adapter {
               if (Array.isArray(row)) {
                 for (const value of row) {
                   if (typeof value === "number") {
-                    values.push(value);
+                    const convertedValue = value / 100;
+                    values.push(convertedValue);
                   }
                 }
               }
@@ -826,9 +830,11 @@ class Brightsky extends utils.Adapter {
   async writeMaxPrecipitationForecasts() {
     const intervals = [5, 10, 15, 30, 45, 60, 90];
     const forecasts = {};
+    const cumulativeForecasts = {};
     for (const interval of intervals) {
       const numIntervals = Math.ceil(interval / 5);
       let maxPrecipitation = -1;
+      let maxCumulative = -1;
       if (this.radarData.length > 0) {
         for (let i = 0; i < numIntervals && i < this.radarData.length; i++) {
           const item = this.radarData[i];
@@ -837,9 +843,49 @@ class Brightsky extends utils.Adapter {
           }
         }
       }
+      if (this.rawRadarData.length > 0) {
+        let numCols = 0;
+        if (this.rawRadarData[0] && Array.isArray(this.rawRadarData[0].precipitation_5)) {
+          for (const row of this.rawRadarData[0].precipitation_5) {
+            if (Array.isArray(row) && row.length > numCols) {
+              numCols = row.length;
+            }
+          }
+        }
+        if (numCols > 0) {
+          const columnSums = new Array(numCols).fill(0);
+          for (let i = 0; i < numIntervals && i < this.rawRadarData.length; i++) {
+            const item = this.rawRadarData[i];
+            if (Array.isArray(item.precipitation_5)) {
+              for (const row of item.precipitation_5) {
+                if (Array.isArray(row)) {
+                  for (let col = 0; col < row.length && col < numCols; col++) {
+                    const value = row[col];
+                    if (typeof value === "number") {
+                      columnSums[col] += value / 100;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          if (columnSums.length > 0) {
+            maxCumulative = Math.max(...columnSums);
+            maxCumulative = Math.round(maxCumulative * 100) / 100;
+          }
+        }
+      }
       forecasts[`next_${interval}min`] = maxPrecipitation;
+      cumulativeForecasts[`next_${interval}min_sum`] = maxCumulative;
     }
     for (const [key, value] of Object.entries(forecasts)) {
+      await this.library.writedp(
+        `radar.max_precipitation_forecast.${key}`,
+        value,
+        import_definition.genericStateObjects.max_precipitation_forecast[key]
+      );
+    }
+    for (const [key, value] of Object.entries(cumulativeForecasts)) {
       await this.library.writedp(
         `radar.max_precipitation_forecast.${key}`,
         value,

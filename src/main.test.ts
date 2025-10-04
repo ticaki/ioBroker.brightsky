@@ -134,3 +134,89 @@ describe('Weekday Name Formatting', () => {
         expect(sunday.toLocaleString('en', { weekday: 'short' })).to.equal('Sun');
     });
 });
+
+describe('Radar Precipitation Unit Conversion', () => {
+    it('should correctly convert API values from 0.01mm to mm', () => {
+        // Simulate API data: values like 16, 19, 21 represent 0.16mm, 0.19mm, 0.21mm
+        const apiValues = [16, 19, 21, 100, 0];
+        const expectedMm = [0.16, 0.19, 0.21, 1.0, 0];
+
+        for (let i = 0; i < apiValues.length; i++) {
+            const converted = apiValues[i] / 100;
+            expect(converted).to.equal(expectedMm[i]);
+        }
+    });
+
+    it('should calculate cumulative precipitation sum correctly', () => {
+        // Simulate a 2D grid of precipitation values (in 0.01mm)
+        // Each column represents a specific geographical area
+        const precipitationGrid = [
+            [20, 10], // Row 1: Column 0 gets 0.20mm, Column 1 gets 0.10mm
+            [10, 40], // Row 2: Column 0 gets 0.10mm, Column 1 gets 0.40mm
+            [5, 5], // Row 3: Column 0 gets 0.05mm, Column 1 gets 0.05mm
+        ];
+
+        // Convert to mm and calculate sum for each column
+        const numCols = 2;
+        const columnSums: number[] = [0, 0];
+
+        for (const row of precipitationGrid) {
+            for (let col = 0; col < numCols; col++) {
+                columnSums[col] += row[col] / 100; // Convert from 0.01mm to mm
+            }
+        }
+
+        // Round to 2 decimal places to avoid floating point issues
+        const roundedSums = columnSums.map(sum => Math.round(sum * 100) / 100);
+
+        // Column 0 sum: 0.20 + 0.10 + 0.05 = 0.35mm
+        // Column 1 sum: 0.10 + 0.40 + 0.05 = 0.55mm
+        // Maximum sum across all columns should be 0.55
+        const maxSum = Math.max(...roundedSums);
+
+        expect(roundedSums).to.deep.equal([0.35, 0.55]);
+        expect(maxSum).to.equal(0.55);
+    });
+
+    it('should calculate cumulative sum across multiple time intervals', () => {
+        // Simulate 2 time intervals (for a 10-minute forecast)
+        const interval1 = [
+            [10, 20], // Column 0: 0.10mm, Column 1: 0.20mm
+            [5, 15], // Column 0: 0.05mm, Column 1: 0.15mm
+        ];
+        const interval2 = [
+            [15, 10], // Column 0: 0.15mm, Column 1: 0.10mm
+            [10, 20], // Column 0: 0.10mm, Column 1: 0.20mm
+        ];
+
+        const numCols = 2;
+        const columnSums: number[] = [0, 0];
+
+        // Process both intervals
+        for (const interval of [interval1, interval2]) {
+            for (const row of interval) {
+                for (let col = 0; col < numCols; col++) {
+                    columnSums[col] += row[col] / 100; // Convert from 0.01mm to mm
+                }
+            }
+        }
+
+        // Round to 2 decimal places
+        const roundedSums = columnSums.map(sum => Math.round(sum * 100) / 100);
+
+        // Column 0: (0.10 + 0.05) + (0.15 + 0.10) = 0.15 + 0.25 = 0.40mm
+        // Column 1: (0.20 + 0.15) + (0.10 + 0.20) = 0.35 + 0.30 = 0.65mm
+        // Maximum: 0.65mm
+        const maxSum = Math.max(...roundedSums);
+
+        expect(roundedSums).to.deep.equal([0.4, 0.65]);
+        expect(maxSum).to.equal(0.65);
+    });
+
+    it('should round values to 2 decimal places', () => {
+        const value = 0.123456;
+        const rounded = Math.round(value * 100) / 100;
+
+        expect(rounded).to.equal(0.12);
+    });
+});
