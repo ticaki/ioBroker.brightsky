@@ -999,6 +999,19 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         },
         native: {},
     },
+    apparent_temperature: {
+        _id: 'apparent_temperature',
+        type: 'state',
+        common: {
+            name: 'Apparent Temperature',
+            type: 'number',
+            role: 'value.temperature.feelslike',
+            read: true,
+            write: false,
+            unit: '°C',
+        },
+        native: {},
+    },
     icon_special: {
         _id: 'icon_special',
         type: 'state',

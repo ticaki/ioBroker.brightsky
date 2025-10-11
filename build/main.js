@@ -434,6 +434,7 @@ class Brightsky extends utils.Adapter {
                         dailyData.apparent_temperature_min = min !== Infinity ? Math.round(min * 10) / 10 : null;
                         dailyData.apparent_temperature_max = max !== -Infinity ? Math.round(max * 10) / 10 : null;
                         dailyData.apparent_temperature_median = median !== null ? Math.round(median * 10) / 10 : null;
+                        dailyData.apparent_temperature = avg;
                       } else {
                         dailyData[`${k}_median`] = median;
                         dailyData[k] = avg;
@@ -443,6 +444,7 @@ class Brightsky extends utils.Adapter {
                         dailyData.apparent_temperature_min = null;
                         dailyData.apparent_temperature_max = null;
                         dailyData.apparent_temperature_median = null;
+                        dailyData.apparent_temperature = null;
                       } else {
                         dailyData[k] = null;
                         dailyData[`${k}_median`] = null;
@@ -1611,7 +1613,8 @@ class Brightsky extends utils.Adapter {
         case "wind_gust_direction":
         case "wind_gust_speed":
         case "precipitation_probability":
-        case "precipitation_probability_6h": {
+        case "precipitation_probability_6h":
+        case "apparent_temperature": {
           const values = weatherValues[k];
           if (values && values.length > 0) {
             let median = null;
@@ -1637,11 +1640,27 @@ class Brightsky extends utils.Adapter {
                 avg = null;
               }
             }
-            result[`${k}_median`] = median;
-            result[k] = avg;
+            if (k === "apparent_temperature") {
+              const min = Math.min(...values.filter((v) => v !== null));
+              const max = Math.max(...values.filter((v) => v !== null));
+              result.apparent_temperature_min = min !== Infinity ? Math.round(min * 10) / 10 : null;
+              result.apparent_temperature_max = max !== -Infinity ? Math.round(max * 10) / 10 : null;
+              result.apparent_temperature_median = median !== null ? Math.round(median * 10) / 10 : null;
+              result.apparent_temperature = avg;
+            } else {
+              result[`${k}_median`] = median;
+              result[k] = avg;
+            }
           } else {
-            result[k] = null;
-            result[`${k}_median`] = null;
+            if (k === "apparent_temperature") {
+              result.apparent_temperature_min = null;
+              result.apparent_temperature_max = null;
+              result.apparent_temperature_median = null;
+              result.apparent_temperature = null;
+            } else {
+              result[k] = null;
+              result[`${k}_median`] = null;
+            }
           }
           break;
         }
