@@ -521,7 +521,7 @@ const hourly: ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject> =
         common: {
             name: 'Apparent Temperature',
             type: 'number',
-            role: 'value',
+            role: 'value.temperature.feelslike',
             read: true,
             write: false,
             unit: '°C',
@@ -966,7 +966,7 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         common: {
             name: 'Apparent Temperature Min',
             type: 'number',
-            role: 'value.temperature.min',
+            role: 'value.temperature.feelslike.min',
             read: true,
             write: false,
             unit: '°C',
@@ -979,7 +979,7 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         common: {
             name: 'Apparent Temperature Max',
             type: 'number',
-            role: 'value.temperature.max',
+            role: 'value.temperature.feelslike.max',
             read: true,
             write: false,
             unit: '°C',
@@ -992,7 +992,7 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         common: {
             name: 'Apparent Temperature Median',
             type: 'number',
-            role: 'value.temperature',
+            role: 'value.temperature.feelslike.median',
             read: true,
             write: false,
             unit: '°C',
@@ -1416,6 +1416,19 @@ export const genericStateObjects: {
                 type: 'folder',
                 common: {
                     name: 'Current Weather',
+                },
+                native: {},
+            },
+            apparent_temperature: {
+                _id: 'apparent_temperature',
+                type: 'state',
+                common: {
+                    name: 'Apparent Temperature',
+                    type: 'number',
+                    role: 'value.temperature.feelslike',
+                    read: true,
+                    write: false,
+                    unit: '°C',
                 },
                 native: {},
             },

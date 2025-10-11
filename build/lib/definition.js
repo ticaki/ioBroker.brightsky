@@ -527,7 +527,7 @@ const hourly = {
     common: {
       name: "Apparent Temperature",
       type: "number",
-      role: "value",
+      role: "value.temperature.feelslike",
       read: true,
       write: false,
       unit: "\xB0C"
@@ -970,7 +970,7 @@ const daily = {
     common: {
       name: "Apparent Temperature Min",
       type: "number",
-      role: "value.temperature.min",
+      role: "value.temperature.feelslike.min",
       read: true,
       write: false,
       unit: "\xB0C"
@@ -983,7 +983,7 @@ const daily = {
     common: {
       name: "Apparent Temperature Max",
       type: "number",
-      role: "value.temperature.max",
+      role: "value.temperature.feelslike.max",
       read: true,
       write: false,
       unit: "\xB0C"
@@ -996,7 +996,7 @@ const daily = {
     common: {
       name: "Apparent Temperature Median",
       type: "number",
-      role: "value.temperature",
+      role: "value.temperature.feelslike.median",
       read: true,
       write: false,
       unit: "\xB0C"
@@ -1391,6 +1391,19 @@ const genericStateObjects = {
         type: "folder",
         common: {
           name: "Current Weather"
+        },
+        native: {}
+      },
+      apparent_temperature: {
+        _id: "apparent_temperature",
+        type: "state",
+        common: {
+          name: "Apparent Temperature",
+          type: "number",
+          role: "value.temperature.feelslike",
+          read: true,
+          write: false,
+          unit: "\xB0C"
         },
         native: {}
       },
