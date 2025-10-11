@@ -71,9 +71,5 @@
     "BF9": "Silna wichura",
     "BF10": "Sztorm",
     "BF11": "Gwałtowny sztorm",
-    "BF12": "Huragan",
-    "Apparent Temperature": "Temperatura Odczuwalna",
-    "Apparent Temperature Min": "Temperatura Odczuwalna Min",
-    "Apparent Temperature Max": "Temperatura Odczuwalna Max",
-    "Apparent Temperature Median": "Temperatura Odczuwalna Mediana"
+    "BF12": "Huragan"
 }

@@ -59,9 +59,5 @@
     "wr1": "Inversor 1 máx. poder (KW)",
     "wr2": "Inversor 2 máx. poder (KW)",
     "wr3": "Inversor 3 máx. poder (KW)",
-    "wr4": "Inversor 4 max. poder (KW)",
-    "Apparent Temperature": "Temperatura Aparente",
-    "Apparent Temperature Min": "Temperatura Aparente Mín",
-    "Apparent Temperature Max": "Temperatura Aparente Máx",
-    "Apparent Temperature Median": "Temperatura Aparente Mediana"
+    "wr4": "Inversor 4 max. poder (KW)"
 }

@@ -1058,7 +1058,7 @@ class Brightsky extends utils.Adapter {
    *
    * Heat index formula:
    * - Applied when temperature > 26.7°C and humidity > 40%
-   * - Formula: -8.784695 + 1.61139411*T + 2.338549*RH - 0.14611605*T*RH - 0.012308094*T² 
+   * - Formula: -8.784695 + 1.61139411*T + 2.338549*RH - 0.14611605*T*RH - 0.012308094*T²
    *            - 0.016424828*RH² + 0.002211732*T²*RH + 0.00072546*T*RH² - 0.000003582*T²*RH²
    *
    * @param temperature Temperature in °C

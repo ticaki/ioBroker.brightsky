@@ -74,9 +74,5 @@
     "BF9": "Storm",
     "BF10": "Zware storm",
     "BF11": "Zeer zware storm",
-    "BF12": "Orkaan",
-    "Apparent Temperature": "Gevoelstemperatuur",
-    "Apparent Temperature Min": "Gevoelstemperatuur Min",
-    "Apparent Temperature Max": "Gevoelstemperatuur Max",
-    "Apparent Temperature Median": "Gevoelstemperatuur Mediaan"
+    "BF12": "Orkaan"
 }
