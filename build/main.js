@@ -269,6 +269,11 @@ class Brightsky extends utils.Adapter {
             if (!item) {
               continue;
             }
+            item.apparent_temperature = this.calculateApparentTemperature(
+              item.temperature,
+              item.wind_speed,
+              item.relative_humidity
+            );
             const dataDay = Math.floor(new Date(item.timestamp).getTime() / (24 * 60 * 60 * 1e3));
             const day = dataDay - currentDay;
             if (weatherArr[day] === void 0) {
@@ -395,7 +400,8 @@ class Brightsky extends utils.Adapter {
                 case "wind_gust_direction":
                 case "wind_gust_speed":
                 case "precipitation_probability":
-                case "precipitation_probability_6h": {
+                case "precipitation_probability_6h":
+                case "apparent_temperature": {
                   const values = weatherArr[i][k];
                   if (values && values.length > 0) {
                     if (values && values.length > 0) {
@@ -422,11 +428,25 @@ class Brightsky extends utils.Adapter {
                           avg = null;
                         }
                       }
-                      dailyData[`${k}_median`] = median;
-                      dailyData[k] = avg;
+                      if (k === "apparent_temperature") {
+                        const min = Math.min(...values.filter((v) => v !== null));
+                        const max = Math.max(...values.filter((v) => v !== null));
+                        dailyData.apparent_temperature_min = min !== Infinity ? Math.round(min * 10) / 10 : null;
+                        dailyData.apparent_temperature_max = max !== -Infinity ? Math.round(max * 10) / 10 : null;
+                        dailyData.apparent_temperature_median = median !== null ? Math.round(median * 10) / 10 : null;
+                      } else {
+                        dailyData[`${k}_median`] = median;
+                        dailyData[k] = avg;
+                      }
                     } else {
-                      dailyData[k] = null;
-                      dailyData[`${k}_median`] = null;
+                      if (k === "apparent_temperature") {
+                        dailyData.apparent_temperature_min = null;
+                        dailyData.apparent_temperature_max = null;
+                        dailyData.apparent_temperature_median = null;
+                      } else {
+                        dailyData[k] = null;
+                        dailyData[`${k}_median`] = null;
+                      }
                     }
                   }
                   break;
@@ -566,6 +586,11 @@ class Brightsky extends utils.Adapter {
             });
             item.icon_special = iconsHour.mdi;
             item.iconUrl = iconsHour.url;
+            item.apparent_temperature = this.calculateApparentTemperature(
+              item.temperature,
+              item.wind_speed,
+              item.relative_humidity
+            );
             if (this.config.position.split(",").length === 2 && this.config.panels.length > 0 && item.solar) {
               item.solar_estimate = this.estimatePVEnergyForHour(
                 (_b = item.solar) != null ? _b : 0,
@@ -641,6 +666,11 @@ class Brightsky extends utils.Adapter {
           });
           weather.icon_special = iconsNow.mdi;
           weather.iconUrl = iconsNow.url;
+          weather.apparent_temperature = this.calculateApparentTemperature(
+            weather.temperature,
+            weather.wind_speed_10,
+            weather.relative_humidity
+          );
           await this.library.writeFromJson("current", "weather.current", import_definition.genericStateObjects, weather, true);
           await this.library.writedp(
             "current.sources",
@@ -1017,6 +1047,40 @@ class Brightsky extends utils.Adapter {
       // Hurricane
     ];
     return this.library.getTranslation(descriptions[beaufortScale] || "BF0");
+  }
+  /**
+   * Calculates the apparent temperature (feels like) based on actual temperature, wind speed, and humidity
+   * Uses windchill formula for cold conditions and heat index formula for hot conditions
+   *
+   * Windchill formula (US/Canada, UK):
+   * - Applied when temperature < 10°C and wind speed 4.8-177 km/h
+   * - Formula: 13.12 + 0.6215*T - 11.37*V^0.16 + 0.3965*T*V^0.16
+   *
+   * Heat index formula:
+   * - Applied when temperature > 26.7°C and humidity > 40%
+   * - Formula: -8.784695 + 1.61139411*T + 2.338549*RH - 0.14611605*T*RH - 0.012308094*T² 
+   *            - 0.016424828*RH² + 0.002211732*T²*RH + 0.00072546*T*RH² - 0.000003582*T²*RH²
+   *
+   * @param temperature Temperature in °C
+   * @param windSpeed Wind speed in km/h
+   * @param humidity Relative humidity in percent (0-100)
+   * @returns Apparent temperature in °C, rounded to 1 decimal place, or null if parameters invalid
+   */
+  calculateApparentTemperature(temperature, windSpeed, humidity) {
+    if (temperature === null || temperature === void 0) {
+      return null;
+    }
+    if (temperature < 10 && windSpeed !== null && windSpeed !== void 0 && windSpeed > 4.8 && windSpeed < 177) {
+      const windchill = 13.12 + 0.6215 * temperature - 11.37 * Math.pow(windSpeed, 0.16) + 0.3965 * temperature * Math.pow(windSpeed, 0.16);
+      return Math.round(windchill * 10) / 10;
+    }
+    if (temperature > 26.7 && humidity !== null && humidity !== void 0 && humidity > 40) {
+      const h = Math.max(0, Math.min(100, humidity));
+      const t = temperature;
+      const heatIndex = -8.784695 + 1.61139411 * t + 2.338549 * h - 0.14611605 * t * h - 0.012308094 * (t * t) - 0.016424828 * (h * h) + 2211732e-9 * (t * t) * h + 72546e-8 * t * (h * h) - 3582e-9 * (t * t) * (h * h);
+      return Math.round(heatIndex * 10) / 10;
+    }
+    return Math.round(temperature * 10) / 10;
   }
   /**
    * Called when adapter shuts down - cleanup timers and connections
