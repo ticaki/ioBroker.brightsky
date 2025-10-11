@@ -72,5 +72,9 @@
     "BF9": "Шторм",
     "BF10": "Сильный шторм",
     "BF11": "Жестокий шторм",
-    "BF12": "Ураган"
+    "BF12": "Ураган",
+    "Apparent Temperature": "Ощущаемая температура",
+    "Apparent Temperature Min": "Ощущаемая температура Мин",
+    "Apparent Temperature Max": "Ощущаемая температура Макс",
+    "Apparent Temperature Median": "Ощущаемая температура Медиана"
 }

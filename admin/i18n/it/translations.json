@@ -72,5 +72,9 @@
     "BF9": "Burrasca forte",
     "BF10": "Tempesta",
     "BF11": "Tempesta violenta",
-    "BF12": "Uragano"
+    "BF12": "Uragano",
+    "Apparent Temperature": "Temperatura Percepita",
+    "Apparent Temperature Min": "Temperatura Percepita Min",
+    "Apparent Temperature Max": "Temperatura Percepita Max",
+    "Apparent Temperature Median": "Temperatura Percepita Mediana"
 }

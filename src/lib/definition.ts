@@ -515,6 +515,19 @@ const hourly: ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject> =
         },
         native: {},
     },
+    apparent_temperature: {
+        _id: 'apparent_temperature',
+        type: 'state',
+        common: {
+            name: 'Apparent Temperature',
+            type: 'number',
+            role: 'value.temperature.feelslike',
+            read: true,
+            write: false,
+            unit: '°C',
+        },
+        native: {},
+    },
     icon: {
         _id: 'icon',
         type: 'state',
@@ -947,6 +960,58 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         },
         native: {},
     },
+    apparent_temperature_min: {
+        _id: 'apparent_temperature_min',
+        type: 'state',
+        common: {
+            name: 'Apparent Temperature Min',
+            type: 'number',
+            role: 'value.temperature.feelslike.min',
+            read: true,
+            write: false,
+            unit: '°C',
+        },
+        native: {},
+    },
+    apparent_temperature_max: {
+        _id: 'apparent_temperature_max',
+        type: 'state',
+        common: {
+            name: 'Apparent Temperature Max',
+            type: 'number',
+            role: 'value.temperature.feelslike.max',
+            read: true,
+            write: false,
+            unit: '°C',
+        },
+        native: {},
+    },
+    apparent_temperature_median: {
+        _id: 'apparent_temperature_median',
+        type: 'state',
+        common: {
+            name: 'Apparent Temperature Median',
+            type: 'number',
+            role: 'value.temperature.feelslike.median',
+            read: true,
+            write: false,
+            unit: '°C',
+        },
+        native: {},
+    },
+    apparent_temperature: {
+        _id: 'apparent_temperature',
+        type: 'state',
+        common: {
+            name: 'Apparent Temperature',
+            type: 'number',
+            role: 'value.temperature.feelslike',
+            read: true,
+            write: false,
+            unit: '°C',
+        },
+        native: {},
+    },
     icon_special: {
         _id: 'icon_special',
         type: 'state',
@@ -1364,6 +1429,19 @@ export const genericStateObjects: {
                 type: 'folder',
                 common: {
                     name: 'Current Weather',
+                },
+                native: {},
+            },
+            apparent_temperature: {
+                _id: 'apparent_temperature',
+                type: 'state',
+                common: {
+                    name: 'Apparent Temperature',
+                    type: 'number',
+                    role: 'value.temperature.feelslike',
+                    read: true,
+                    write: false,
+                    unit: '°C',
                 },
                 native: {},
             },
@@ -1933,6 +2011,9 @@ export type BrightskyDailyData = BrightskyWeather & {
     wind_speed_max: number | null;
     temperature_min: number | null;
     temperature_max: number | null;
+    apparent_temperature_min?: number | null;
+    apparent_temperature_max?: number | null;
+    apparent_temperature_median?: number | null;
     solar_max: number | null;
     pressure_msl_median: number | null;
     temperature_median: number | null;
@@ -1969,6 +2050,9 @@ export type BrightskyDayNightData = BrightskyWeather & {
     wind_speed_max?: number | null;
     temperature_min?: number | null;
     temperature_max?: number | null;
+    apparent_temperature_min?: number | null;
+    apparent_temperature_max?: number | null;
+    apparent_temperature_median?: number | null;
     solar_max?: number | null;
     pressure_msl_median?: number | null;
     temperature_median?: number | null;
@@ -2009,6 +2093,7 @@ export type BrightskyWeather = {
     precipitation_probability_6h: number | null;
     solar: number | null;
     solar_estimate?: number | null;
+    apparent_temperature?: number | null;
 
     icon: string | null;
     icon_special?: string | null;
@@ -2078,6 +2163,7 @@ export type BrightskyCurrently = {
     icon_special?: string;
     iconUrl?: string;
     temperature: number;
+    apparent_temperature?: number | null;
     fallback_source_ids: BrightskyCurrentlyFallback;
     icon: string;
 } & BrightskyCurrentlyFallback;

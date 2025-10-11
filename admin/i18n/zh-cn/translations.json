@@ -72,5 +72,9 @@
     "BF9": "烈风",
     "BF10": "狂风",
     "BF11": "暴风",
-    "BF12": "飓风"
+    "BF12": "飓风",
+    "Apparent Temperature": "体感温度",
+    "Apparent Temperature Min": "体感温度 最小",
+    "Apparent Temperature Max": "体感温度 最大",
+    "Apparent Temperature Median": "体感温度 中位数"
 }

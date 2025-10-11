@@ -71,5 +71,9 @@
     "BF9": "Ventania forte",
     "BF10": "Tempestade",
     "BF11": "Tempestade violenta",
-    "BF12": "Furacão"
+    "BF12": "Furacão",
+    "Apparent Temperature": "Temperatura Aparente",
+    "Apparent Temperature Min": "Temperatura Aparente Mín",
+    "Apparent Temperature Max": "Temperatura Aparente Máx",
+    "Apparent Temperature Median": "Temperatura Aparente Mediana"
 }

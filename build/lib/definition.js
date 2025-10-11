@@ -521,6 +521,19 @@ const hourly = {
     },
     native: {}
   },
+  apparent_temperature: {
+    _id: "apparent_temperature",
+    type: "state",
+    common: {
+      name: "Apparent Temperature",
+      type: "number",
+      role: "value.temperature.feelslike",
+      read: true,
+      write: false,
+      unit: "\xB0C"
+    },
+    native: {}
+  },
   icon: {
     _id: "icon",
     type: "state",
@@ -951,6 +964,58 @@ const daily = {
     },
     native: {}
   },
+  apparent_temperature_min: {
+    _id: "apparent_temperature_min",
+    type: "state",
+    common: {
+      name: "Apparent Temperature Min",
+      type: "number",
+      role: "value.temperature.feelslike.min",
+      read: true,
+      write: false,
+      unit: "\xB0C"
+    },
+    native: {}
+  },
+  apparent_temperature_max: {
+    _id: "apparent_temperature_max",
+    type: "state",
+    common: {
+      name: "Apparent Temperature Max",
+      type: "number",
+      role: "value.temperature.feelslike.max",
+      read: true,
+      write: false,
+      unit: "\xB0C"
+    },
+    native: {}
+  },
+  apparent_temperature_median: {
+    _id: "apparent_temperature_median",
+    type: "state",
+    common: {
+      name: "Apparent Temperature Median",
+      type: "number",
+      role: "value.temperature.feelslike.median",
+      read: true,
+      write: false,
+      unit: "\xB0C"
+    },
+    native: {}
+  },
+  apparent_temperature: {
+    _id: "apparent_temperature",
+    type: "state",
+    common: {
+      name: "Apparent Temperature",
+      type: "number",
+      role: "value.temperature.feelslike",
+      read: true,
+      write: false,
+      unit: "\xB0C"
+    },
+    native: {}
+  },
   icon_special: {
     _id: "icon_special",
     type: "state",
@@ -1339,6 +1404,19 @@ const genericStateObjects = {
         type: "folder",
         common: {
           name: "Current Weather"
+        },
+        native: {}
+      },
+      apparent_temperature: {
+        _id: "apparent_temperature",
+        type: "state",
+        common: {
+          name: "Apparent Temperature",
+          type: "number",
+          role: "value.temperature.feelslike",
+          read: true,
+          write: false,
+          unit: "\xB0C"
         },
         native: {}
       },

@@ -72,5 +72,9 @@
     "BF9": "Fort coup de vent",
     "BF10": "Tempête",
     "BF11": "Violente tempête",
-    "BF12": "Ouragan"
+    "BF12": "Ouragan",
+    "Apparent Temperature": "Température Ressentie",
+    "Apparent Temperature Min": "Température Ressentie Min",
+    "Apparent Temperature Max": "Température Ressentie Max",
+    "Apparent Temperature Median": "Température Ressentie Médiane"
 }
