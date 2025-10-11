@@ -85,10 +85,7 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (ticaki) Added apparent temperature (gefühlte Temperatur) datapoints for current, hourly, and daily weather data
-- (ticaki) Windchill calculation for temperatures below 10°C with wind speeds between 4.8-177 km/h
-- (ticaki) Heat index calculation for temperatures above 26.7°C with humidity above 40%
-- (ticaki) Daily apparent temperature includes min, max, and median values
+- (ticaki) Added apparent temperature datapoints for current, hourly, and daily weather data
 
 ### 0.6.5 (2025-10-04)
 - (ticaki) Added leading zero to 5-minute radar datapoint folders for correct sorting in UI
