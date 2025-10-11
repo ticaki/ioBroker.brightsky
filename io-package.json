@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.6.5",
+    "version": "0.6.6",
     "news": {
+      "0.6.6": {
+        "en": "Added apparent temperature datapoints for current, hourly, and daily weather data",
+        "de": "Zusätzlich gefühlte Temperaturwerte für aktuelle, stündliche und tägliche Wetterdaten",
+        "ru": "Добавлены кажущиеся температурные данные для текущих, часовых и ежедневных данных о погоде",
+        "pt": "Pontos de dados de temperatura aparentes para dados meteorológicos atuais, horários e diários",
+        "nl": "Toegevoegd schijnbare temperatuurgegevenspunten voor actuele, uur- en dagweergegevens",
+        "fr": "Ajout de points de données de température apparente pour les données météorologiques courantes, horaires et quotidiennes",
+        "it": "Aggiunti i dati di temperatura apparenti per i dati attuali, tempestivi e meteorologici giornalieri",
+        "es": "Se agregaron datos de temperatura aparente para datos actuales, horales y meteorológicos diarios",
+        "pl": "Dodano widoczne punkty temperatury dla bieżących, godzinowych i dziennych danych pogodowych",
+        "uk": "Додані видимі температурні точки для поточних, часових і щоденних погодних даних",
+        "zh-cn": "增加了当前、小时和每日天气数据的表面温度数据点"
+      },
       "0.6.5": {
         "en": "Added leading zero to 5-minute radar datapoint folders for correct sorting in UI",
         "de": "Führende Null zu 5-Minuten-Radar-Datenpunktordnern hinzugefügt, um die korrekte Sortierung in der Benutzeroberfläche sicherzustellen",
@@ -80,19 +93,6 @@
         "pl": "Nowy punkt danych wind _ hurst _ speed _ max for role value.speed.max.wind\nkontrola roli",
         "uk": "Нова точка даних вітру_gust_speed_max для значення ролі.speed.max.wind\nроль перевіряється",
         "zh-cn": "新的数据点风_gust_speed_max 对于角色值.speed.max.wind\n角色检查"
-      },
-      "0.5.1": {
-        "en": "more robust fetch usage",
-        "de": "robuster einsatz von fetch",
-        "ru": "более надежное использование",
-        "pt": "uso de busca mais robusto",
-        "nl": "robuuster fetchgebruik",
-        "fr": "utilisation de la récupération plus robuste",
-        "it": "più robusto uso fetch",
-        "es": "uso más robusto del fetch",
-        "pl": "bardziej solidne użycie pobierania",
-        "uk": "більш надійний використання fetch",
-        "zh-cn": "更坚固的获取使用"
       }
     },
     "titleLang": {
