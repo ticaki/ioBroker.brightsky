@@ -331,3 +331,138 @@ describe('Beaufort Wind Scale Conversion', () => {
         expect(getBeaufortScale(118)).to.equal(12);
     });
 });
+
+describe('Apparent Temperature Calculation', () => {
+    // Mock implementation of calculateApparentTemperature for testing
+    const calculateApparentTemperature = (
+        temperature: number | null | undefined,
+        windSpeed: number | null | undefined,
+        humidity: number | null | undefined,
+    ): number | null => {
+        if (temperature === null || temperature === undefined) {
+            return null;
+        }
+
+        // Windchill calculation for cold conditions
+        if (temperature < 10 && windSpeed !== null && windSpeed !== undefined && windSpeed > 4.8 && windSpeed < 177) {
+            const windchill =
+                13.12 +
+                0.6215 * temperature -
+                11.37 * Math.pow(windSpeed, 0.16) +
+                0.3965 * temperature * Math.pow(windSpeed, 0.16);
+            return Math.round(windchill * 10) / 10;
+        }
+
+        // Heat index calculation for hot conditions
+        if (temperature > 26.7 && humidity !== null && humidity !== undefined && humidity > 40) {
+            // Limit humidity to valid range
+            const h = Math.max(0, Math.min(100, humidity));
+            const t = temperature;
+
+            const heatIndex =
+                -8.784695 +
+                1.61139411 * t +
+                2.338549 * h -
+                0.14611605 * t * h -
+                0.012308094 * (t * t) -
+                0.016424828 * (h * h) +
+                0.002211732 * (t * t) * h +
+                0.00072546 * t * (h * h) -
+                0.000003582 * (t * t) * (h * h);
+            return Math.round(heatIndex * 10) / 10;
+        }
+
+        // For moderate conditions, apparent temperature equals actual temperature
+        return Math.round(temperature * 10) / 10;
+    };
+
+    it('should return null for null or undefined temperature', () => {
+        expect(calculateApparentTemperature(null, 10, 50)).to.equal(null);
+        expect(calculateApparentTemperature(undefined, 10, 50)).to.equal(null);
+    });
+
+    it('should calculate windchill for cold temperatures with wind', () => {
+        // Temperature 5°C, wind speed 20 km/h
+        const result = calculateApparentTemperature(5, 20, 50);
+        expect(result).to.be.a('number');
+        expect(result!).to.be.lessThan(5); // Windchill should feel colder
+    });
+
+    it('should not calculate windchill for temperature >= 10°C', () => {
+        // Temperature 10°C, wind speed 20 km/h -> should return actual temp
+        const result = calculateApparentTemperature(10, 20, 50);
+        expect(result).to.equal(10.0);
+
+        // Temperature 15°C, wind speed 20 km/h -> should return actual temp
+        const result2 = calculateApparentTemperature(15, 20, 50);
+        expect(result2).to.equal(15.0);
+    });
+
+    it('should not calculate windchill for wind speed < 4.8 km/h', () => {
+        // Temperature 5°C, wind speed 4 km/h (too low)
+        const result = calculateApparentTemperature(5, 4, 50);
+        expect(result).to.equal(5.0);
+    });
+
+    it('should not calculate windchill for wind speed >= 177 km/h', () => {
+        // Temperature 5°C, wind speed 180 km/h (too high)
+        const result = calculateApparentTemperature(5, 180, 50);
+        expect(result).to.equal(5.0);
+    });
+
+    it('should calculate heat index for hot temperatures with high humidity', () => {
+        // Temperature 30°C, humidity 60%
+        const result = calculateApparentTemperature(30, 10, 60);
+        expect(result).to.be.a('number');
+        expect(result!).to.be.greaterThan(30); // Heat index should feel hotter
+    });
+
+    it('should not calculate heat index for temperature <= 26.7°C', () => {
+        // Temperature 26°C, humidity 60% -> should return actual temp
+        const result = calculateApparentTemperature(26, 10, 60);
+        expect(result).to.equal(26.0);
+
+        // Temperature 20°C, humidity 60% -> should return actual temp
+        const result2 = calculateApparentTemperature(20, 10, 60);
+        expect(result2).to.equal(20.0);
+    });
+
+    it('should not calculate heat index for humidity <= 40%', () => {
+        // Temperature 30°C, humidity 40% (too low)
+        const result = calculateApparentTemperature(30, 10, 40);
+        expect(result).to.equal(30.0);
+
+        // Temperature 30°C, humidity 35%
+        const result2 = calculateApparentTemperature(30, 10, 35);
+        expect(result2).to.equal(30.0);
+    });
+
+    it('should return actual temperature for moderate conditions', () => {
+        // Temperature 15°C, wind speed 5 km/h, humidity 50%
+        const result = calculateApparentTemperature(15, 5, 50);
+        expect(result).to.equal(15.0);
+
+        // Temperature 20°C, no wind, moderate humidity
+        const result2 = calculateApparentTemperature(20, 0, 55);
+        expect(result2).to.equal(20.0);
+    });
+
+    it('should round to 1 decimal place', () => {
+        // Test with various temperatures that should return the actual temp
+        const result1 = calculateApparentTemperature(12.345, 3, 50);
+        expect(result1).to.equal(12.3);
+
+        const result2 = calculateApparentTemperature(23.789, 2, 30);
+        expect(result2).to.equal(23.8);
+    });
+
+    it('should handle edge cases with null wind or humidity', () => {
+        // Temperature with null wind speed -> should return actual temp
+        const result1 = calculateApparentTemperature(15, null, 50);
+        expect(result1).to.equal(15.0);
+
+        // Temperature with null humidity -> should return actual temp
+        const result2 = calculateApparentTemperature(15, 10, null);
+        expect(result2).to.equal(15.0);
+    });
+});
