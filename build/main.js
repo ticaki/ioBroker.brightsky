@@ -511,8 +511,43 @@ class Brightsky extends utils.Adapter {
         }
       }
     } catch (error) {
+      this.handleFetchError(error);
       await this.setState("info.connection", false, true);
-      this.log.error(`Error fetching daily weather data: ${JSON.stringify(error)}`);
+    }
+  }
+  handleFetchError(error) {
+    var _a;
+    if (error.name !== "AbortError") {
+      const errorDetails = [];
+      errorDetails.push(`Error in getPirateWeatherLoop:`);
+      if (error instanceof Error) {
+        let isHttpError = false;
+        errorDetails.push(`  Name: ${error.name}`);
+        if (error.cause && typeof error.cause === "object" && "code" in error.cause && typeof error.cause.code === "string") {
+          isHttpError = true;
+          errorDetails.push(`  code: ${error.cause.code}`);
+        }
+        errorDetails.push(`  Message: ${error.message}`);
+        isHttpError = isHttpError || error.message.includes("HTTP") || error.status || error.url;
+        if (error.stack && !isHttpError) {
+          errorDetails.push(`  Stack: ${error.stack}`);
+        }
+      } else if (typeof error === "object" && error !== null) {
+        errorDetails.push(`  Type: ${((_a = error.constructor) == null ? void 0 : _a.name) || "Object"}`);
+        if (error.status) {
+          errorDetails.push(`  HTTP Status: ${error.status}`);
+        }
+        if (error.statusText) {
+          errorDetails.push(`  Status Text: ${error.statusText}`);
+        }
+        if (error.code) {
+          errorDetails.push(`  Error Code: ${error.code}`);
+        }
+        errorDetails.push(`  Full Error: ${JSON.stringify(error, null, 2)}`);
+      } else {
+        errorDetails.push(`  Raw Error: ${String(error)}`);
+      }
+      this.log.error(errorDetails.join("\n"));
     }
   }
   /**
@@ -631,8 +666,8 @@ class Brightsky extends utils.Adapter {
         }
       }
     } catch (error) {
+      this.handleFetchError(error);
       await this.setState("info.connection", false, true);
-      this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
     }
   }
   /**
@@ -690,8 +725,8 @@ class Brightsky extends utils.Adapter {
         }
       }
     } catch (error) {
+      this.handleFetchError(error);
       await this.setState("info.connection", false, true);
-      this.log.error(`Error fetching weather data: ${JSON.stringify(error)}`);
     }
   }
   /**
@@ -785,8 +820,8 @@ class Brightsky extends utils.Adapter {
         await this.setState("info.connection", true, true);
       }
     } catch (error) {
+      this.handleFetchError(error);
       await this.setState("info.connection", false, true);
-      this.log.error(`Error fetching radar data: ${JSON.stringify(error)}`);
     }
   }
   /**
@@ -1107,8 +1142,7 @@ class Brightsky extends utils.Adapter {
         this.controller.abort();
         this.controller = null;
       }
-      callback();
-    } catch {
+    } finally {
       callback();
     }
   }
