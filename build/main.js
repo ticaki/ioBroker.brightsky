@@ -496,7 +496,6 @@ class Brightsky extends utils.Adapter {
                   break;
                 }
                 default: {
-                  this.log.warn(`Unhandled key in daily data aggregation: ${k}`);
                   break;
                 }
               }
