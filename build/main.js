@@ -234,6 +234,7 @@ class Brightsky extends utils.Adapter {
     if (loopTime <= 0) {
       loopTime = loopTime + 24 * 60 * 60 * 1e3;
     }
+    loopTime = Math.max(loopTime, 15 * 6e4);
     this.weatherTimeout[2] = this.setTimeout(() => {
       void this.weatherDailyLoop();
     }, loopTime);

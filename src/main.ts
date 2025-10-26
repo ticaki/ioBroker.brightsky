@@ -288,6 +288,7 @@ class Brightsky extends utils.Adapter {
         if (loopTime <= 0) {
             loopTime = loopTime + 24 * 60 * 60 * 1000; // If the time is in the past, set it to the next day
         }
+        loopTime = Math.max(loopTime, 15 * 60000); // Ensure minimum interval of 15 minutes
         this.weatherTimeout[2] = this.setTimeout(() => {
             void this.weatherDailyLoop();
         }, loopTime);
