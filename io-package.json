@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.6.6",
+    "version": "0.6.7",
     "news": {
+      "0.6.7": {
+        "en": "Corrected some roles for Lovelance\nAdded conditionUI\nAir pressure and humidity are now integers\nAdded air pressure to daily data\nImproved error logging",
+        "de": "Einige Rollen für Lovelance korrigiert\nZusätzlich conditionUI\nLuftdruck und Luftfeuchtigkeit sind jetzt ganze Zahlen\nZusätzlicher Luftdruck zu Tagesdaten\nVerbesserte Fehlermeldung",
+        "ru": "Исправлены некоторые роли для Lovelance\nДобавлено условие UI\nДавление и влажность воздуха теперь целые числа\nДобавлено давление воздуха в ежедневные данные\nУлучшенная регистрация ошибок",
+        "pt": "Corrigi alguns papéis para Lovelance\nCondição adicionada UI\nPressão do ar e umidade são agora inteiros\nPressão de ar adicionada aos dados diários\nRegisto de erros melhorado",
+        "nl": "Enkele rollen voor Lovelance gecorrigeerd\nToegevoegde conditie UI\nLuchtdruk en vochtigheid zijn nu gehele getallen\nToegevoegde luchtdruk aan dagelijkse gegevens\nVerbeterde fout logging",
+        "fr": "Corrigé certains rôles pour Lovelance\nÉtat ajouté Prestations de chômage\nLa pression d'air et l'humidité sont maintenant entiers\nAjout de la pression d'air aux données quotidiennes\nAmélioration de l'enregistrement des erreurs",
+        "it": "Corretto alcuni ruoli per Lovelance\nAggiunta condizione U\nLa pressione dell'aria e l'umidità sono ora interi\nAggiunta pressione dell'aria ai dati quotidiani\nRegistrazione degli errori migliorata",
+        "es": "Corregido algunos papeles para Lovelance\nCondición adicional UI\nLa presión del aire y la humedad son ahora enteros\nPresión de aire agregada a los datos diarios\nRegistro de errores mejorado",
+        "pl": "Poprawił kilka ról dla Lovelance\nDodano warunek Interfejs\nCiśnienie powietrza i wilgotność są teraz całkowite\nDodano ciśnienie powietrza do danych dziennych\nUlepszone rejestrowanie błędów",
+        "uk": "Виправлено деякі ролі для Lovelance\nДодана умова УІ\nПовітряний тиск і вологість тепер цілі\nДодано тиск повітря до щоденних даних\nПокращувати журнал помилок",
+        "zh-cn": "纠正了Lovelance的一些角色\n添加条件 用户\n气压和湿度现在是整数\n每日数据增加气压\n改进错误记录"
+      },
       "0.6.6": {
         "en": "Added apparent temperature datapoints for current, hourly, and daily weather data",
         "de": "Zusätzlich gefühlte Temperaturwerte für aktuelle, stündliche und tägliche Wetterdaten",
@@ -80,19 +93,6 @@
         "pl": "Dodano radar pogody z 2-godzinną prognozą opadów\nDane z radaru pokazują opady w mm ze średnimi, min, maksimum i medianą\nKonfigurowalny interwał sondaży radarowych (5 + minut, automatycznie obraca dane co 5 min)\nDodano maksimum przewidywanych opadów na kolejne 5, 10, 15, 30, 45, 60, 90 minut",
         "uk": "Додано метеорологічну радіолокацію з прогнозом 2-х годинних опадів\nРахункові дані показують опади в мм з середнім, хв, макс і значення медіана\nКонфігуративний інтервал радіолокаційної зйомки (5+ хвилин, автоматично обертається дані кожні 5 хв)\nДодано максимальні прогнози опадів на наступні 5, 10, 15, 30, 45, 60, 90 хвилин",
         "zh-cn": "增加了气象雷达特征,预测降水量为2小时\n雷达数据显示降水量为毫米,平均值、分数、最大值和中值\n可配置的雷达投票间隔(5+分钟,每5分钟自动旋转数据)\n未来5、10、15、30、45、60、90分钟的降水量预测"
-      },
-      "0.5.2": {
-        "en": "New data point wind_gust_speed_max for role value.speed.max.wind\nrole checked",
-        "de": "Neuer Datenpunkt wind_gust_speed_max für Role value.speed.max.wind\nRollen geprüft",
-        "ru": "Новая точка данных wind_gust_speed_max для ролевого значения.speed.max.wind\nпроверка роли",
-        "pt": "Novo ponto de dados wind_gust_speed_max para role value.speed.max.wind\nfunção verificada",
-        "nl": "Nieuw datapunt wind_gust_speed_max voor rolwaarde.speed.max.wind\nrol gecontroleerd",
-        "fr": "Nouveau point de données wind_gust_speed_max pour la valeur de rôle.speed.max.wind\nrôle vérifié",
-        "it": "Nuovo punto dati wind_gust_speed_max per valore di ruolo.speed.max.wind\nruolo controllato",
-        "es": "Nuevo punto de datos wind_gust_speed_max para el valor del papel.speed.max.wind\nfunción revisada",
-        "pl": "Nowy punkt danych wind _ hurst _ speed _ max for role value.speed.max.wind\nkontrola roli",
-        "uk": "Нова точка даних вітру_gust_speed_max для значення ролі.speed.max.wind\nроль перевіряється",
-        "zh-cn": "新的数据点风_gust_speed_max 对于角色值.speed.max.wind\n角色检查"
       }
     },
     "titleLang": {
