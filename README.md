@@ -85,6 +85,10 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (ticaki) Corrected some roles for Lovelance
+- (ticaki) Added conditionUI
+- (ticaki) Air pressure and humidity are now integers
+- (ticaki) Added air pressure to daily data
 - (ticaki) Improved error logging
 
 ### 0.6.6 (2025-10-11)

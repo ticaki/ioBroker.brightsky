@@ -464,7 +464,6 @@ class Brightsky extends utils.Adapter {
                                 case 'dew_point':
                                 case 'relative_humidity':
                                 case 'pressure_msl':
-
                                 case 'visibility':
                                 case 'wind_gust_direction':
                                 case 'wind_gust_speed':
