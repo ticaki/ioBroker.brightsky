@@ -423,7 +423,7 @@ class Brightsky extends utils.Adapter {
                         return sum;
                       }, 0);
                       if (avg != null) {
-                        if (values.filter((v) => v !== null).length > 12) {
+                        if (values.filter((v) => v !== null).length > 6) {
                           if (k === "relative_humidity" || k === "cloud_cover" || k === "visibility" || k === "wind_direction" || k === "wind_gust_direction" || k === "pressure_msl") {
                             avg = Math.round(avg / values.filter((v) => v !== null).length);
                           } else {
@@ -581,6 +581,7 @@ class Brightsky extends utils.Adapter {
     if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
       nextInterval = testTime.getTime() - now + 3e4 + Math.ceil(Math.random() * 5e3);
     }
+    nextInterval = Math.max(nextInterval, 6e4);
     this.weatherTimeout[0] = this.setTimeout(() => {
       void this.weatherCurrentlyLoop();
     }, nextInterval);
@@ -595,9 +596,12 @@ class Brightsky extends utils.Adapter {
     }
     await this.weatherHourlyUpdate();
     const loopTime = (/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.pollInterval, 0, 0) + 3e3 + Math.ceil(Math.random() * 5e3);
-    this.weatherTimeout[1] = this.setTimeout(() => {
-      void this.weatherHourlyLoop();
-    }, loopTime - Date.now());
+    this.weatherTimeout[1] = this.setTimeout(
+      () => {
+        void this.weatherHourlyLoop();
+      },
+      Math.max(loopTime - Date.now(), 5 * 6e4)
+    );
   }
   /**
    * Fetches and processes hourly weather forecast data from BrightSky API
@@ -752,7 +756,8 @@ class Brightsky extends utils.Adapter {
       this.clearTimeout(this.weatherTimeout[3]);
     }
     await this.weatherRadarUpdate();
-    const nextInterval = this.config.pollIntervalRadar * 6e4 + 15e3 + Math.ceil(Math.random() * 5e3);
+    let nextInterval = this.config.pollIntervalRadar * 6e4 + 1e4 + Math.ceil(Math.random() * 5e3);
+    nextInterval = Math.max(nextInterval, 3 * 6e4);
     this.weatherTimeout[3] = this.setTimeout(() => {
       void this.weatherRadarLoop();
     }, nextInterval);

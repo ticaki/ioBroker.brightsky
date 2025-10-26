@@ -492,7 +492,7 @@ class Brightsky extends utils.Adapter {
                                                 return sum;
                                             }, 0);
                                             if (avg != null) {
-                                                if (values.filter(v => v !== null).length > 12) {
+                                                if (values.filter(v => v !== null).length > 6) {
                                                     if (
                                                         k === 'relative_humidity' ||
                                                         k === 'cloud_cover' ||
@@ -697,6 +697,7 @@ class Brightsky extends utils.Adapter {
         if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
             nextInterval = testTime.getTime() - now + 30000 + Math.ceil(Math.random() * 5000);
         }
+        nextInterval = Math.max(nextInterval, 60000); // Ensure minimum interval of 1 minutes
 
         this.weatherTimeout[0] = this.setTimeout(() => {
             void this.weatherCurrentlyLoop();
@@ -716,9 +717,12 @@ class Brightsky extends utils.Adapter {
             new Date().setHours(new Date().getHours() + this.config.pollInterval, 0, 0) +
             3000 +
             Math.ceil(Math.random() * 5000); // Add a random delay of up to 5 second
-        this.weatherTimeout[1] = this.setTimeout(() => {
-            void this.weatherHourlyLoop();
-        }, loopTime - Date.now());
+        this.weatherTimeout[1] = this.setTimeout(
+            () => {
+                void this.weatherHourlyLoop();
+            },
+            Math.max(loopTime - Date.now(), 5 * 60_000),
+        );
     }
 
     /**
@@ -892,9 +896,9 @@ class Brightsky extends utils.Adapter {
         }
         await this.weatherRadarUpdate();
 
-        // Calculate next interval: configured minutes + 15s + random 0-5s
-        const nextInterval = this.config.pollIntervalRadar * 60000 + 15000 + Math.ceil(Math.random() * 5000);
-
+        // Calculate next interval: configured minutes + 10s + random 0-5s
+        let nextInterval = this.config.pollIntervalRadar * 60000 + 10000 + Math.ceil(Math.random() * 5000);
+        nextInterval = Math.max(nextInterval, 3 * 60000);
         this.weatherTimeout[3] = this.setTimeout(() => {
             void this.weatherRadarLoop();
         }, nextInterval);
