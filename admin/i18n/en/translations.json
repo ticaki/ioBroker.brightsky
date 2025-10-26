@@ -3,7 +3,7 @@
     "position": "Position",
     "pollInterval": "Query interval overview of hours (every hour on the hour)",
     "Hours-to-display": "Hours to display",
-    "maxDistance": "Maximum distance to the weather station",    
+    "maxDistance": "Maximum distance to the weather station",
     "pollIntervalCurrently": "Query Interval for current weather (in minutes)",
     "createDaily": "Creates daily overviews (after 0:00, 5:00 and 18:00)",
     "createHourly": "Creates hourly overviews",
@@ -62,5 +62,12 @@
     "wr1": "Inverter 1 max. power (kW)",
     "wr2": "Inverter 2 max. power (kW)",
     "wr3": "Inverter 3 max. power (kW)",
-    "wr4": "Inverter 4 max. power (kW)"
+    "wr4": "Inverter 4 max. power (kW)",
+    "Dry": "Dry",
+    "Fog": "Fog",
+    "Rain": "Rain",
+    "Sleet": "Sleet",
+    "Snow": "Snow",
+    "Hail": "Hail",
+    "Thunderstorm": "Thunderstorm"
 }

@@ -463,6 +463,18 @@ const hourly: ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject> =
         },
         native: {},
     },
+    conditionUI: {
+        _id: 'condition',
+        type: 'state',
+        common: {
+            name: 'Condition translated',
+            type: 'string',
+            role: 'weather.state',
+            read: true,
+            write: false,
+        },
+        native: {},
+    },
     precipitation_probability: {
         _id: 'precipitation_probability',
         type: 'state',
@@ -874,7 +886,33 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         common: {
             name: 'Pressure MSL Median',
             type: 'number',
-            role: 'value',
+            role: 'value.pressure.median',
+            read: true,
+            write: false,
+            unit: 'hPa',
+        },
+        native: {},
+    },
+    pressure_msl_min: {
+        _id: 'pressure_msl_median',
+        type: 'state',
+        common: {
+            name: 'Pressure MSL Median',
+            type: 'number',
+            role: 'value.pressure.min',
+            read: true,
+            write: false,
+            unit: 'hPa',
+        },
+        native: {},
+    },
+    pressure_msl_max: {
+        _id: 'pressure_msl_median',
+        type: 'state',
+        common: {
+            name: 'Pressure MSL Median',
+            type: 'number',
+            role: 'value.pressure.max',
             read: true,
             write: false,
             unit: 'hPa',
@@ -2016,6 +2054,8 @@ export type BrightskyDailyData = BrightskyWeather & {
     apparent_temperature_median?: number | null;
     solar_max: number | null;
     pressure_msl_median: number | null;
+    pressure_msl_min: number | null;
+    pressure_msl_max: number | null;
     temperature_median: number | null;
     wind_direction_median: number | null;
     wind_speed_median: number | null;
@@ -2098,6 +2138,7 @@ export type BrightskyWeather = {
     icon: string | null;
     icon_special?: string | null;
     iconUrl?: string | null;
+    conditionUI?: string;
 };
 
 // Typ für ein einzelnes Source-Objekt in testdata.sources

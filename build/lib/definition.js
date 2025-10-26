@@ -469,6 +469,18 @@ const hourly = {
     },
     native: {}
   },
+  conditionUI: {
+    _id: "condition",
+    type: "state",
+    common: {
+      name: "Condition translated",
+      type: "string",
+      role: "weather.state",
+      read: true,
+      write: false
+    },
+    native: {}
+  },
   precipitation_probability: {
     _id: "precipitation_probability",
     type: "state",
@@ -879,7 +891,33 @@ const daily = {
     common: {
       name: "Pressure MSL Median",
       type: "number",
-      role: "value",
+      role: "value.pressure.median",
+      read: true,
+      write: false,
+      unit: "hPa"
+    },
+    native: {}
+  },
+  pressure_msl_min: {
+    _id: "pressure_msl_median",
+    type: "state",
+    common: {
+      name: "Pressure MSL Median",
+      type: "number",
+      role: "value.pressure.min",
+      read: true,
+      write: false,
+      unit: "hPa"
+    },
+    native: {}
+  },
+  pressure_msl_max: {
+    _id: "pressure_msl_median",
+    type: "state",
+    common: {
+      name: "Pressure MSL Median",
+      type: "number",
+      role: "value.pressure.max",
       read: true,
       write: false,
       unit: "hPa"

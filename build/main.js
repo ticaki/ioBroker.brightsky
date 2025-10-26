@@ -243,7 +243,7 @@ class Brightsky extends utils.Adapter {
    * Retrieves weather data for the next 8 days and creates aggregated daily values
    */
   async weatherDailyUpdate() {
-    var _a;
+    var _a, _b;
     const startTime = new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0)).toISOString();
     const endTime = new Date(
       new Date((/* @__PURE__ */ new Date()).setHours(23, 59, 59, 999)).setDate((/* @__PURE__ */ new Date()).getDate() + 7)
@@ -396,6 +396,7 @@ class Brightsky extends utils.Adapter {
                 case "cloud_cover":
                 case "dew_point":
                 case "relative_humidity":
+                case "pressure_msl":
                 case "visibility":
                 case "wind_gust_direction":
                 case "wind_gust_speed":
@@ -423,7 +424,13 @@ class Brightsky extends utils.Adapter {
                       }, 0);
                       if (avg != null) {
                         if (values.filter((v) => v !== null).length > 12) {
-                          avg = Math.round(avg / values.filter((v) => v !== null).length * 10) / 10;
+                          if (k === "relative_humidity" || k === "cloud_cover" || k === "visibility" || k === "wind_direction" || k === "wind_gust_direction" || k === "pressure_msl") {
+                            avg = Math.round(avg / values.filter((v) => v !== null).length);
+                          } else {
+                            avg = Math.round(
+                              avg / values.filter((v) => v !== null).length * 10
+                            ) / 10;
+                          }
                         } else {
                           avg = null;
                         }
@@ -482,6 +489,14 @@ class Brightsky extends utils.Adapter {
                   });
                   dailyData.icon_special = iconsDay.mdi;
                   dailyData.iconUrl = iconsDay.url;
+                  const condition = (_b = dailyData.condition) != null ? _b : "unknown";
+                  dailyData.conditionUI = this.library.getTranslation(
+                    condition.charAt(0).toUpperCase() + condition.slice(1)
+                  );
+                  break;
+                }
+                default: {
+                  this.log.warn(`Unhandled key in daily data aggregation: ${k}`);
                   break;
                 }
               }
