@@ -635,8 +635,6 @@ class Brightsky extends utils.Adapter {
         if (error.name !== 'AbortError') {
             // Detailed error logging
             const errorDetails: string[] = [];
-            errorDetails.push(`Error in getPirateWeatherLoop:`);
-
             if (error instanceof Error) {
                 let isHttpError = false;
                 errorDetails.push(`  Name: ${error.name}`);
