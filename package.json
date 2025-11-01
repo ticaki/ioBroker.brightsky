@@ -35,7 +35,7 @@
     "@tsconfig/node22": "^22.0.2",
     "@types/node": "^24.9.2",
     "@types/suncalc": "^1.9.2",
-    "rimraf": "^6.0.1",
+    "rimraf": "^6.1.0",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
