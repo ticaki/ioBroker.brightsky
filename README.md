@@ -84,6 +84,10 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Customisable update interval for Daily (expert)
+- (ticaki) BREAKING: remove forHomoran states
+
 ### 0.6.7 (2025-10-26)
 - (ticaki) Corrected some roles for Lovelance
 - (ticaki) Added conditionUI

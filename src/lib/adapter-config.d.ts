@@ -26,6 +26,7 @@ declare global {
             pollIntervalCurrently: number;
 
             createCurrently: boolean;
+            createDailyCustomInterval: number;
             createHourly: boolean;
             createDaily: boolean;
             createRadar: boolean;

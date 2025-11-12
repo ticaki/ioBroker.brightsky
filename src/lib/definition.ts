@@ -684,19 +684,6 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         },
         native: {},
     },
-    solar_forHomoran: {
-        _id: 'solar_forHomoran',
-        type: 'state',
-        common: {
-            name: 'Solar for Homoran (daily total)',
-            type: 'number',
-            role: 'value.power',
-            read: true,
-            write: false,
-            unit: 'kWh/m²',
-        },
-        native: {},
-    },
     solar_estimate: {
         _id: 'solar_estimate',
         type: 'state',
@@ -710,20 +697,6 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         },
         native: {},
     },
-    solar_estimateForHomoran: {
-        _id: 'solar_estimateForHomoran',
-        type: 'state',
-        common: {
-            name: 'Solar Estimate for Homoran (daily total)',
-            type: 'number',
-            role: 'value.power',
-            read: true,
-            write: false,
-            unit: 'kWh',
-        },
-        native: {},
-    },
-
     wind_direction_median: {
         _id: 'wind_direction_median',
         type: 'state',
@@ -2070,9 +2043,7 @@ export type BrightskyDailyData = BrightskyWeather & {
     precipitation_probability_median: number | null;
     precipitation_probability_6h_median: number | null;
     solar_median: number | null;
-    solar_forHomoran?: number | null;
     solar_estimate?: number | null;
-    solar_estimateForHomoran?: number | null;
     sunset?: number | null;
     sunrise?: number | null;
     icon_special?: string | null;

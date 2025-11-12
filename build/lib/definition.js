@@ -690,37 +690,11 @@ const daily = {
     },
     native: {}
   },
-  solar_forHomoran: {
-    _id: "solar_forHomoran",
-    type: "state",
-    common: {
-      name: "Solar for Homoran (daily total)",
-      type: "number",
-      role: "value.power",
-      read: true,
-      write: false,
-      unit: "kWh/m\xB2"
-    },
-    native: {}
-  },
   solar_estimate: {
     _id: "solar_estimate",
     type: "state",
     common: {
       name: "Solar Estimate (daily total)",
-      type: "number",
-      role: "value.power",
-      read: true,
-      write: false,
-      unit: "kWh"
-    },
-    native: {}
-  },
-  solar_estimateForHomoran: {
-    _id: "solar_estimateForHomoran",
-    type: "state",
-    common: {
-      name: "Solar Estimate for Homoran (daily total)",
       type: "number",
       role: "value.power",
       read: true,

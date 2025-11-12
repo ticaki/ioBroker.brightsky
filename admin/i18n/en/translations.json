@@ -6,6 +6,7 @@
     "maxDistance": "Maximum distance to the weather station",
     "pollIntervalCurrently": "Query Interval for current weather (in minutes)",
     "createDaily": "Creates daily overviews (after 0:00, 5:00 and 18:00)",
+    "createDailyCustomInterval": "Use custom interval for daily overviews (0 off) - not recommended",
     "createHourly": "Creates hourly overviews",
     "createCurrently": "Creates current weather data",
     "createRadar": "Creates weather radar data",

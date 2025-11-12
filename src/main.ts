@@ -84,6 +84,11 @@ class Brightsky extends utils.Adapter {
         } else {
             // Create the daily data folder
             await this.library.writedp('daily', null, genericStateObjects.weather.daily._channel);
+            for (let day = 0; day < 8; day++) {
+                if (this.library.readdb(`daily.0${day}.solar_estimateForHomoran`) != null) {
+                    await this.delObjectAsync(`daily.0${day}.solar_estimateForHomoran`);
+                }
+            }
         }
         if (!this.config.createCurrently) {
             await this.delObjectAsync('current', { recursive: true });
@@ -260,7 +265,7 @@ class Brightsky extends utils.Adapter {
             await this.weatherRadarLoop();
         }
         this.log.info(
-            `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours` : 'Hourly data disabled'} - ${this.config.createDaily ? 'Daily data enabled' : 'Daily data disabled'} - ${this.config.createRadar ? `Radar data enabled. Poll interval: ${this.config.pollIntervalRadar} minutes` : 'Radar data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
+            `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours` : 'Hourly data disabled'} - ${this.config.createDaily ? (this.config.createDailyCustomInterval ? `Daily data enabled. Poll interval: ${this.config.createDailyCustomInterval}h` : 'Daily data enabled') : 'Daily data disabled'} - ${this.config.createRadar ? `Radar data enabled. Poll interval: ${this.config.pollIntervalRadar} minutes` : 'Radar data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
         );
         this.log.info(
             `Using ${this.config.dwd_station_id ? `WMO Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`,
@@ -277,14 +282,23 @@ class Brightsky extends utils.Adapter {
         }
         await this.weatherDailyUpdate();
         let loopTime = 100000;
-        if (new Date().getHours() >= 5 && new Date().getHours() < 18) {
-            loopTime = new Date().setHours(18, 0, 0, 0) + 30000 + Math.ceil(Math.random() * 5000);
-        } else if (new Date().getHours() >= 18) {
-            loopTime = new Date().setHours(0, 0, 0, 0) + 30000 + Math.ceil(Math.random() * 60000);
+        if (!this.config.createDailyCustomInterval) {
+            if (new Date().getHours() >= 5 && new Date().getHours() < 18) {
+                loopTime = new Date().setHours(18, 0, 0, 0);
+            } else if (new Date().getHours() >= 18) {
+                loopTime = new Date().setHours(0, 0, 0, 0);
+            } else {
+                loopTime = new Date().setHours(5, 0, 0, 0);
+            }
         } else {
-            loopTime = new Date().setHours(5, 0, 0, 0) + 30000 + Math.ceil(Math.random() * 5000);
+            loopTime = new Date().setHours(
+                Math.min(new Date().getHours() + this.config.createDailyCustomInterval, 24),
+                0,
+                0,
+                0,
+            );
         }
-        loopTime = loopTime - Date.now(); // Calculate the time until the next update
+        loopTime = loopTime + 30000 + Math.ceil(Math.random() * 30000) - Date.now(); // Calculate the time until the next update
         if (loopTime <= 0) {
             loopTime = loopTime + 24 * 60 * 60 * 1000; // If the time is in the past, set it to the next day
         }
@@ -416,20 +430,6 @@ class Brightsky extends utils.Adapter {
                                                 dailyData.solar_estimate = dailyData.solar_estimate
                                                     ? Math.round(dailyData.solar_estimate * 1000) / 1000
                                                     : dailyData.solar_estimate;
-                                            }
-                                            if (new Date().getHours() === 5) {
-                                                dailyData.solar_forHomoran = values.reduce((sum, value) => {
-                                                    if (typeof sum !== 'number') {
-                                                        sum = 0; // Initialize sum to 0 if it's not a number
-                                                    }
-                                                    if (value != null && typeof value === 'number') {
-                                                        return sum + value;
-                                                    }
-                                                    return sum;
-                                                });
-                                                if (dailyData.solar_estimate != null) {
-                                                    dailyData.solar_estimateForHomoran = dailyData.solar_estimate;
-                                                }
                                             }
                                         }
                                         dailyData[`${k}_max`] = max !== -Infinity ? max : null;

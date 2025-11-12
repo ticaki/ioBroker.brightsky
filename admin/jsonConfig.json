@@ -169,6 +169,23 @@
                     "lg": 4,
                     "xl": 4
                 },
+                "createDailyCustomInterval": {
+                    "type": "number",
+                    "label": "createDailyCustomInterval",
+                    "expertMode": true,
+                    "min": 0,
+                    "max": 24,
+                    "step": 1,
+                    "unit": "hours",
+                    "default": 0,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                
                 "createRadar": {
                     "type": "checkbox",
                     "label": "createRadar",
