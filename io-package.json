@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "0.6.7",
+    "version": "1.0.0-alpha.0",
     "news": {
+      "1.0.0-alpha.0": {
+        "en": "Customisable update interval for Daily (expert)\nBREAKING: remove forHomoran states",
+        "de": "Benutzerdefinierte Update-Intervall für Daily (Experte)\nBREAKING: entfernen fürHomoran States",
+        "ru": "Интервал обновления для Daily (эксперт)\nОригинальное название: Remove forHomoran States",
+        "pt": "Intervalo de atualização personalizável para o Daily (expert)\nRENDIMENTO: remover para estados homorianos",
+        "nl": "Aanpasbaar update-interval voor dagelijks (deskundige)\nBreaking: verwijderen voorHomoraanse staten",
+        "fr": "Intervalle de mise à jour personnalisable pour chaque jour (expert)\nBREAKING: supprimer pour les états homorans",
+        "it": "Intervallo di aggiornamento personalizzabile per Daily (esperto)\nBREAKING: rimuovere gli stati omoran",
+        "es": "Intervalo de actualización personal para Daily (experto)\nBREAKING: eliminar los estados de Homoran",
+        "pl": "Dostosowalny interwał aktualizacji dla Daily (ekspert)\nBREAKING: usunąć dla Homoran stanów",
+        "uk": "Індивідуальний інтервал оновлення для щоденного (експерти)\nBREAKING: видалення для",
+        "zh-cn": "可自定义的每日更新间隔( 专家)\n霍莫兰州:"
+      },
       "0.6.7": {
         "en": "Corrected some roles for Lovelance\nAdded conditionUI\nAir pressure and humidity are now integers\nAdded air pressure to daily data\nImproved error logging",
         "de": "Einige Rollen für Lovelance korrigiert\nZusätzlich conditionUI\nLuftdruck und Luftfeuchtigkeit sind jetzt ganze Zahlen\nZusätzlicher Luftdruck zu Tagesdaten\nVerbesserte Fehlermeldung",
@@ -80,19 +93,6 @@
         "pl": "Dodano opcjonalną konfigurację RadarData, aby utworzyć szczegółowy folder radar.data opcjonalne poprawki [# 45] (https: / / github.com / ticaki / ioBroker.brightsky / issues / 45)\nDodano weekday name datapoints (krótki i długi) do dziennych poprawek danych pogodowych [# 41] (https: / / github.com / ticaki / ioBroker.brightsky / issues / 41)",
         "uk": "Додано додаткові можливості створення конфігураціїRadarData для детального радіолокатора. Текстові виправлення даних [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nДодано тижневі іменні точки (короткий і довгий) до щоденних погодних умов [#41] (https://github.com/ticaki/ioBroker.brightsky/issues/41)",
         "zh-cn": "添加可选创建 RadarData 配置, 以制作详细的 radar.data 文件夹可选修正 [# 45] (https://github.com/ticaki/ioBroker.brightsky/issues/45)\n在日常天气数据修补[#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)中增加了周日名称数据点(短和长)"
-      },
-      "0.6.0": {
-        "en": "Added weather radar feature with 2-hour precipitation forecast\nRadar data shows precipitation in mm with average, min, max, and median values\nConfigurable radar polling interval (5+ minutes, auto-rotates data every 5 min)\nAdded max precipitation forecast states for next 5, 10, 15, 30, 45, 60, 90 minutes",
-        "de": "Wetterradar-Funktion mit 2-stündiger Niederschlagsvorhersage hinzugefügt. Radardaten zeigen Niederschlag in mm mit Mittelwert, Minimum, Maximum und Median. Konfigurierbares Radar-Abfrageintervall (5+ Minuten, Daten automatisch alle 5 Minuten aktualisiert). Maximal-Niederschlagsvorhersage für die nächsten 5, 10, 15, 30, 45, 60 und 90 Minuten hinzugefügt.",
-        "ru": "Добавлена функция метеорологического радара с 2-часовым прогнозом осадков\nРадиолокационные данные показывают осадки в мм со средними, мин, макс и медианными значениями\nНастраиваемый интервал радиолокационного опроса (5+ минут, автоматические повороты данных каждые 5 минут)\nДобавлен максимальный прогноз осадков на следующие 5, 10, 15, 30, 45, 60, 90 минут",
-        "pt": "Adicionado recurso de radar meteorológico com previsão de precipitação de 2 horas\nOs dados do radar mostram precipitação em mm com valores médios, mínimos, máximos e medianos\nIntervalo de sondagem de radar configurável (5+ minutos, rotaciona automaticamente os dados a cada 5 min)\nAdicionado estados de previsão de precipitação máxima para os próximos 5, 10, 15, 30, 45, 60, 90 minutos",
-        "nl": "Toegevoegd weer radar functie met 2 uur neerslagvoorspelling\nRadargegevens tonen neerslag in mm met gemiddelde, min, max en mediane waarden\nConfigureerbare radarpeilingsinterval (5+ minuten, automatisch roteert gegevens elke 5 minuten)\nToegevoegd max neerslag voorspelling toestanden voor de volgende 5, 10, 15, 30, 45, 60, 90 minuten",
-        "fr": "Ajout d'un radar météorologique avec prévisions de précipitations de 2 heures\nLes données radar montrent des précipitations en mm avec des valeurs moyennes, min, max et médianes\nIntervalle de scrutin radar configurable (5+ minutes, données auto-rotation toutes les 5 minutes)\nAjout d'états maxi de prévision des précipitations pour les prochaines 5, 10, 15, 30, 45, 60, 90 minutes",
-        "it": "Aggiunta di funzione radar meteo con previsioni di precipitazioni 2 ore\nPioggia dei dati radar in mm con valori medi, min, max e median\nIntervallo radar configurabile (5+ minuti, dati auto-rota ogni 5 min)\nAggiunta massima precipitazione stati per il prossimo 5, 10, 15, 30, 45, 60, 90 minuti",
-        "es": "Función de radar meteorológico adicional con previsión de precipitación de 2 horas\nLos datos de radar muestran precipitación en mm con valores promedio, min, max y mediana\nIntervalo de detección de radar configurable (5+ minutos, auto-rota datos cada 5 min)\nEstados de pronóstico de precipitación max agregado para los próximos 5, 10, 15, 30, 45, 60, 90 minutos",
-        "pl": "Dodano radar pogody z 2-godzinną prognozą opadów\nDane z radaru pokazują opady w mm ze średnimi, min, maksimum i medianą\nKonfigurowalny interwał sondaży radarowych (5 + minut, automatycznie obraca dane co 5 min)\nDodano maksimum przewidywanych opadów na kolejne 5, 10, 15, 30, 45, 60, 90 minut",
-        "uk": "Додано метеорологічну радіолокацію з прогнозом 2-х годинних опадів\nРахункові дані показують опади в мм з середнім, хв, макс і значення медіана\nКонфігуративний інтервал радіолокаційної зйомки (5+ хвилин, автоматично обертається дані кожні 5 хв)\nДодано максимальні прогнози опадів на наступні 5, 10, 15, 30, 45, 60, 90 хвилин",
-        "zh-cn": "增加了气象雷达特征,预测降水量为2小时\n雷达数据显示降水量为毫米,平均值、分数、最大值和中值\n可配置的雷达投票间隔(5+分钟,每5分钟自动旋转数据)\n未来5、10、15、30、45、60、90分钟的降水量预测"
       }
     },
     "titleLang": {
