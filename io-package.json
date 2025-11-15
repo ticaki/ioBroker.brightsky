@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "1.0.0-alpha.0",
+    "version": "1.0.0-beta.0",
     "news": {
-      "1.0.0-alpha.0": {
+      "1.0.0-beta.0": {
         "en": "Customisable update interval for Daily (expert)\nBREAKING: remove forHomoran states",
         "de": "Benutzerdefinierte Update-Intervall für Daily (Experte)\nBREAKING: entfernen fürHomoran States",
         "ru": "Интервал обновления для Daily (эксперт)\nОригинальное название: Remove forHomoran States",
