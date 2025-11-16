@@ -84,6 +84,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 1.0.0-beta.1 (2025-11-16)
+- (ticaki) fixed: remove dps/timezone/translation
+
 ### 1.0.0-beta.0 (2025-11-15)
 - (ticaki) Customisable update interval for Daily (expert)
 - (ticaki) BREAKING: remove forHomoran states

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "1.0.0-beta.0",
+    "version": "1.0.0-beta.1",
     "news": {
+      "1.0.0-beta.1": {
+        "en": "fixed: states/timezone/translation",
+        "de": "fixed: states/timezone/translation ",
+        "ru": "фиксированный: удалить dps/timezone/translation",
+        "pt": "fixo: remover dps/timezone/tradução",
+        "nl": "vast: verwijder dps/tijdzone/vertaling",
+        "fr": "fixe: supprimer dps/timezone/traduction",
+        "it": "fisso: rimuovere dps/timezone/traduzione",
+        "es": "fijo: eliminar dps/timezone/traducción",
+        "pl": "stałe: usunąć dps / timezone / tłumaczenie",
+        "uk": "фіксована: видалення dps/timezone/translation",
+        "zh-cn": "固定: 删除 dps/ 时区/ 翻译"
+      },
       "1.0.0-beta.0": {
         "en": "Customisable update interval for Daily (expert)\nBREAKING: remove forHomoran states",
         "de": "Benutzerdefinierte Update-Intervall für Daily (Experte)\nBREAKING: entfernen fürHomoran States",
@@ -80,19 +93,6 @@
         "pl": "Flaga ustawiona do aktywacji języka",
         "uk": "Прапор встановлюється для активації мови",
         "zh-cn": "启用语言的旗帜集"
-      },
-      "0.6.1": {
-        "en": "Added optional createRadarData configuration to make detailed radar.data folder optional fixes [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nAdded weekday name datapoints (short and long) to daily weather data fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
-        "de": "Optionale createRadarData-Konfiguration hinzugefügt, um den detaillierten Ordner radar.data optional zu machen (behebt [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45))\nWochentags-Datenpunkte (kurz und lang) zu den täglichen Wetterdaten hinzugefügt (fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41))",
-        "ru": "Добавлена опциональная конфигурация createRadarData, чтобы сделать детальную папку radar.data необязательным исправлением [#45] (https://github.com/ticaki/ioBroker.brightsky/issues/45)\nДобавлены будние данные (короткие и длинные) в ежедневные данные о погоде [#41] (https://github.com/ticaki/ioBroker.brightsky/issues/41)",
-        "pt": "Adicionado opcional createRadarConfiguração de dados para fazer correções detalhadas da pasta radar.data opcional [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nPontos de dados do nome do dia da semana adicionados (curto e longo) às correções diárias de dados meteorológicos [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
-        "nl": "Toegevoegd optionele createRadarData configuratie om gedetailleerde radar.data map optionele fixes [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nToegevoegd weekdag naam datapoints (kort en lang) aan dagelijkse weergegevens fixes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
-        "fr": "Ajout de la configuration optionnelle createRadarData pour faire des corrections détaillées du dossier radar.data [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nAjout de points de données nominatives en semaine (courts et longs) aux corrections de données météorologiques quotidiennes [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
-        "it": "Aggiunta la configurazione opzionale di creareRadarData per rendere il radar dettagliato.data cartella correzioni opzionali [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nAggiunto il nome del giorno della settimana datapoints (breve e lungo) alle correzioni di dati meteo giornalieri [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
-        "es": "Añadido la configuración opcional CrearRadarData para hacer correcciones opcionales detalladas de la carpeta radar.data [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nPuntos de datos del nombre del día de semana (cortados y largos) para fijar datos meteorológicos diarios [#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)",
-        "pl": "Dodano opcjonalną konfigurację RadarData, aby utworzyć szczegółowy folder radar.data opcjonalne poprawki [# 45] (https: / / github.com / ticaki / ioBroker.brightsky / issues / 45)\nDodano weekday name datapoints (krótki i długi) do dziennych poprawek danych pogodowych [# 41] (https: / / github.com / ticaki / ioBroker.brightsky / issues / 41)",
-        "uk": "Додано додаткові можливості створення конфігураціїRadarData для детального радіолокатора. Текстові виправлення даних [#45](https://github.com/ticaki/ioBroker.brightsky/issues/45)\nДодано тижневі іменні точки (короткий і довгий) до щоденних погодних умов [#41] (https://github.com/ticaki/ioBroker.brightsky/issues/41)",
-        "zh-cn": "添加可选创建 RadarData 配置, 以制作详细的 radar.data 文件夹可选修正 [# 45] (https://github.com/ticaki/ioBroker.brightsky/issues/45)\n在日常天气数据修补[#41](https://github.com/ticaki/ioBroker.brightsky/issues/41)中增加了周日名称数据点(短和长)"
       }
     },
     "titleLang": {
