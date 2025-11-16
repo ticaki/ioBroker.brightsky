@@ -85,7 +85,7 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### 1.0.0-beta.1 (2025-11-16)
-- (ticaki) fixed: remove dps/timezone/translation
+- (ticaki) fixed: states/timezone/translation
 
 ### 1.0.0-beta.0 (2025-11-15)
 - (ticaki) Customisable update interval for Daily (expert)
