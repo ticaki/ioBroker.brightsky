@@ -91,6 +91,8 @@ export class Library extends BaseClass {
                 this.log.info(`Unknown tokens: ${JSON.stringify(this.unknownTokens)}`);
             }, 60000);
         }*/
+        const states = await this.adapter.getStatesAsync('*');
+        await this.library.initStates(states);
     }
 
     /**

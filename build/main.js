@@ -72,6 +72,8 @@ class Brightsky extends utils.Adapter {
     });
     await this.setState("info.connection", false, true);
     await this.library.init();
+    const states = await this.getStatesAsync("*");
+    await this.library.initStates(states);
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
     } else {
@@ -113,8 +115,6 @@ class Brightsky extends utils.Adapter {
         });
       }
     }
-    const states = await this.getStatesAsync("*");
-    await this.library.initStates(states);
     if (!this.config.createCurrently && !this.config.createHourly && !this.config.createDaily && !this.config.createRadar) {
       this.log.error(
         "No data creation is enabled in the adapter configuration. Please enable at least one of the options: Currently, Hourly, Daily, or Radar."

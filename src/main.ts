@@ -126,9 +126,6 @@ class Brightsky extends utils.Adapter {
             }
         }
 
-        const states = await this.getStatesAsync('*');
-        await this.library.initStates(states);
-
         if (
             !this.config.createCurrently &&
             !this.config.createHourly &&
