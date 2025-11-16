@@ -104,7 +104,7 @@ class Library extends BaseClass {
   async init() {
     await this.checkLanguage();
     const states = await this.adapter.getStatesAsync("*");
-    await this.library.initStates(states);
+    await this.initStates(states);
   }
   /**
    * Write/create from a Json with defined keys, the associated states and channels.

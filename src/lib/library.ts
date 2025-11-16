@@ -92,7 +92,7 @@ export class Library extends BaseClass {
             }, 60000);
         }*/
         const states = await this.adapter.getStatesAsync('*');
-        await this.library.initStates(states);
+        await this.initStates(states);
     }
 
     /**

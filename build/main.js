@@ -72,8 +72,6 @@ class Brightsky extends utils.Adapter {
     });
     await this.setState("info.connection", false, true);
     await this.library.init();
-    const states = await this.getStatesAsync("*");
-    await this.library.initStates(states);
     if (!this.config.createDaily) {
       await this.delObjectAsync("daily", { recursive: true });
     } else {
@@ -279,7 +277,7 @@ class Brightsky extends utils.Adapter {
         if (result.data.weather && Array.isArray(result.data.weather)) {
           const weatherArr = [];
           const resultArr = [];
-          const currentDay = Math.floor((/* @__PURE__ */ new Date()).getTime() / (24 * 60 * 60 * 1e3));
+          const currentDay = new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0)).getTime();
           for (const item of result.data.weather) {
             if (!item) {
               continue;
@@ -289,8 +287,9 @@ class Brightsky extends utils.Adapter {
               item.wind_speed,
               item.relative_humidity
             );
-            const dataDay = Math.floor(new Date(item.timestamp).getTime() / (24 * 60 * 60 * 1e3));
-            const day = dataDay - currentDay;
+            const day = Math.floor(
+              (new Date(item.timestamp).getTime() - currentDay) / (24 * 60 * 60 * 1e3)
+            );
             if (weatherArr[day] === void 0) {
               weatherArr[day] = {};
             }

@@ -332,7 +332,7 @@ class Brightsky extends utils.Adapter {
                 if (result.data.weather && Array.isArray(result.data.weather)) {
                     const weatherArr: Record<string, (string | number | null)[]>[] = [];
                     const resultArr: Partial<BrightskyDailyData>[] = [];
-                    const currentDay = Math.floor(new Date().getTime() / (24 * 60 * 60 * 1000)); // Current day in milliseconds
+                    const currentDay = new Date(new Date().setHours(0, 0, 0, 0)).getTime(); // Current day in milliseconds
                     for (const item of result.data.weather as BrightskyWeather[]) {
                         if (!item) {
                             continue; // Skip if item is null or undefined
@@ -345,8 +345,9 @@ class Brightsky extends utils.Adapter {
                             item.relative_humidity,
                         );
 
-                        const dataDay = Math.floor(new Date(item.timestamp).getTime() / (24 * 60 * 60 * 1000));
-                        const day = dataDay - currentDay;
+                        const day = Math.floor(
+                            (new Date(item.timestamp).getTime() - currentDay) / (24 * 60 * 60 * 1000),
+                        );
                         if (weatherArr[day] === undefined) {
                             weatherArr[day] = {};
                         }

@@ -50,7 +50,7 @@
     "brightsky adapter settings": "Adaptereinstellungen für brightsky",
     "createCurrently": "Erstellt aktuelle Wetterdatenübersicht",
     "createDaily": "Erstellt Tagesübersichten (nach 0:00, 5:00 und 18:00 Uhr)",
-    "createDailyCustomInterval": "Verwende benutzerdefiniertes Intervall für Tagesübersichten (0 aus) - nicht empfohlen",
+    "createDailyCustomInterval": "Verwende benutzerdefiniertes Intervall für Tagesübersichten (0 = 0:00/5:00/18:00 Uhr) - nicht empfohlen",
     "createHourly": "Erstellt stündliche Übersichten",
     "createRadar": "Erstellt Wetterradar-Daten",
     "createRadarData": "Erstellt detaillierten Radardaten-Ordner (Zeitreihendaten)",
