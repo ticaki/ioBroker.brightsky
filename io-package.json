@@ -1,33 +1,20 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "1.0.0-beta.1",
+    "version": "1.0.0",
     "news": {
-      "1.0.0-beta.1": {
-        "en": "fixed: states/timezone/translation",
-        "de": "fixed: states/timezone/translation ",
-        "ru": "фиксированный: удалить dps/timezone/translation",
-        "pt": "fixo: remover dps/timezone/tradução",
-        "nl": "vast: verwijder dps/tijdzone/vertaling",
-        "fr": "fixe: supprimer dps/timezone/traduction",
-        "it": "fisso: rimuovere dps/timezone/traduzione",
-        "es": "fijo: eliminar dps/timezone/traducción",
-        "pl": "stałe: usunąć dps / timezone / tłumaczenie",
-        "uk": "фіксована: видалення dps/timezone/translation",
-        "zh-cn": "固定: 删除 dps/ 时区/ 翻译"
-      },
-      "1.0.0-beta.0": {
-        "en": "Customisable update interval for Daily (expert)\nBREAKING: remove forHomoran states",
-        "de": "Benutzerdefinierte Update-Intervall für Daily (Experte)\nBREAKING: entfernen fürHomoran States",
-        "ru": "Интервал обновления для Daily (эксперт)\nОригинальное название: Remove forHomoran States",
-        "pt": "Intervalo de atualização personalizável para o Daily (expert)\nRENDIMENTO: remover para estados homorianos",
-        "nl": "Aanpasbaar update-interval voor dagelijks (deskundige)\nBreaking: verwijderen voorHomoraanse staten",
-        "fr": "Intervalle de mise à jour personnalisable pour chaque jour (expert)\nBREAKING: supprimer pour les états homorans",
-        "it": "Intervallo di aggiornamento personalizzabile per Daily (esperto)\nBREAKING: rimuovere gli stati omoran",
-        "es": "Intervalo de actualización personal para Daily (experto)\nBREAKING: eliminar los estados de Homoran",
-        "pl": "Dostosowalny interwał aktualizacji dla Daily (ekspert)\nBREAKING: usunąć dla Homoran stanów",
-        "uk": "Індивідуальний інтервал оновлення для щоденного (експерти)\nBREAKING: видалення для",
-        "zh-cn": "可自定义的每日更新间隔( 专家)\n霍莫兰州:"
+      "1.0.0": {
+        "en": "fixed: states/timezone/translation\nCustomisable update interval for Daily (expert)\nBREAKING: remove forHomoran states",
+        "de": "behoben: zustände/zeitzone/übersetzung\nBenutzerdefinierte Update-Intervall für Daily (Experte)\nBREAKING: entfernen fürHomoran States",
+        "ru": "фиксированный: состояния/временная зона/перевод\nИнтервал обновления для Daily (эксперт)\nОригинальное название: Remove forHomoran States",
+        "pt": "fixo: estados/zona temporal/tradução\nIntervalo de atualização personalizável para o Daily (expert)\nRENDIMENTO: remover para estados homorianos",
+        "nl": "vast: toestanden/tijdzone/vertaling\nAanpasbaar update-interval voor dagelijks (deskundige)\nBreaking: verwijderen voorHomoraanse staten",
+        "fr": "fixe : état/heure/traduction\nIntervalle de mise à jour personnalisable pour chaque jour (expert)\nBREAKING: supprimer pour les états homorans",
+        "it": "fisso: stato/tempo/traduzione\nIntervallo di aggiornamento personalizzabile per Daily (esperto)\nBREAKING: rimuovere gli stati omoran",
+        "es": "fija: estados/zona horaria/traducción\nIntervalo de actualización personal para Daily (experto)\nBREAKING: eliminar los estados de Homoran",
+        "pl": "stałe: stany / strefa czasowa / tłumaczenie\nDostosowalny interwał aktualizacji dla Daily (ekspert)\nBREAKING: usunąć dla Homoran stanów",
+        "uk": "фіксована: стани/часозон/трансляція\nІндивідуальний інтервал оновлення для щоденного (експерти)\nBREAKING: видалення для",
+        "zh-cn": "固定:状态/时区/翻译\n可自定义的每日更新间隔( 专家)\n霍莫兰州:"
       },
       "0.6.7": {
         "en": "Corrected some roles for Lovelance\nAdded conditionUI\nAir pressure and humidity are now integers\nAdded air pressure to daily data\nImproved error logging",
