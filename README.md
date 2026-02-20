@@ -84,9 +84,8 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.0.1 (2026-02-20)
 - (ticaki) sunrise and sunset fixed
-
 
 ### 1.0.0 (2026-01-10)
 - (ticaki) fixed: states/timezone/translation

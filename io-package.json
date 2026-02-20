@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "news": {
+      "1.0.1": {
+        "en": "fixed: sunrise and sunset calculation",
+        "de": "behoben: Berechnung von Sonnenaufgang und Sonnenuntergang",
+        "ru": "исправлено: расчет восхода и заката",
+        "pt": "corrigido: cálculo do nascer e do pôr do sol",
+        "nl": "gerepareerd: berekening van zonsopgang en zonsondergang",
+        "fr": "corrigé : calcul du lever et du coucher du soleil",
+        "it": "corretto: calcolo dell'alba e del tramonto",
+        "es": "corregido: cálculo del amanecer y el atardecer",
+        "pl": "naprawiono: obliczanie wschodu i zachodu słońca",
+        "uk": "виправлено: розрахунок сходу та заходу сонця",
+        "zh-cn": "修正：日出和日落计算"
+      },
       "1.0.0": {
         "en": "fixed: states/timezone/translation\nCustomisable update interval for Daily (expert)\nBREAKING: remove forHomoran states",
         "de": "behoben: zustände/zeitzone/übersetzung\nBenutzerdefinierte Update-Intervall für Daily (Experte)\nBREAKING: entfernen fürHomoran States",
