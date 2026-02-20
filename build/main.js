@@ -324,7 +324,8 @@ class Brightsky extends utils.Adapter {
               }
               switch (k) {
                 case "timestamp": {
-                  dailyData.timestamp = weatherArr[i].timestamp[0];
+                  const middleIndex = Math.floor(weatherArr[i].timestamp.length / 2);
+                  dailyData.timestamp = weatherArr[i].timestamp[middleIndex];
                   break;
                 }
                 case "source_id": {
@@ -500,8 +501,11 @@ class Brightsky extends utils.Adapter {
                 }
               }
             }
+            const currentDayLocal = new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0));
+            const targetDate = new Date(currentDayLocal);
+            targetDate.setDate(currentDayLocal.getDate() + i);
             const times = suncalc.getTimes(
-              new Date(dailyData.timestamp),
+              targetDate,
               parseFloat(this.config.position.split(",")[0]),
               parseFloat(this.config.position.split(",")[1])
             );

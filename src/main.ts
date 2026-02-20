@@ -382,7 +382,9 @@ class Brightsky extends utils.Adapter {
                             }
                             switch (k) {
                                 case 'timestamp': {
-                                    dailyData.timestamp = weatherArr[i].timestamp[0] as string;
+                                    // Use middle timestamp of the day instead of first to avoid timezone issues
+                                    const middleIndex = Math.floor(weatherArr[i].timestamp.length / 2);
+                                    dailyData.timestamp = weatherArr[i].timestamp[middleIndex] as string;
                                     break;
                                 }
                                 case 'source_id': {
@@ -592,8 +594,12 @@ class Brightsky extends utils.Adapter {
                         temperature_min: weatherArr.min[i].temperature,
                         temperature_max: weatherArr.max[i].temperature,
                     };*/
+                        // Calculate sunrise/sunset based on day index, not timestamp, to avoid timezone issues
+                        const currentDayLocal = new Date(new Date().setHours(0, 0, 0, 0));
+                        const targetDate = new Date(currentDayLocal);
+                        targetDate.setDate(currentDayLocal.getDate() + i);
                         const times = suncalc.getTimes(
-                            new Date(dailyData.timestamp as string),
+                            targetDate,
                             parseFloat(this.config.position.split(',')[0]),
                             parseFloat(this.config.position.split(',')[1]),
                         );
