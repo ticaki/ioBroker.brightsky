@@ -501,7 +501,7 @@ class Brightsky extends utils.Adapter {
                 }
               }
             }
-            const currentDayLocal = new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0));
+            const currentDayLocal = new Date((/* @__PURE__ */ new Date()).setHours(12, 0, 0, 0));
             const targetDate = new Date(currentDayLocal);
             targetDate.setDate(currentDayLocal.getDate() + i);
             const times = suncalc.getTimes(

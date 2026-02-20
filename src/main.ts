@@ -595,7 +595,7 @@ class Brightsky extends utils.Adapter {
                         temperature_max: weatherArr.max[i].temperature,
                     };*/
                         // Calculate sunrise/sunset based on day index, not timestamp, to avoid timezone issues
-                        const currentDayLocal = new Date(new Date().setHours(0, 0, 0, 0));
+                        const currentDayLocal = new Date(new Date().setHours(12, 0, 0, 0));
                         const targetDate = new Date(currentDayLocal);
                         targetDate.setDate(currentDayLocal.getDate() + i);
                         const times = suncalc.getTimes(
