@@ -2,6 +2,19 @@
 
 // Augment the globally declared type ioBroker.AdapterConfig
 declare global {
+    interface Panel {
+        azimuth: number;
+        tilt: number;
+        area: number;
+        efficiency: number;
+        wr: 0 | 1 | 2 | 3;
+    }
+
+    interface Coords {
+        lat: number;
+        lon: number;
+    }
+
     namespace ioBroker {
         interface AdapterConfig {
             /**
