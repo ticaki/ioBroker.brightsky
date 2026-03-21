@@ -52,6 +52,7 @@
   ],
   "scripts": {
     "prebuild": "rimraf build",
+    "prepare": "npm run build",
     "build": "build-adapter ts",
     "watch": "build-adapter ts --watch",
     "prebuild:ts": "rimraf build",
