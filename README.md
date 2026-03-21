@@ -85,7 +85,7 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (ticaki) Fixed: DWD station ID was incorrectly logged as WMO station ID fixes [#28](https://github.com/ticaki/ioBroker.brightsky/issues/28)
+- (ticaki) Fixed: DWD station ID was incorrectly logged as WMO station ID fixes [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)
 
 ### 1.0.1 (2026-02-20)
 - (ticaki) sunrise and sunset fixed
