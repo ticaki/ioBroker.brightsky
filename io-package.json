@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "news": {
+      "1.0.3": {
+        "en": "fix: hourly data correctly nested under daily.XX.hourly.YY; remove fallback_source_ids; restructured admin UI with sections; forecast poll interval default 2h",
+        "de": "fix: stündliche Daten korrekt unter daily.XX.hourly.YY; fallback_source_ids entfernt; Admin-UI mit Sektionen strukturiert; Vorhersage-Abfrageintervall Standard 2h"
+      },
       "1.0.2": {
         "en": "feat: configurable forecast days, hourly data nested under daily.XX.hourly.YY, removed top-level hourly tree",
         "de": "feat: konfigurierbare Vorhersagetage, stuendliche Daten unter daily.XX.hourly.YY, top-level hourly-Baum entfernt"
@@ -160,11 +164,12 @@
       {
         "admin": ">=7.6.17"
       }
-    ]
+    ],
+    "installedFrom": "cavernerg/ioBroker.brightsky"
   },
   "native": {
     "position": "",
-    "pollInterval": 1,
+    "pollInterval": 2,
     "maxDistance": 50000,
     "forecastDays": 7,
     "hourlyForecastDays": 3,
