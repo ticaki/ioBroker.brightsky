@@ -1,12 +1,3 @@
-/*type ChangeTypeToChannelAndState<Obj> = Obj extends object
-    ? {
-          [K in keyof Obj]-?: ChangeTypeToChannelAndState<Obj[K]>;
-      } & customChannelType
-    : ioBroker.StateObject;
-export type ChangeToChannel<Obj, T> = Obj extends object
-    ? { [K in keyof Obj]-?: customChannelType & T }
-    : ioBroker.StateObject;
-*/
 export type ChangeTypeOfKeysForState<Obj, N> = Obj extends object
     ? customChannelType & { [K in keyof Obj]: ChangeTypeOfKeysForState<Obj[K], N> }
     : N;
@@ -1268,6 +1259,11 @@ export const genericStateObjects: {
         },
         daily: {
             ...daily,
+            hourly: {
+                _channel: { _id: '', type: 'folder' as const, common: { name: 'Hourly Forecast' }, native: {} },
+                _array:   { _id: '', type: 'folder' as const, common: { name: 'Hour' }, native: {} },
+                ...hourly,
+            },
             day: {
                 ...daily,
                 _channel: {
@@ -2052,6 +2048,7 @@ export type BrightskyDailyData = BrightskyWeather & {
     night?: Partial<BrightskyDayNightData>;
     dayName_short?: string | null;
     dayName_long?: string | null;
+    hourly?: BrightskyWeather[];
 };
 
 export type BrightskyDayNightData = BrightskyWeather & {

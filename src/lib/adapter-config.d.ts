@@ -16,7 +16,8 @@ declare global {
              */
             pollInterval: number;
 
-            hours: number;
+            forecastDays: number;
+            hourlyForecastDays: number;
             /**
              * Maximum distance in meters for location-based queries.
              * Default is 50000 meters (50 km).
@@ -27,7 +28,6 @@ declare global {
 
             createCurrently: boolean;
             createDailyCustomInterval: number;
-            createHourly: boolean;
             createDaily: boolean;
             createRadar: boolean;
             createRadarData: boolean;

@@ -1,8 +1,7 @@
 {
     "brightsky adapter settings": "Adapter settings for brightsky",
     "position": "Position",
-    "pollInterval": "Query interval overview of hours (every hour on the hour)",
-    "Hours-to-display": "Hours to display",
+    "pollInterval": "Query interval for forecast (hourly)",
     "maxDistance": "Maximum distance to the weather station",
     "pollIntervalCurrently": "Query Interval for current weather (in minutes)",
     "createDaily": "Creates daily overviews (after 0:00, 5:00 and 18:00)",
@@ -13,6 +12,8 @@
     "createRadarData": "Creates detailed radar data folder (time-series data)",
     "pollIntervalRadar": "Query interval for radar data (in minutes, must be divisible by 5)",
     "radarDistance": "Radar search area radius (data extends this distance to each side from center, max 50km)",
+    "forecastDays": "Number of forecast days",
+    "hourlyForecastDays": "Days with hourly data",
     "wmo_station": "WMO station ID (optional, default is empty)",
     "wmo_station_link": "Link to WMO station information",
     "dwd_station_id": "DWD station ID (optional, default is empty)",

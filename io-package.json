@@ -161,7 +161,9 @@
   "native": {
     "position": "",
     "pollInterval": 1,
-    "maxDistance": 50000
+    "maxDistance": 50000,
+    "forecastDays": 7,
+    "hourlyForecastDays": 3
   },
   "objects": [],
   "instanceObjects": [

@@ -55,7 +55,7 @@
                     "max": 24,
                     "step": 1,
                     "unit": "hours",
-                    "disabled": "!data.createHourly",
+                    "disabled": "!data.createDaily",
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -121,14 +121,31 @@
                     "lg": 4,
                     "xl": 4
                 },
-                "hours": {
+                "forecastDays": {
                     "type": "number",
-                    "label": "Hours-to-display",
-                    "default": 12,
+                    "label": "forecastDays",
+                    "default": 7,
+                    "min": 1,
+                    "max": 10,
+                    "step": 1,
+                    "unit": "days",
+                    "disabled": "!data.createDaily",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "hourlyForecastDays": {
+                    "type": "number",
+                    "label": "hourlyForecastDays",
+                    "default": 3,
                     "min": 0,
-                    "max": 48,
-                    "disabled": "!data.createHourly",
-                    "unit": "hours",
+                    "max": 10,
+                    "step": 1,
+                    "unit": "days",
+                    "disabled": "!data.createDaily",
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -139,17 +156,6 @@
                 "createCurrently": {
                     "type": "checkbox",
                     "label": "createCurrently",
-                    "default": true,
-                    "newLine": true,
-                    "xs": 12,
-                    "sm": 12,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 4
-                },
-                "createHourly": {
-                    "type": "checkbox",
-                    "label": "createHourly",
                     "default": true,
                     "newLine": true,
                     "xs": 12,
@@ -185,7 +191,6 @@
                     "lg": 4,
                     "xl": 4
                 },
-                
                 "createRadar": {
                     "type": "checkbox",
                     "label": "createRadar",
@@ -275,7 +280,7 @@
                             "step": 1,
                             "unit": "°"
                         },
-                         {
+                        {
                             "attr": "area",
                             "type": "number",
                             "label": "area",
@@ -298,10 +303,22 @@
                             "attr": "wr",
                             "type": "select",
                             "options": [
-                                {"value": 0, "label": "Inverter1"},
-                                {"value": 1, "label": "Inverter2"},
-                                {"value": 2, "label": "Inverter3"},
-                                {"value": 3, "label": "Inverter4"}
+                                {
+                                    "value": 0,
+                                    "label": "Inverter1"
+                                },
+                                {
+                                    "value": 1,
+                                    "label": "Inverter2"
+                                },
+                                {
+                                    "value": 2,
+                                    "label": "Inverter3"
+                                },
+                                {
+                                    "value": 3,
+                                    "label": "Inverter4"
+                                }
                             ],
                             "label": "__wr",
                             "default": 0
