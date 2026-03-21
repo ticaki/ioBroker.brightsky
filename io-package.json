@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "news": {
+      "1.0.2": {
+        "en": "feat: configurable forecast days, hourly data nested under daily.XX.hourly.YY, removed top-level hourly tree",
+        "de": "feat: konfigurierbare Vorhersagetage, stuendliche Daten unter daily.XX.hourly.YY, top-level hourly-Baum entfernt"
+      },
       "1.0.1": {
         "en": "fixed: sunrise and sunset calculation",
         "de": "behoben: Berechnung von Sonnenaufgang und Sonnenuntergang",
