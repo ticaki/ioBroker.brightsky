@@ -88,6 +88,16 @@ class Brightsky extends utils.Adapter {
             await this.library.writedp('current', null, genericStateObjects.weather.current._channel);
         }
         await this.delObjectAsync('hourly', { recursive: true });
+        // Remove legacy fallback_source_ids objects
+        const fbObjects = await this.getObjectViewAsync('system', 'state', {
+            startkey: `${this.namespace}.daily.`,
+            endkey: `${this.namespace}.daily.\u9999`,
+        });
+        for (const row of fbObjects.rows) {
+            if (row.id.includes('.fallback_source_ids')) {
+                await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ''), { recursive: true });
+            }
+        }
         if (!this.config.createRadar) {
             await this.delObjectAsync('radar', { recursive: true });
         } else {
@@ -339,7 +349,8 @@ class Brightsky extends utils.Adapter {
                             if (rawHourlyByDay[day] === undefined) {
                                 rawHourlyByDay[day] = [];
                             }
-                            rawHourlyByDay[day].push(item);
+                            const { fallback_source_ids: _ignored, ...itemFiltered } = item as any;
+                            rawHourlyByDay[day].push(itemFiltered);
                         }
                         for (const key of Object.keys(item)) {
                             if (weatherArr[day][key] === undefined) {
