@@ -1263,7 +1263,7 @@ export const genericStateObjects: {
                 _channel: { _id: '', type: 'folder' as const, common: { name: 'Hourly Forecast' }, native: {} },
                 _array:   { _id: '', type: 'folder' as const, common: { name: 'Hour' }, native: {} },
                 ...hourly,
-            },
+            } as any,
             day: {
                 ...daily,
                 _channel: {
