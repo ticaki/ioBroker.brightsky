@@ -858,10 +858,10 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         native: {},
     },
     pressure_msl_min: {
-        _id: 'pressure_msl_median',
+        _id: 'pressure_msl_min',
         type: 'state',
         common: {
-            name: 'Pressure MSL Median',
+            name: 'Pressure MSL Min',
             type: 'number',
             role: 'value.pressure.min',
             read: true,
@@ -871,10 +871,10 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         native: {},
     },
     pressure_msl_max: {
-        _id: 'pressure_msl_median',
+        _id: 'pressure_msl_max',
         type: 'state',
         common: {
-            name: 'Pressure MSL Median',
+            name: 'Pressure MSL Max',
             type: 'number',
             role: 'value.pressure.max',
             read: true,

@@ -163,7 +163,11 @@
     "pollInterval": 1,
     "maxDistance": 50000,
     "forecastDays": 7,
-    "hourlyForecastDays": 3
+    "hourlyForecastDays": 3,
+    "createCurrently": true,
+    "createDaily": true,
+    "createRadar": false,
+    "createRadarData": false
   },
   "objects": [],
   "instanceObjects": [

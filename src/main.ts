@@ -75,7 +75,7 @@ class Brightsky extends utils.Adapter {
         } else {
             // Create the daily data folder
             await this.library.writedp('daily', null, genericStateObjects.weather.daily._channel);
-            for (let day = 0; day < 8; day++) {
+            for (let day = 0; day < 10; day++) {
                 if (this.library.readdb(`daily.0${day}.solar_estimateForHomoran`) != null) {
                     await this.delObjectAsync(`daily.0${day}.solar_estimateForHomoran`);
                 }
@@ -293,9 +293,10 @@ class Brightsky extends utils.Adapter {
      */
     async weatherDailyUpdate(): Promise<void> {
         const startTime = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
-        const endTime = new Date(
-            new Date(new Date().setHours(23, 59, 59, 999)).setDate(new Date().getDate() + this.config.forecastDays),
-        ).toISOString();
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + this.config.forecastDays);
+        endDate.setHours(23, 59, 59, 999);
+        const endTime = endDate.toISOString();
         try {
             const response = await this.fetch(
                 `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
@@ -611,7 +612,7 @@ class Brightsky extends utils.Adapter {
                         dailyData.night = nightData;
 
                         if (i < this.config.hourlyForecastDays && rawHourlyByDay[i] !== undefined) {
-                            (dailyData as any).hourly = rawHourlyByDay[i];
+                            dailyData.hourly = rawHourlyByDay[i];
                         }
                         resultArr.push(dailyData);
                     }
