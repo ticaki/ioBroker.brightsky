@@ -84,7 +84,7 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 1.0.2 (2026-03-21)
+### **WORK IN PROGRESS**
 - (ticaki) Fixed: DWD station ID was incorrectly logged as WMO station ID fixes [#28](https://github.com/ticaki/ioBroker.brightsky/issues/28)
 
 ### 1.0.1 (2026-02-20)
