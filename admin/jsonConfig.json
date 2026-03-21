@@ -6,6 +6,17 @@
             "type": "panel",
             "label": "General",
             "items": {
+                "headerLocation": {
+                    "type": "header",
+                    "size": 5,
+                    "text": "headerLocation",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
                 "position": {
                     "type": "coordinates",
                     "label": "position",
@@ -32,46 +43,15 @@
                     "lg": 4,
                     "xl": 4
                 },
-                "pollIntervalCurrently": {
-                    "type": "number",
-                    "label": "pollIntervalCurrently",
-                    "default": 60,
-                    "min": 10,
-                    "step": 1,
-                    "unit": "minutes",
-                    "disabled": "!data.createCurrently",
-                    "newLine": true,
-                    "xs": 12,
-                    "sm": 12,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 4
-                },
-                "pollInterval": {
-                    "type": "number",
-                    "label": "pollInterval",
-                    "default": 1,
-                    "min": 1,
-                    "max": 24,
-                    "step": 1,
-                    "unit": "hours",
-                    "disabled": "!data.createDaily",
-                    "newLine": true,
-                    "xs": 12,
-                    "sm": 12,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 4
-                },
                 "statictext1": {
                     "type": "staticText",
                     "text": "statictext1",
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 4
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "staticLink1": {
                     "type": "staticLink",
@@ -90,7 +70,7 @@
                     "label": "wmo_station",
                     "disabled": "data.dwd_station_id",
                     "default": "",
-                    "newLine": true,
+                    "newLine": false,
                     "xs": 12,
                     "sm": 12,
                     "md": 6,
@@ -114,6 +94,38 @@
                     "label": "dwd_station_id",
                     "disabled": "data.wmo_station",
                     "default": "",
+                    "newLine": false,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+
+                "divider1": {
+                    "type": "divider",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "headerForecast": {
+                    "type": "header",
+                    "size": 5,
+                    "text": "headerForecast",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "createDaily": {
+                    "type": "checkbox",
+                    "label": "createDaily",
+                    "default": true,
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -146,28 +158,22 @@
                     "step": 1,
                     "unit": "days",
                     "disabled": "!data.createDaily",
-                    "newLine": true,
+                    "newLine": false,
                     "xs": 12,
                     "sm": 12,
                     "md": 6,
                     "lg": 4,
                     "xl": 4
                 },
-                "createCurrently": {
-                    "type": "checkbox",
-                    "label": "createCurrently",
-                    "default": true,
-                    "newLine": true,
-                    "xs": 12,
-                    "sm": 12,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 4
-                },
-                "createDaily": {
-                    "type": "checkbox",
-                    "label": "createDaily",
-                    "default": true,
+                "pollInterval": {
+                    "type": "number",
+                    "label": "pollInterval",
+                    "default": 2,
+                    "min": 1,
+                    "max": 24,
+                    "step": 1,
+                    "unit": "hours",
+                    "disabled": "!data.createDaily",
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -184,12 +190,80 @@
                     "step": 1,
                     "unit": "hours",
                     "default": 0,
+                    "newLine": false,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+
+                "divider2": {
+                    "type": "divider",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "headerCurrentWeather": {
+                    "type": "header",
+                    "size": 5,
+                    "text": "headerCurrentWeather",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "createCurrently": {
+                    "type": "checkbox",
+                    "label": "createCurrently",
+                    "default": true,
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
                     "md": 6,
                     "lg": 4,
                     "xl": 4
+                },
+                "pollIntervalCurrently": {
+                    "type": "number",
+                    "label": "pollIntervalCurrently",
+                    "default": 60,
+                    "min": 10,
+                    "step": 1,
+                    "unit": "minutes",
+                    "disabled": "!data.createCurrently",
+                    "newLine": false,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+
+                "divider3": {
+                    "type": "divider",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "headerRadar": {
+                    "type": "header",
+                    "size": 5,
+                    "text": "headerRadar",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 },
                 "createRadar": {
                     "type": "checkbox",
@@ -207,7 +281,7 @@
                     "label": "createRadarData",
                     "default": false,
                     "disabled": "!data.createRadar",
-                    "newLine": true,
+                    "newLine": false,
                     "xs": 12,
                     "sm": 12,
                     "md": 6,
@@ -238,7 +312,7 @@
                     "step": 500,
                     "unit": "meters",
                     "disabled": "!data.createRadar",
-                    "newLine": true,
+                    "newLine": false,
                     "xs": 12,
                     "sm": 12,
                     "md": 6,
@@ -303,22 +377,10 @@
                             "attr": "wr",
                             "type": "select",
                             "options": [
-                                {
-                                    "value": 0,
-                                    "label": "Inverter1"
-                                },
-                                {
-                                    "value": 1,
-                                    "label": "Inverter2"
-                                },
-                                {
-                                    "value": 2,
-                                    "label": "Inverter3"
-                                },
-                                {
-                                    "value": 3,
-                                    "label": "Inverter4"
-                                }
+                                { "value": 0, "label": "Inverter1" },
+                                { "value": 1, "label": "Inverter2" },
+                                { "value": 2, "label": "Inverter3" },
+                                { "value": 3, "label": "Inverter4" }
                             ],
                             "label": "__wr",
                             "default": 0
