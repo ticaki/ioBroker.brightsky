@@ -182,7 +182,14 @@ export class Library extends BaseClass {
                 }
 
                 for (const k in data) {
-                    await this.writeFromJson(`${prefix}.${k}`, `${objNode}.${k}`, def, data[k], expandTree);
+                    if (Array.isArray(data[k])) {
+                        const containerDef = await this.getObjectDefFromJson(`${objNode}.${k}`, def, data[k]);
+                        const containerChannel = this.getChannelObject(containerDef);
+                        await this.writedp(`${prefix}.${k}`, null, containerChannel);
+                        await this.writeFromJson(`${prefix}.${k}.r`, `${objNode}.${k}`, def, data[k], expandTree);
+                    } else {
+                        await this.writeFromJson(`${prefix}.${k}`, `${objNode}.${k}`, def, data[k], expandTree);
+                    }
                 }
             }
         } else {
