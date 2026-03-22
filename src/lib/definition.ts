@@ -1261,8 +1261,10 @@ export const genericStateObjects: {
             ...daily,
             hourly: {
                 _channel: { _id: '', type: 'folder' as const, common: { name: 'Hourly Forecast' }, native: {} },
-                _array:   { _id: '', type: 'folder' as const, common: { name: 'Hour' }, native: {} },
+                _array: { _id: '', type: 'folder' as const, common: { name: 'Hour' }, native: {} },
                 ...hourly,
+                // cast needed because the TS type for daily.hourly maps BrightskyWeather[] → array type,
+                // but here we provide a channel-definition object (not runtime data)
             } as any,
             day: {
                 ...daily,
@@ -2102,6 +2104,8 @@ export type BrightskyWeather = {
     solar: number | null;
     solar_estimate?: number | null;
     apparent_temperature?: number | null;
+    /** API metadata field, present in /weather responses but not relevant for home automation */
+    fallback_source_ids?: unknown;
 
     icon: string | null;
     icon_special?: string | null;

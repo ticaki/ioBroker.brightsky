@@ -73,8 +73,9 @@ The data is as follows Provided:
 
 
 * current - the current weather (see also: https://brightsky.dev/docs/#/operations/getCurrentWeather )
-* daily - the current weather forecast for the next 8 days (created by the adapter and is not part of the API)
-* hourly - the current weather forecast for the next defined n hours (see also: https://brightsky.dev/docs/#/operations/getWeather )
+* daily - the current weather forecast for the next configurable number of days (see forecastDays config, default 7 days), with optional nested hourly data per day (see hourlyForecastDays)
+* hourly - the current weather forecast for the next defined n hours (flat list, see also: https://brightsky.dev/docs/#/operations/getWeather )
+  * The day index `daily.XX.hourly` additionally contains hourly data nested under the respective day (new optional feature)
 * radar - precipitation radar forecast for the next 2 hours in 5-minute intervals with values in mm per 5 minutes. Includes maximum values across grid cells and cumulative sums across all grid areas (see also: https://brightsky.dev/docs/#/operations/getRadar )
 
 ---
@@ -84,6 +85,15 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Added nested hourly forecast under `daily.XX.hourly.YY` as additional optional feature (configurable via `forecastDays` and `hourlyForecastDays`)
+- (ticaki) Existing flat `hourly/` tree preserved alongside new nested hourly data
+- (ticaki) Fixed forecastDays end-date calculation to cover exactly the configured number of days
+- (ticaki) Improved admin UI with labeled sections (Location, Forecast, Hourly Overview, Current Weather, Weather Radar)
+- (ticaki) Added `fallback_source_ids` field to `BrightskyWeather` type for proper type-safety when filtering API metadata
+- (ticaki) Removed misleading `installedFrom` field from io-package.json
+- (ticaki) Added missing translations for new UI keys to all supported languages
+
 ### 1.0.1 (2026-02-20)
 - (ticaki) sunrise and sunset fixed
 

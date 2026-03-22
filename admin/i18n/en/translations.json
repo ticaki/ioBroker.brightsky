@@ -1,7 +1,8 @@
 {
     "brightsky adapter settings": "Adapter settings for brightsky",
     "position": "Position",
-    "pollInterval": "Query interval for forecast (hourly)",
+    "pollInterval": "Query interval for hourly data (in hours)",
+    "Hours-to-display": "Hours to display",
     "maxDistance": "Maximum distance to the weather station",
     "pollIntervalCurrently": "Query Interval for current weather (in minutes)",
     "createDaily": "Creates daily overviews (after 0:00, 5:00 and 18:00)",
@@ -15,6 +16,7 @@
     "forecastDays": "Number of forecast days",
     "headerCurrentWeather": "Current Weather",
     "headerForecast": "Forecast",
+    "headerHourly": "Hourly Overview",
     "headerLocation": "Location",
     "headerRadar": "Weather Radar",
     "hourlyForecastDays": "Days with hourly data",

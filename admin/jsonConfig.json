@@ -165,22 +165,6 @@
                     "lg": 4,
                     "xl": 4
                 },
-                "pollInterval": {
-                    "type": "number",
-                    "label": "pollInterval",
-                    "default": 2,
-                    "min": 1,
-                    "max": 24,
-                    "step": 1,
-                    "unit": "hours",
-                    "disabled": "!data.createDaily",
-                    "newLine": true,
-                    "xs": 12,
-                    "sm": 12,
-                    "md": 6,
-                    "lg": 4,
-                    "xl": 4
-                },
                 "createDailyCustomInterval": {
                     "type": "number",
                     "label": "createDailyCustomInterval",
@@ -199,6 +183,69 @@
                 },
 
                 "divider2": {
+                    "type": "divider",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "headerHourly": {
+                    "type": "header",
+                    "size": 5,
+                    "text": "headerHourly",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "createHourly": {
+                    "type": "checkbox",
+                    "label": "createHourly",
+                    "default": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "hours": {
+                    "type": "number",
+                    "label": "Hours-to-display",
+                    "default": 12,
+                    "min": 0,
+                    "max": 48,
+                    "disabled": "!data.createHourly",
+                    "unit": "hours",
+                    "newLine": false,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+                "pollInterval": {
+                    "type": "number",
+                    "label": "pollInterval",
+                    "default": 1,
+                    "min": 1,
+                    "max": 24,
+                    "step": 1,
+                    "unit": "hours",
+                    "disabled": "!data.createHourly",
+                    "newLine": false,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
+
+                "divider3": {
                     "type": "divider",
                     "newLine": true,
                     "xs": 12,
@@ -245,7 +292,7 @@
                     "xl": 4
                 },
 
-                "divider3": {
+                "divider4": {
                     "type": "divider",
                     "newLine": true,
                     "xs": 12,

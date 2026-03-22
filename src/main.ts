@@ -87,8 +87,14 @@ class Brightsky extends utils.Adapter {
             // Create the currently data folder
             await this.library.writedp('current', null, genericStateObjects.weather.current._channel);
         }
-        await this.delObjectAsync('hourly', { recursive: true });
-        // Remove legacy fallback_source_ids objects
+        if (!this.config.createHourly) {
+            await this.delObjectAsync('hourly', { recursive: true });
+        } else {
+            // Create the hourly data folder
+            await this.library.writedp('hourly', null, genericStateObjects.weather.hourly._channel);
+            await this.library.writedp('hourly.sources', undefined, genericStateObjects.weather.sources._channel);
+        }
+        // Remove legacy fallback_source_ids objects from the daily subtree
         const fbObjects = await this.getObjectViewAsync('system', 'state', {
             startkey: `${this.namespace}.daily.`,
             endkey: `${this.namespace}.daily.\u9999`,
@@ -123,6 +129,7 @@ class Brightsky extends utils.Adapter {
 
         if (
             !this.config.createCurrently &&
+            !this.config.createHourly &&
             !this.config.createDaily &&
             !this.config.createRadar
         ) {
@@ -178,10 +185,18 @@ class Brightsky extends utils.Adapter {
         if (this.config.panels == undefined || !Array.isArray(this.config.panels)) {
             this.config.panels = [];
         }
+        if (this.config.hours == undefined || this.config.hours < 0 || this.config.hours > 48) {
+            this.log.warn(`Invalid hours to display: ${this.config.hours}. Using default value of 24 hours.`);
+            this.config.hours = 24; // Default to 24 hours if invalid
+        }
         if (this.config.forecastDays == undefined || this.config.forecastDays < 1 || this.config.forecastDays > 10) {
             this.config.forecastDays = 7;
         }
-        if (this.config.hourlyForecastDays == undefined || this.config.hourlyForecastDays < 0 || this.config.hourlyForecastDays > this.config.forecastDays) {
+        if (
+            this.config.hourlyForecastDays == undefined ||
+            this.config.hourlyForecastDays < 0 ||
+            this.config.hourlyForecastDays > this.config.forecastDays
+        ) {
             this.config.hourlyForecastDays = Math.min(3, this.config.forecastDays);
         }
 
@@ -245,6 +260,10 @@ class Brightsky extends utils.Adapter {
             await this.delay(3000); // Wait for 1 second to ensure the adapter is ready
             await this.weatherCurrentlyLoop();
         }
+        if (this.config.createHourly) {
+            await this.delay(3000);
+            await this.weatherHourlyLoop();
+        }
         if (this.config.createDaily) {
             await this.delay(3000);
             await this.weatherDailyLoop();
@@ -254,7 +273,7 @@ class Brightsky extends utils.Adapter {
             await this.weatherRadarLoop();
         }
         this.log.info(
-            `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createDaily ? `Daily forecast: ${this.config.forecastDays} days, hourly for ${this.config.hourlyForecastDays} days. Poll interval: ${this.config.pollInterval} hours` : ''} - ${this.config.createDaily ? (this.config.createDailyCustomInterval ? `Daily data enabled. Poll interval: ${this.config.createDailyCustomInterval}h` : 'Daily data enabled') : 'Daily data disabled'} - ${this.config.createRadar ? `Radar data enabled. Poll interval: ${this.config.pollIntervalRadar} minutes` : 'Radar data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
+            `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours, ${this.config.hours} hours ahead` : 'Hourly data disabled'} - ${this.config.createDaily ? `Daily forecast: ${this.config.forecastDays} days, nested hourly for ${this.config.hourlyForecastDays} days` : 'Daily forecast disabled'} - ${this.config.createDaily ? (this.config.createDailyCustomInterval ? `Daily data enabled. Custom interval: every ${this.config.createDailyCustomInterval}h` : 'Daily data enabled. Scheduled at 05:00, 18:00 and 00:00') : 'Daily data disabled'} - ${this.config.createRadar ? `Radar data enabled. Poll interval: ${this.config.pollIntervalRadar} minutes` : 'Radar data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
         );
         this.log.info(
             `Using ${this.config.dwd_station_id ? `WMO Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`,
@@ -299,12 +318,17 @@ class Brightsky extends utils.Adapter {
 
     /**
      * Fetches and processes daily weather forecast data from BrightSky API
-     * Retrieves weather data for the next 8 days and creates aggregated daily values
+     * Retrieves weather data for the configured number of forecast days (see forecastDays config)
+     * and creates aggregated daily values. For the first hourlyForecastDays days, also stores
+     * raw hourly data nested under daily.XX.hourly.
      */
     async weatherDailyUpdate(): Promise<void> {
         const startTime = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+        // Ensure the date range covers exactly forecastDays days including today
+        const forecastDaysCount = this.config.forecastDays || 0;
+        const daysToAdd = Math.max(0, forecastDaysCount - 1);
         const endDate = new Date();
-        endDate.setDate(endDate.getDate() + this.config.forecastDays);
+        endDate.setDate(endDate.getDate() + daysToAdd);
         endDate.setHours(23, 59, 59, 999);
         const endTime = endDate.toISOString();
         try {
@@ -349,15 +373,19 @@ class Brightsky extends utils.Adapter {
                             if (rawHourlyByDay[day] === undefined) {
                                 rawHourlyByDay[day] = [];
                             }
-                            const { fallback_source_ids: _ignored, ...itemFiltered } = item as any;
-                            rawHourlyByDay[day].push(itemFiltered);
+                            // Strip the API metadata field before storing hourly items
+                            const { fallback_source_ids: _ignored, ...itemFiltered } = item;
+                            rawHourlyByDay[day].push(itemFiltered as BrightskyWeather);
                         }
                         for (const key of Object.keys(item)) {
+                            if (key === 'fallback_source_ids') {
+                                continue; // skip API metadata field, not a weather data point
+                            }
                             if (weatherArr[day][key] === undefined) {
                                 weatherArr[day][key] = [];
                             }
                             const k = key as keyof BrightskyWeather;
-                            weatherArr[day][key].push(item[k] ?? null);
+                            weatherArr[day][key].push((item[k] as string | number | null | undefined) ?? null);
                         }
                     }
                     for (let i = 0; i < weatherArr.length; i++) {
@@ -680,6 +708,124 @@ class Brightsky extends utils.Adapter {
             }
 
             this.log.error(errorDetails.join('\n'));
+        }
+    }
+
+    /**
+     * Manages the hourly weather data update loop
+     * Schedules updates based on configured poll interval with random delay
+     */
+    async weatherHourlyLoop(): Promise<void> {
+        if (this.weatherTimeout[1]) {
+            this.clearTimeout(this.weatherTimeout[1]);
+        }
+        await this.weatherHourlyUpdate();
+        const loopTime =
+            new Date().setHours(new Date().getHours() + this.config.pollInterval, 0, 0) +
+            3000 +
+            Math.ceil(Math.random() * 5000); // Add a random delay of up to 5 seconds
+        this.weatherTimeout[1] = this.setTimeout(
+            () => {
+                void this.weatherHourlyLoop();
+            },
+            Math.max(loopTime - Date.now(), 5 * 60_000),
+        );
+    }
+
+    /**
+     * Fetches and processes hourly weather forecast data from BrightSky API
+     * Retrieves weather data for the configured number of hours ahead (see hours config)
+     */
+    async weatherHourlyUpdate(): Promise<void> {
+        const startTime = new Date(new Date().setMinutes(0, 0, 0)).toISOString();
+        const endTime = new Date(new Date().setHours(new Date().getHours() + this.config.hours, 0, 0, 0)).toISOString();
+        try {
+            const response = await this.fetch(
+                `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
+            );
+            if (response.status !== 200) {
+                throw new Error(`Error fetching hourly weather data: ${response.status} ${response.statusText}`);
+            }
+            const result = { data: await response.json() } as {
+                data: BrightskyHourly | null;
+            };
+            if (result.data) {
+                this.log.debug(`Hourly weather data fetched successfully: ${JSON.stringify(result.data)}`);
+
+                if (result.data.weather && Array.isArray(result.data.weather)) {
+                    const coords = this.config.position.split(',').map(parseFloat);
+                    for (const item of result.data.weather) {
+                        if (!item) {
+                            continue; // Skip if item is null or undefined
+                        }
+                        item.solar_estimate = 0;
+                        item.wind_bearing_text = this.getWindBearingText(item.wind_direction ?? undefined);
+                        // Determine day/night for this hour
+                        const t = new Date(item.timestamp);
+                        const { sunrise, sunset } = suncalc.getTimes(t, coords[0], coords[1]);
+                        const isDayTime = t >= sunrise && t <= sunset;
+                        // Icons for hourly
+                        const iconsHour = this.pickHourlyWeatherIcon({
+                            condition: item.condition,
+                            wind_speed: item.wind_speed,
+                            cloud_cover: item.cloud_cover,
+                            day: isDayTime,
+                            precipitation_probability: item.precipitation_probability,
+                        });
+                        (item as any).icon_special = iconsHour.mdi;
+                        (item as any).iconUrl = iconsHour.url;
+
+                        // Calculate apparent temperature (feels like)
+                        item.apparent_temperature = this.calculateApparentTemperature(
+                            item.temperature,
+                            item.wind_speed,
+                            item.relative_humidity,
+                        );
+
+                        if (
+                            this.config.position.split(',').length === 2 &&
+                            this.config.panels.length > 0 &&
+                            item.solar
+                        ) {
+                            item.solar_estimate = this.estimatePVEnergyForHour(
+                                item.solar ?? 0,
+                                item.timestamp,
+                                {
+                                    lat: parseFloat(this.config.position.split(',')[0]),
+                                    lon: parseFloat(this.config.position.split(',')[1]),
+                                },
+                                this.config.panels,
+                            );
+                            if (item.solar_estimate) {
+                                item.solar_estimate = Math.round(item.solar_estimate * 1000) / 1000;
+                            }
+                        }
+                    }
+                    await this.library.writeFromJson(
+                        'hourly.r',
+                        'weather.hourly',
+                        genericStateObjects,
+                        result.data.weather,
+                        true,
+                    );
+                    await this.library.writedp(
+                        'hourly.sources',
+                        undefined,
+                        genericStateObjects.weather.sources._channel,
+                    );
+                    await this.library.writeFromJson(
+                        'hourly.sources.r',
+                        'weather.sources',
+                        genericStateObjects,
+                        result.data.sources,
+                        true,
+                    );
+                    await this.setState('info.connection', true, true);
+                }
+            }
+        } catch (error) {
+            this.handleFetchError(error);
+            await this.setState('info.connection', false, true);
         }
     }
 

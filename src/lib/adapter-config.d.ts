@@ -29,6 +29,7 @@ declare global {
              */
             pollInterval: number;
 
+            hours: number;
             forecastDays: number;
             hourlyForecastDays: number;
             /**
@@ -40,6 +41,7 @@ declare global {
             pollIntervalCurrently: number;
 
             createCurrently: boolean;
+            createHourly: boolean;
             createDailyCustomInterval: number;
             createDaily: boolean;
             createRadar: boolean;
