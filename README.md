@@ -86,13 +86,7 @@ The data is as follows Provided:
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
-- (ticaki) Added nested hourly forecast under `daily.XX.hourly.YY` as additional optional feature (configurable via `forecastDays` and `hourlyForecastDays`)
-- (ticaki) Existing flat `hourly/` tree preserved alongside new nested hourly data
-- (ticaki) Fixed forecastDays end-date calculation to cover exactly the configured number of days
-- (ticaki) Improved admin UI with labeled sections (Location, Forecast, Hourly Overview, Current Weather, Weather Radar)
-- (ticaki) Added `fallback_source_ids` field to `BrightskyWeather` type for proper type-safety when filtering API metadata
-- (ticaki) Removed misleading `installedFrom` field from io-package.json
-- (ticaki) Added missing translations for new UI keys to all supported languages
+- (ticaki) Fixed: DWD station ID was incorrectly logged as WMO station ID fixes [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)
 
 ### 1.0.1 (2026-02-20)
 - (ticaki) sunrise and sunset fixed

@@ -276,7 +276,7 @@ class Brightsky extends utils.Adapter {
             `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : 'Currently data disabled'} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours, ${this.config.hours} hours ahead` : 'Hourly data disabled'} - ${this.config.createDaily ? `Daily forecast: ${this.config.forecastDays} days, nested hourly for ${this.config.hourlyForecastDays} days` : 'Daily forecast disabled'} - ${this.config.createDaily ? (this.config.createDailyCustomInterval ? `Daily data enabled. Custom interval: every ${this.config.createDailyCustomInterval}h` : 'Daily data enabled. Scheduled at 05:00, 18:00 and 00:00') : 'Daily data disabled'} - ${this.config.createRadar ? `Radar data enabled. Poll interval: ${this.config.pollIntervalRadar} minutes` : 'Radar data disabled'}. Max distance: ${this.config.maxDistance} meters.`,
         );
         this.log.info(
-            `Using ${this.config.dwd_station_id ? `WMO Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`,
+            `Using ${this.config.dwd_station_id ? `DWD Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`,
         );
     }
 
