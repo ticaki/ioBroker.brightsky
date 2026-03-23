@@ -88,11 +88,9 @@ The data is as follows Provided:
 -->
 ### **WORK IN PROGRESS**
 - (ticaki) Fixed: DWD station ID was incorrectly logged as WMO station ID fixes [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)
-- (ticaki) Added nested hourly forecast data under `daily.XX.hourly.YY` (configurable via `hourlyForecastDays`; 0 = disabled)
-- (ticaki) Added configurable number of forecast days (`forecastDays`, default 7)
-- (ticaki) Admin UI restructured into labeled sections (Location, Forecast, Current Weather, Radar)
-- (ticaki) Removed `fallback_source_ids` metadata from hourly and daily data points
-- (ticaki) Legacy `fallback_source_ids` objects are cleaned up on adapter startup
+- (cavernerg) Added nested hourly forecast data under `daily.XX.hourly.YY` (0 = disabled)
+- (cavernerg) Added configurable number of forecast days (`forecastDays`, default 7)
+- (cavernerg) Admin UI restructured into labeled sections (Location, Forecast, Current Weather, Radar)
 
 ### 1.0.1 (2026-02-20)
 - (ticaki) sunrise and sunset fixed
