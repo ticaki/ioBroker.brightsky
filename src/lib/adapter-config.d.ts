@@ -2,6 +2,19 @@
 
 // Augment the globally declared type ioBroker.AdapterConfig
 declare global {
+    interface Panel {
+        azimuth: number;
+        tilt: number;
+        area: number;
+        efficiency: number;
+        wr: 0 | 1 | 2 | 3;
+    }
+
+    interface Coords {
+        lat: number;
+        lon: number;
+    }
+
     namespace ioBroker {
         interface AdapterConfig {
             /**
@@ -17,6 +30,8 @@ declare global {
             pollInterval: number;
 
             hours: number;
+            forecastDays: number;
+            hourlyForecastDays: number;
             /**
              * Maximum distance in meters for location-based queries.
              * Default is 50000 meters (50 km).
@@ -26,8 +41,8 @@ declare global {
             pollIntervalCurrently: number;
 
             createCurrently: boolean;
-            createDailyCustomInterval: number;
             createHourly: boolean;
+            createDailyCustomInterval: number;
             createDaily: boolean;
             createRadar: boolean;
             createRadarData: boolean;

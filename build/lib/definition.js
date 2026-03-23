@@ -873,10 +873,10 @@ const daily = {
     native: {}
   },
   pressure_msl_min: {
-    _id: "pressure_msl_median",
+    _id: "pressure_msl_min",
     type: "state",
     common: {
-      name: "Pressure MSL Median",
+      name: "Pressure MSL Min",
       type: "number",
       role: "value.pressure.min",
       read: true,
@@ -886,10 +886,10 @@ const daily = {
     native: {}
   },
   pressure_msl_max: {
-    _id: "pressure_msl_median",
+    _id: "pressure_msl_max",
     type: "state",
     common: {
-      name: "Pressure MSL Median",
+      name: "Pressure MSL Max",
       type: "number",
       role: "value.pressure.max",
       read: true,
@@ -1244,6 +1244,11 @@ const genericStateObjects = {
     },
     daily: {
       ...daily,
+      hourly: {
+        _channel: { _id: "", type: "folder", common: { name: "Hourly Forecast" }, native: {} },
+        _array: { _id: "", type: "folder", common: { name: "Hour" }, native: {} },
+        ...hourly
+      },
       day: {
         ...daily,
         _channel: {

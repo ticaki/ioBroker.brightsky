@@ -156,7 +156,7 @@ export class Library extends BaseClass {
                         const aName = k._index != null ? k._index : a;
                         const nameCount = k._index != null ? -3 : -2;
                         if (defChannel.common?.name) {
-                            defChannel.common.name = `+ ${aName}`;
+                            defChannel.common.name = k._label != null ? String(k._label) : `+ ${aName}`;
                         }
                         const newPrefix = prefix.split('.').slice(0, -1).join('.');
                         const n = `000${aName}`.slice(nameCount); // 001, 002, ... 099
@@ -182,11 +182,18 @@ export class Library extends BaseClass {
                 }
 
                 for (const k in data) {
-                    await this.writeFromJson(`${prefix}.${k}`, `${objNode}.${k}`, def, data[k], expandTree);
+                    if (Array.isArray(data[k])) {
+                        const containerDef = await this.getObjectDefFromJson(`${objNode}.${k}`, def, data[k]);
+                        const containerChannel = this.getChannelObject(containerDef);
+                        await this.writedp(`${prefix}.${k}`, null, containerChannel);
+                        await this.writeFromJson(`${prefix}.${k}.r`, `${objNode}.${k}`, def, data[k], expandTree);
+                    } else {
+                        await this.writeFromJson(`${prefix}.${k}`, `${objNode}.${k}`, def, data[k], expandTree);
+                    }
                 }
             }
         } else {
-            if (!objectDefinition || prefix.endsWith('_index')) {
+            if (!objectDefinition || prefix.endsWith('_index') || prefix.endsWith('_label')) {
                 return;
             }
             if (

@@ -1,12 +1,3 @@
-/*type ChangeTypeToChannelAndState<Obj> = Obj extends object
-    ? {
-          [K in keyof Obj]-?: ChangeTypeToChannelAndState<Obj[K]>;
-      } & customChannelType
-    : ioBroker.StateObject;
-export type ChangeToChannel<Obj, T> = Obj extends object
-    ? { [K in keyof Obj]-?: customChannelType & T }
-    : ioBroker.StateObject;
-*/
 export type ChangeTypeOfKeysForState<Obj, N> = Obj extends object
     ? customChannelType & { [K in keyof Obj]: ChangeTypeOfKeysForState<Obj[K], N> }
     : N;
@@ -867,10 +858,10 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         native: {},
     },
     pressure_msl_min: {
-        _id: 'pressure_msl_median',
+        _id: 'pressure_msl_min',
         type: 'state',
         common: {
-            name: 'Pressure MSL Median',
+            name: 'Pressure MSL Min',
             type: 'number',
             role: 'value.pressure.min',
             read: true,
@@ -880,10 +871,10 @@ const daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, io
         native: {},
     },
     pressure_msl_max: {
-        _id: 'pressure_msl_median',
+        _id: 'pressure_msl_max',
         type: 'state',
         common: {
-            name: 'Pressure MSL Median',
+            name: 'Pressure MSL Max',
             type: 'number',
             role: 'value.pressure.max',
             read: true,
@@ -1190,7 +1181,11 @@ export const genericStateObjects: {
     customString: ioBroker.StateObject;
     weather: customChannelType & {
         hourly: customChannelType & ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject>;
-        daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, ioBroker.StateObject>;
+        daily: customChannelType &
+            Omit<ChangeTypeOfKeysForState<BrightskyDailyData, ioBroker.StateObject>, 'hourly'> & {
+                /** Nested hourly channel definition; typed separately to allow the channel object shape */
+                hourly?: customChannelType & ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject>;
+            };
 
         sources: customChannelType & ChangeTypeOfKeysForState<BrightskySource, ioBroker.StateObject>;
         current: customChannelType & ChangeTypeOfKeysForState<BrightskyCurrently, ioBroker.StateObject>;
@@ -1268,6 +1263,11 @@ export const genericStateObjects: {
         },
         daily: {
             ...daily,
+            hourly: {
+                _channel: { _id: '', type: 'folder' as const, common: { name: 'Hourly Forecast' }, native: {} },
+                _array: { _id: '', type: 'folder' as const, common: { name: 'Hour' }, native: {} },
+                ...hourly,
+            },
             day: {
                 ...daily,
                 _channel: {
@@ -2052,6 +2052,7 @@ export type BrightskyDailyData = BrightskyWeather & {
     night?: Partial<BrightskyDayNightData>;
     dayName_short?: string | null;
     dayName_long?: string | null;
+    hourly?: BrightskyWeather[];
 };
 
 export type BrightskyDayNightData = BrightskyWeather & {
@@ -2105,6 +2106,8 @@ export type BrightskyWeather = {
     solar: number | null;
     solar_estimate?: number | null;
     apparent_temperature?: number | null;
+    /** API metadata field, present in /weather responses but not relevant for home automation */
+    fallback_source_ids?: unknown;
 
     icon: string | null;
     icon_special?: string | null;
