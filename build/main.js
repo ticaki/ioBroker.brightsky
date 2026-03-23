@@ -177,10 +177,16 @@ class Brightsky extends utils.Adapter {
       0
     );
     if (this.config.createDaily) {
-      for (let day = this.config.hourlyForecastDays; day < 10; day++) {
+      for (let day = 0; day < 10; day++) {
         const dayKey = day.toString().padStart(2, "0");
-        if (await this.getObjectAsync(`daily.${dayKey}.hourly`)) {
-          await this.delObjectAsync(`daily.${dayKey}.hourly`, { recursive: true });
+        if (day >= this.config.forecastDays) {
+          if (await this.getObjectAsync(`daily.${dayKey}`)) {
+            await this.delObjectAsync(`daily.${dayKey}`, { recursive: true });
+          }
+        } else if (day >= this.config.hourlyForecastDays) {
+          if (await this.getObjectAsync(`daily.${dayKey}.hourly`)) {
+            await this.delObjectAsync(`daily.${dayKey}.hourly`, { recursive: true });
+          }
         }
       }
     }

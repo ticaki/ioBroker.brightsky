@@ -198,12 +198,21 @@ class Brightsky extends utils.Adapter {
             0,
         );
 
-        // Remove surplus daily.XX.hourly subfolders if hourlyForecastDays was reduced
+        // Remove surplus daily.XX subfolders if forecastDays was reduced, and
+        // remove surplus daily.XX.hourly subfolders if hourlyForecastDays was reduced
         if (this.config.createDaily) {
-            for (let day = this.config.hourlyForecastDays; day < 10; day++) {
+            for (let day = 0; day < 10; day++) {
                 const dayKey = day.toString().padStart(2, '0');
-                if (await this.getObjectAsync(`daily.${dayKey}.hourly`)) {
-                    await this.delObjectAsync(`daily.${dayKey}.hourly`, { recursive: true });
+                if (day >= this.config.forecastDays) {
+                    // Entire day folder is surplus
+                    if (await this.getObjectAsync(`daily.${dayKey}`)) {
+                        await this.delObjectAsync(`daily.${dayKey}`, { recursive: true });
+                    }
+                } else if (day >= this.config.hourlyForecastDays) {
+                    // Day folder stays, but nested hourly subfolder must be removed
+                    if (await this.getObjectAsync(`daily.${dayKey}.hourly`)) {
+                        await this.delObjectAsync(`daily.${dayKey}.hourly`, { recursive: true });
+                    }
                 }
             }
         }
