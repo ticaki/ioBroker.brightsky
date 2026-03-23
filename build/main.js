@@ -343,7 +343,16 @@ class Brightsky extends utils.Adapter {
                 rawHourlyByDay[day] = [];
               }
               const { fallback_source_ids: _ignored, ...itemFiltered } = item;
-              rawHourlyByDay[day].push(itemFiltered);
+              let timeLabel;
+              if (item.timestamp) {
+                const ts = new Date(item.timestamp);
+                timeLabel = `${ts.getHours().toString().padStart(2, "0")}:${ts.getMinutes().toString().padStart(2, "0")}`;
+              }
+              const hourlyItem = {
+                _label: timeLabel,
+                ...itemFiltered
+              };
+              rawHourlyByDay[day].push(hourlyItem);
             }
             for (const key of Object.keys(item)) {
               if (key === "fallback_source_ids") {

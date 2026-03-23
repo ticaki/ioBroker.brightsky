@@ -155,7 +155,7 @@ class Library extends BaseClass {
             const aName = k._index != null ? k._index : a;
             const nameCount = k._index != null ? -3 : -2;
             if ((_a = defChannel.common) == null ? void 0 : _a.name) {
-              defChannel.common.name = `+ ${aName}`;
+              defChannel.common.name = k._label != null ? String(k._label) : `+ ${aName}`;
             }
             const newPrefix = prefix.split(".").slice(0, -1).join(".");
             const n = `000${aName}`.slice(nameCount);
@@ -187,7 +187,7 @@ class Library extends BaseClass {
         }
       }
     } else {
-      if (!objectDefinition || prefix.endsWith("_index")) {
+      if (!objectDefinition || prefix.endsWith("_index") || prefix.endsWith("_label")) {
         return;
       }
       if (objectDefinition.type === "state" && objectDefinition.common.role && objectDefinition.common.role !== "value" && objectDefinition.common.role !== "text" && prefix.startsWith("daily")) {

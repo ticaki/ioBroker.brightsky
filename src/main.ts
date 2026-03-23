@@ -402,7 +402,17 @@ class Brightsky extends utils.Adapter {
                             }
                             // Strip the API metadata field before storing hourly items
                             const { fallback_source_ids: _ignored, ...itemFiltered } = item;
-                            rawHourlyByDay[day].push(itemFiltered as BrightskyWeather);
+                            // Add time label (HH:MM) in local system time
+                            let timeLabel: string | undefined;
+                            if (item.timestamp) {
+                                const ts = new Date(item.timestamp);
+                                timeLabel = `${ts.getHours().toString().padStart(2, '0')}:${ts.getMinutes().toString().padStart(2, '0')}`;
+                            }
+                            const hourlyItem = {
+                                _label: timeLabel,
+                                ...itemFiltered,
+                            } as BrightskyWeather;
+                            rawHourlyByDay[day].push(hourlyItem);
                         }
                         for (const key of Object.keys(item)) {
                             if (key === 'fallback_source_ids') {
