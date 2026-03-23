@@ -58,7 +58,7 @@ class Brightsky extends utils.Adapter {
    * Is called when databases are connected and adapter received configuration.
    */
   async onReady() {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
     await this.setObjectNotExistsAsync("info.connection", {
       type: "state",
       common: {
@@ -102,6 +102,15 @@ class Brightsky extends utils.Adapter {
         await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ""), { recursive: true });
       }
     }
+    const fbHourlyObjects = await this.getObjectListAsync({
+      startkey: `${this.namespace}.hourly.`,
+      endkey: `${this.namespace}.hourly.\u9999`
+    });
+    for (const row of (_b = fbHourlyObjects.rows) != null ? _b : []) {
+      if (row.id.includes(".fallback_source_ids")) {
+        await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ""), { recursive: true });
+      }
+    }
     if (!this.config.createRadar) {
       await this.delObjectAsync("radar", { recursive: true });
     } else {
@@ -136,16 +145,16 @@ class Brightsky extends utils.Adapter {
       this.log.warn(`Invalid DWD station ID. Using default value of "".`);
       this.config.dwd_station_id = "";
     }
-    this.wrArray.push((_b = this.config.wr1) != null ? _b : 0);
-    this.wrArray.push((_c = this.config.wr2) != null ? _c : 0);
-    this.wrArray.push((_d = this.config.wr3) != null ? _d : 0);
-    this.wrArray.push((_e = this.config.wr4) != null ? _e : 0);
+    this.wrArray.push((_c = this.config.wr1) != null ? _c : 0);
+    this.wrArray.push((_d = this.config.wr2) != null ? _d : 0);
+    this.wrArray.push((_e = this.config.wr3) != null ? _e : 0);
+    this.wrArray.push((_f = this.config.wr4) != null ? _f : 0);
     this.wrArray.forEach(() => {
       this.groupArray.push([]);
     });
     if (this.config.panels) {
       for (const p of this.config.panels) {
-        const wr = ((_f = p.wr) != null ? _f : 0) | 0;
+        const wr = ((_g = p.wr) != null ? _g : 0) | 0;
         if (wr >= 0 && wr < this.wrArray.length) {
           this.groupArray[wr].push(p);
         }
@@ -173,7 +182,7 @@ class Brightsky extends utils.Adapter {
       this.config.forecastDays = 7;
     }
     this.config.hourlyForecastDays = Math.max(
-      Math.min((_g = this.config.hourlyForecastDays) != null ? _g : 0, (_h = this.config.forecastDays) != null ? _h : 0),
+      Math.min((_h = this.config.hourlyForecastDays) != null ? _h : 0, (_i = this.config.forecastDays) != null ? _i : 0),
       0
     );
     if (this.config.createDaily) {

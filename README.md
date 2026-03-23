@@ -74,9 +74,9 @@ The data is as follows Provided:
 
 * current - the current weather (see also: https://brightsky.dev/docs/#/operations/getCurrentWeather )
 * daily - the current weather forecast for the next configurable number of days (see `forecastDays` config, default 7 days)
-  * `daily.XX.hourly` - optional nested hourly data under the respective day (controlled by `hourlyForecastDays`; only present for the first N days)
+  * `daily.XX.hourly` - optional nested hourly data under the respective day (controlled by `hourlyForecastDays`; only present for the first N days; 0 = disabled)
   * `daily.XX.day` / `daily.XX.night` - aggregated day/night summaries per day
-* hourly - flat list of hourly forecasts for the next N hours (see `hours` config; see also: https://brightsky.dev/docs/#/operations/getWeather )
+* hourly - flat list of hourly forecasts for the next N hours (see `hours` config; independent of the nested `daily.XX.hourly` feature; see also: https://brightsky.dev/docs/#/operations/getWeather )
 * radar - precipitation radar forecast for the next 2 hours in 5-minute intervals with values in mm per 5 minutes. Includes maximum values across grid cells and cumulative sums across all grid areas (see also: https://brightsky.dev/docs/#/operations/getRadar )
 
 ---
@@ -88,6 +88,11 @@ The data is as follows Provided:
 -->
 ### **WORK IN PROGRESS**
 - (ticaki) Fixed: DWD station ID was incorrectly logged as WMO station ID fixes [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)
+- (ticaki) Added nested hourly forecast data under `daily.XX.hourly.YY` (configurable via `hourlyForecastDays`; 0 = disabled)
+- (ticaki) Added configurable number of forecast days (`forecastDays`, default 7)
+- (ticaki) Admin UI restructured into labeled sections (Location, Forecast, Current Weather, Radar)
+- (ticaki) Removed `fallback_source_ids` metadata from hourly and daily data points
+- (ticaki) Legacy `fallback_source_ids` objects are cleaned up on adapter startup
 
 ### 1.0.1 (2026-02-20)
 - (ticaki) sunrise and sunset fixed

@@ -104,6 +104,16 @@ class Brightsky extends utils.Adapter {
                 await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ''), { recursive: true });
             }
         }
+        // Remove legacy fallback_source_ids objects from the hourly subtree
+        const fbHourlyObjects = await this.getObjectListAsync({
+            startkey: `${this.namespace}.hourly.`,
+            endkey: `${this.namespace}.hourly.\u9999`,
+        });
+        for (const row of fbHourlyObjects.rows ?? []) {
+            if (row.id.includes('.fallback_source_ids')) {
+                await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ''), { recursive: true });
+            }
+        }
         if (!this.config.createRadar) {
             await this.delObjectAsync('radar', { recursive: true });
         } else {
@@ -869,7 +879,7 @@ class Brightsky extends utils.Adapter {
         if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
             nextInterval = testTime.getTime() - now + 30000 + Math.ceil(Math.random() * 5000);
         }
-        nextInterval = Math.max(nextInterval, 60000); // Ensure minimum interval of 1 minutes
+        nextInterval = Math.max(nextInterval, 60000); // Ensure minimum interval of 1 minute
 
         this.weatherTimeout[0] = this.setTimeout(() => {
             void this.weatherCurrentlyLoop();
