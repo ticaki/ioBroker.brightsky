@@ -152,7 +152,7 @@
                 "hourlyForecastDays": {
                     "type": "number",
                     "label": "hourlyForecastDays",
-                    "default": 3,
+                    "default": 0,
                     "min": 0,
                     "max": 10,
                     "step": 1,

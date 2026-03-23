@@ -50,6 +50,7 @@
     "brightsky adapter settings": "Impostazioni dell'adattatore per Brightsky",
     "createCurrently": "Crea dati meteorologici attuali",
     "createDaily": "Crea panoramiche quotidiane (dopo le 5:00 e le 18:00)",
+    "createDailyCustomInterval": "Usa intervallo personalizzato per le panoramiche quotidiane (0 off) - non consigliato",
     "createHourly": "Crea panoramiche orarie",
     "forecastDays": "Numero di giorni di previsione",
     "headerCurrentWeather": "Meteo attuale",

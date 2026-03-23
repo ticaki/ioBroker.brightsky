@@ -1248,8 +1248,6 @@ const genericStateObjects = {
         _channel: { _id: "", type: "folder", common: { name: "Hourly Forecast" }, native: {} },
         _array: { _id: "", type: "folder", common: { name: "Hour" }, native: {} },
         ...hourly
-        // cast needed because the TS type for daily.hourly maps BrightskyWeather[] → array type,
-        // but here we provide a channel-definition object (not runtime data)
       },
       day: {
         ...daily,

@@ -49,6 +49,7 @@
     "brightsky adapter settings": "Ustawienia adaptera dla Brightsky",
     "createCurrently": "Tworzy aktualne dane pogodowe",
     "createDaily": "Tworzy codzienne przegląd (po 5:00 i 18:00)",
+    "createDailyCustomInterval": "Użyj niestandardowego interwału dla dziennych przeglądów (0 = wyłączone) - niezalecane",
     "createHourly": "Tworzy przegląd godzin",    "forecastDays": "Liczba dni prognozy",
     "headerCurrentWeather": "Aktualna pogoda",
     "headerForecast": "Prognoza",

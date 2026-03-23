@@ -50,6 +50,7 @@
     "brightsky adapter settings": "Adapterinstellingen voor brightsky",
     "createCurrently": "Creëert huidige weergegevens",
     "createDaily": "Maak dagelijkse weergegevens",
+    "createDailyCustomInterval": "Aangepast interval voor dagelijkse weergegevens",
     "createHourly": "Creëert uur overzichten",    "forecastDays": "Aantal voorspellingsdagen",
     "headerCurrentWeather": "Huidig weer",
     "headerForecast": "Weersvoorspelling",

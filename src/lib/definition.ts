@@ -1181,7 +1181,11 @@ export const genericStateObjects: {
     customString: ioBroker.StateObject;
     weather: customChannelType & {
         hourly: customChannelType & ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject>;
-        daily: customChannelType & ChangeTypeOfKeysForState<BrightskyDailyData, ioBroker.StateObject>;
+        daily: customChannelType &
+            Omit<ChangeTypeOfKeysForState<BrightskyDailyData, ioBroker.StateObject>, 'hourly'> & {
+                /** Nested hourly channel definition; typed separately to allow the channel object shape */
+                hourly?: customChannelType & ChangeTypeOfKeysForState<BrightskyWeather, ioBroker.StateObject>;
+            };
 
         sources: customChannelType & ChangeTypeOfKeysForState<BrightskySource, ioBroker.StateObject>;
         current: customChannelType & ChangeTypeOfKeysForState<BrightskyCurrently, ioBroker.StateObject>;
@@ -1263,9 +1267,7 @@ export const genericStateObjects: {
                 _channel: { _id: '', type: 'folder' as const, common: { name: 'Hourly Forecast' }, native: {} },
                 _array: { _id: '', type: 'folder' as const, common: { name: 'Hour' }, native: {} },
                 ...hourly,
-                // cast needed because the TS type for daily.hourly maps BrightskyWeather[] → array type,
-                // but here we provide a channel-definition object (not runtime data)
-            } as any,
+            },
             day: {
                 ...daily,
                 _channel: {

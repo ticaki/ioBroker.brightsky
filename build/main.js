@@ -58,7 +58,7 @@ class Brightsky extends utils.Adapter {
    * Is called when databases are connected and adapter received configuration.
    */
   async onReady() {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     await this.setObjectNotExistsAsync("info.connection", {
       type: "state",
       common: {
@@ -93,11 +93,11 @@ class Brightsky extends utils.Adapter {
       await this.library.writedp("hourly", null, import_definition.genericStateObjects.weather.hourly._channel);
       await this.library.writedp("hourly.sources", void 0, import_definition.genericStateObjects.weather.sources._channel);
     }
-    const fbObjects = await this.getObjectViewAsync("system", "state", {
+    const fbObjects = await this.getObjectListAsync({
       startkey: `${this.namespace}.daily.`,
       endkey: `${this.namespace}.daily.\u9999`
     });
-    for (const row of fbObjects.rows) {
+    for (const row of (_a = fbObjects.rows) != null ? _a : []) {
       if (row.id.includes(".fallback_source_ids")) {
         await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ""), { recursive: true });
       }
@@ -136,16 +136,16 @@ class Brightsky extends utils.Adapter {
       this.log.warn(`Invalid DWD station ID. Using default value of "".`);
       this.config.dwd_station_id = "";
     }
-    this.wrArray.push((_a = this.config.wr1) != null ? _a : 0);
-    this.wrArray.push((_b = this.config.wr2) != null ? _b : 0);
-    this.wrArray.push((_c = this.config.wr3) != null ? _c : 0);
-    this.wrArray.push((_d = this.config.wr4) != null ? _d : 0);
+    this.wrArray.push((_b = this.config.wr1) != null ? _b : 0);
+    this.wrArray.push((_c = this.config.wr2) != null ? _c : 0);
+    this.wrArray.push((_d = this.config.wr3) != null ? _d : 0);
+    this.wrArray.push((_e = this.config.wr4) != null ? _e : 0);
     this.wrArray.forEach(() => {
       this.groupArray.push([]);
     });
     if (this.config.panels) {
       for (const p of this.config.panels) {
-        const wr = ((_e = p.wr) != null ? _e : 0) | 0;
+        const wr = ((_f = p.wr) != null ? _f : 0) | 0;
         if (wr >= 0 && wr < this.wrArray.length) {
           this.groupArray[wr].push(p);
         }
@@ -172,8 +172,17 @@ class Brightsky extends utils.Adapter {
     if (this.config.forecastDays == void 0 || this.config.forecastDays < 1 || this.config.forecastDays > 10) {
       this.config.forecastDays = 7;
     }
-    if (this.config.hourlyForecastDays == void 0 || this.config.hourlyForecastDays < 0 || this.config.hourlyForecastDays > this.config.forecastDays) {
-      this.config.hourlyForecastDays = Math.min(3, this.config.forecastDays);
+    this.config.hourlyForecastDays = Math.max(
+      Math.min((_g = this.config.hourlyForecastDays) != null ? _g : 0, (_h = this.config.forecastDays) != null ? _h : 0),
+      0
+    );
+    if (this.config.createDaily) {
+      for (let day = this.config.hourlyForecastDays; day < 10; day++) {
+        const dayKey = day.toString().padStart(2, "0");
+        if (await this.getObjectAsync(`daily.${dayKey}.hourly`)) {
+          await this.delObjectAsync(`daily.${dayKey}.hourly`, { recursive: true });
+        }
+      }
     }
     if (this.config.pollInterval == void 0 || this.config.pollInterval < 1 || this.config.pollInterval >= 2 ** 31 / (6e4 * 60)) {
       this.log.warn(`Invalid poll interval: ${this.config.pollInterval}. Using default value of 12 hour.`);
@@ -228,7 +237,7 @@ class Brightsky extends utils.Adapter {
       `Adapter started with configuration: Position: ${this.config.position}, WMO Station ID: ${this.config.wmo_station}, DWD Station ID: ${this.config.dwd_station_id}, ${this.config.createCurrently ? `Currently data enabled. Poll interval: ${this.config.pollIntervalCurrently} minutes` : "Currently data disabled"} - ${this.config.createHourly ? `Hourly data enabled. Poll interval: ${this.config.pollInterval} hours, ${this.config.hours} hours ahead` : "Hourly data disabled"} - ${this.config.createDaily ? `Daily forecast: ${this.config.forecastDays} days, nested hourly for ${this.config.hourlyForecastDays} days` : "Daily forecast disabled"} - ${this.config.createDaily ? this.config.createDailyCustomInterval ? `Daily data enabled. Custom interval: every ${this.config.createDailyCustomInterval}h` : "Daily data enabled. Scheduled at 05:00, 18:00 and 00:00" : "Daily data disabled"} - ${this.config.createRadar ? `Radar data enabled. Poll interval: ${this.config.pollIntervalRadar} minutes` : "Radar data disabled"}. Max distance: ${this.config.maxDistance} meters.`
     );
     this.log.info(
-      `Using ${this.config.dwd_station_id ? `WMO Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`
+      `Using ${this.config.dwd_station_id ? `DWD Station ID: ${this.config.dwd_station_id}` : `${this.config.wmo_station ? `WMO Station ID: ${this.config.wmo_station}` : `Position: ${this.config.position} with max distance: ${this.config.maxDistance} meters`}`}`
     );
   }
   /**
@@ -676,11 +685,12 @@ class Brightsky extends utils.Adapter {
               }
             }
           }
+          const weatherData = result.data.weather.map(({ fallback_source_ids: _ignored, ...item }) => item);
           await this.library.writeFromJson(
             "hourly.r",
             "weather.hourly",
             import_definition.genericStateObjects,
-            result.data.weather,
+            weatherData,
             true
           );
           await this.library.writedp(

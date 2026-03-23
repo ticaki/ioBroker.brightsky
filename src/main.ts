@@ -192,12 +192,20 @@ class Brightsky extends utils.Adapter {
         if (this.config.forecastDays == undefined || this.config.forecastDays < 1 || this.config.forecastDays > 10) {
             this.config.forecastDays = 7;
         }
-        if (
-            this.config.hourlyForecastDays == undefined ||
-            this.config.hourlyForecastDays < 0 ||
-            this.config.hourlyForecastDays > this.config.forecastDays
-        ) {
-            this.config.hourlyForecastDays = Math.min(3, this.config.forecastDays);
+        // Ensure hourlyForecastDays is between 0 and forecastDays
+        this.config.hourlyForecastDays = Math.max(
+            Math.min(this.config.hourlyForecastDays ?? 0, this.config.forecastDays ?? 0),
+            0,
+        );
+
+        // Remove surplus daily.XX.hourly subfolders if hourlyForecastDays was reduced
+        if (this.config.createDaily) {
+            for (let day = this.config.hourlyForecastDays; day < 10; day++) {
+                const dayKey = day.toString().padStart(2, '0');
+                if (await this.getObjectAsync(`daily.${dayKey}.hourly`)) {
+                    await this.delObjectAsync(`daily.${dayKey}.hourly`, { recursive: true });
+                }
+            }
         }
 
         if (
@@ -801,11 +809,13 @@ class Brightsky extends utils.Adapter {
                             }
                         }
                     }
+                    // Strip fallback_source_ids (API metadata, not relevant for home automation)
+                    const weatherData = result.data.weather.map(({ fallback_source_ids: _ignored, ...item }) => item);
                     await this.library.writeFromJson(
                         'hourly.r',
                         'weather.hourly',
                         genericStateObjects,
-                        result.data.weather,
+                        weatherData,
                         true,
                     );
                     await this.library.writedp(

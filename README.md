@@ -73,9 +73,10 @@ The data is as follows Provided:
 
 
 * current - the current weather (see also: https://brightsky.dev/docs/#/operations/getCurrentWeather )
-* daily - the current weather forecast for the next configurable number of days (see forecastDays config, default 7 days), with optional nested hourly data per day (see hourlyForecastDays)
-* hourly - the current weather forecast for the next defined n hours (flat list, see also: https://brightsky.dev/docs/#/operations/getWeather )
-  * The day index `daily.XX.hourly` additionally contains hourly data nested under the respective day (new optional feature)
+* daily - the current weather forecast for the next configurable number of days (see `forecastDays` config, default 7 days)
+  * `daily.XX.hourly` - optional nested hourly data under the respective day (controlled by `hourlyForecastDays`; only present for the first N days)
+  * `daily.XX.day` / `daily.XX.night` - aggregated day/night summaries per day
+* hourly - flat list of hourly forecasts for the next N hours (see `hours` config; see also: https://brightsky.dev/docs/#/operations/getWeather )
 * radar - precipitation radar forecast for the next 2 hours in 5-minute intervals with values in mm per 5 minutes. Includes maximum values across grid cells and cumulative sums across all grid areas (see also: https://brightsky.dev/docs/#/operations/getRadar )
 
 ---
