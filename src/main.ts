@@ -95,11 +95,11 @@ class Brightsky extends utils.Adapter {
             await this.library.writedp('hourly.sources', undefined, genericStateObjects.weather.sources._channel);
         }
         // Remove legacy fallback_source_ids objects from the daily subtree
-        const fbObjects = await this.getObjectViewAsync('system', 'state', {
+        const fbObjects = await this.getObjectListAsync({
             startkey: `${this.namespace}.daily.`,
             endkey: `${this.namespace}.daily.\u9999`,
         });
-        for (const row of fbObjects.rows) {
+        for (const row of fbObjects.rows ?? []) {
             if (row.id.includes('.fallback_source_ids')) {
                 await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ''), { recursive: true });
             }
