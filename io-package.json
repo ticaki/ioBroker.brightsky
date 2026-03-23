@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "brightsky",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "news": {
+      "1.1.0": {
+        "en": "Fixed: DWD station ID was incorrectly logged as WMO station ID [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nAdded nested hourly forecast data under `daily.XX.hourly.YY` (0 = disabled)\nAdded configurable number of forecast days (`forecastDays`, default 7)\nAdmin UI restructured into labeled sections (Location, Forecast, Current Weather, Radar)",
+        "de": "Behoben: Die DWD-Stations-ID wurde fälschlicherweise als WMO-Stations-ID protokolliert [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nVerschachtelte stündliche Prognosedaten unter `daily.XX.hourly.YY` hinzugefügt (0 = deaktiviert)\nKonfigurierbare Anzahl von Prognosetagen hinzugefügt (`forecastDays`, Standard 7)\nAdmin-UI in beschriftete Abschnitte unterteilt (Standort, Prognose, Aktuelles Wetter, Radar)",
+        "ru": "Исправлено: идентификатор станции DWD неверно записывался как идентификатор станции WMO [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nДобавлены вложенные почасовые данные прогноза в `daily.XX.hourly.YY` (0 = отключено)\nДобавлена настраиваемая количество дней прогноза (`forecastDays`, по умолчанию 7)\nИнтерфейс администратора разделён на именованные секции (Местоположение, Прогноз, Текущая погода, Радар)",
+        "pt": "Corrigido: o ID da estação DWD foi registrado incorretamente como ID da estação WMO [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nAdicionados dados de previsão horária aninhados em `daily.XX.hourly.YY` (0 = desativado)\nAdicionado número configurável de dias de previsão (`forecastDays`, padrão 7)\nUI de administração reestruturada em seções rotuladas (Localização, Previsão, Clima Atual, Radar)",
+        "nl": "Opgelost: DWD station-ID werd onjuist geregistreerd als WMO station-ID [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nGeneste uurlijkse prognosegegevens toegevoegd onder `daily.XX.hourly.YY` (0 = uitgeschakeld)\nConfigureerbaar aantal prognosedagen toegevoegd (`forecastDays`, standaard 7)\nBeheerder-UI geherstructureerd in gelabelde secties (Locatie, Prognose, Huidig Weer, Radar)",
+        "fr": "Corrigé : l'identifiant de la station DWD était incorrectement enregistré comme identifiant de la station WMO [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nAjout de données de prévisions horaires imbriquées sous `daily.XX.hourly.YY` (0 = désactivé)\nAjout du nombre configurable de jours de prévision (`forecastDays`, par défaut 7)\nAdmin UI restructuré en sections étiquetées (Emplacement, Prévisions, Météo actuelle, Radar)",
+        "it": "Risolto: l'ID stazione DWD era registrato erroneamente come ID stazione WMO [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nAggiunti i dati di previsione oraria nidificati sotto `daily.XX.hourly.YY` (0 = disabilitato)\nAggiunto numero configurabile di giorni di previsione (`forecastDays`, predefinito 7)\nAdmin UI ristrutturato in sezioni etichettate (Posizione, Previsione, Meteo Corrente, Radar)",
+        "es": "Corregido: el ID de la estación DWD se registraba incorrectamente como ID de la estación WMO [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nDatos de pronóstico horario anidados añadidos en `daily.XX.hourly.YY` (0 = desactivado)\nAñadido número configurable de días de pronóstico (`forecastDays`, predeterminado 7)\nAdmin UI reestructurado en secciones etiquetadas (Ubicación, Pronóstico, Tiempo Actual, Radar)",
+        "pl": "Poprawiono: ID stacji DWD był nieprawidłowo rejestrowany jako ID stacji WMO [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nDodano zagnieżdżone dane prognoz godzinowych w `daily.XX.hourly.YY` (0 = wyłączone)\nDodano konfigurowalną liczbę dni prognozy (`forecastDays`, domyślnie 7)\nInterfejs administratora podzielony na oznaczone sekcje (Lokalizacja, Prognoza, Aktualna pogoda, Radar)",
+        "uk": "Виправлено: ID станції DWD неправильно реєструвався як ID станції WMO [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nДодано вкладені погодинні дані прогнозу в `daily.XX.hourly.YY` (0 = вимкнено)\nДодано налаштування кількості днів прогнозу (`forecastDays`, за замовчуванням 7)\nІнтерфейс адміністратора розділено на позначені секції (Місцезнаходження, Прогноз, Поточна погода, Радар)",
+        "zh-cn": "修复：DWD站点ID被错误地记录为WMO站点ID [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\n在`daily.XX.hourly.YY`下添加了嵌套小时预报数据（0 = 禁用）\n添加了可配置的预报天数（`forecastDays`，默认7天）\nAdmin UI重组为带标签的区段（位置、预报、当前天气、雷达）"
+      },
       "1.0.1": {
         "en": "fixed: sunrise and sunset calculation",
         "de": "behoben: Berechnung von Sonnenaufgang und Sonnenuntergang",
@@ -80,19 +93,6 @@
         "pl": "Dodano Beaufort wind force scale datapoints (wind _ force and wind _ force _ desc) w oparciu o wind _ speed _ 10\nStała konwersja jednostki opadów radarowych - wartości API są w 0,01mm na 5 minut, teraz poprawnie przeliczane na mm\nDodano skumulowane stany opadów (następna _ Xmin _ sum) pokazujące maksymalną sumę opadów we wszystkich obszarach siatki\nDodano opisy do maks. _ prognoza opadów _ ze wskazaniem \"mm na 5 minut\"",
         "uk": "Додана потужність вітру Beaufort вагові точки (wind_force and Wind_force_desc) на основі вітру_speed_10\nВиправлено перетворення радіолокаційних пристроїв - значення API в 0.01mm за 5 хвилин, тепер правильно перетворюються на мм\nДодані накопичувальні стани опадів (next_Xmin_sum) демонструють максимальну кількість опадів по всій площі сітки\nДодано опис до max_precipitation_forecast із зазначенням стану \"мм за 5 хвилин\"",
         "zh-cn": "根据风速_10 添加了 Beaufort 风力规模数据点(wind_force和wind_force_desc)\n固定雷达降水单位转换 -- -- API值为每5分钟0.01毫米,现在正确转换为毫米\n增量累积降水状态(next__Xmin_sum),显示所有网格区域的最大降水总量\n添加到最大_ 降水_ 前置状态的描述, 表示“ 每5分钟mm”"
-      },
-      "0.6.2": {
-        "en": "Flag set to activate language",
-        "de": "Schalter zum Aktivieren der Sprache gesetzt",
-        "ru": "Флаг активирует язык",
-        "pt": "Bandeira definida para ativar a linguagem",
-        "nl": "Vlag om taal te activeren",
-        "fr": "Flag défini pour activer la langue",
-        "it": "Bandiera impostata per attivare la lingua",
-        "es": "Juego de bandera para activar el idioma",
-        "pl": "Flaga ustawiona do aktywacji języka",
-        "uk": "Прапор встановлюється для активації мови",
-        "zh-cn": "启用语言的旗帜集"
       }
     },
     "titleLang": {
