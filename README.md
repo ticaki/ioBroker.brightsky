@@ -91,6 +91,7 @@ The data is as follows Provided:
 - (cavernerg) Added nested hourly forecast data under `daily.XX.hourly.YY` (0 = disabled)
 - (cavernerg) Added configurable number of forecast days (`forecastDays`, default 7)
 - (cavernerg) Admin UI restructured into labeled sections (Location, Forecast, Current Weather, Radar)
+- (ticaki) Fixed: `daily.XX.day` states were null when position was not configured with both latitude and longitude (e.g. when using a station ID without setting the position field) fixes [#92](https://github.com/ticaki/ioBroker.brightsky/issues/92)
 
 ### 1.0.1 (2026-02-20)
 - (ticaki) sunrise and sunset fixed

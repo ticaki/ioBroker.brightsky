@@ -167,8 +167,10 @@ class Brightsky extends utils.Adapter {
       this.config.wmo_station = "";
     }
     this.posId = this.config.dwd_station_id ? `dwd_station_id=${this.config.dwd_station_id}` : this.config.wmo_station == "" ? `lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&` : `wmo_station_id=${this.config.wmo_station}`;
-    if (!this.config.position || typeof this.config.position !== "string" || !this.config.position.split(",").every((coord) => !isNaN(parseFloat(coord)))) {
-      this.log.error("Position is not set in the adapter configuration. Please set it in the adapter settings.");
+    if (!this.config.position || typeof this.config.position !== "string" || this.config.position.split(",").length !== 2 || !this.config.position.split(",").every((coord) => !isNaN(parseFloat(coord)))) {
+      this.log.error(
+        'Position must be set as "latitude,longitude" (e.g. "52.52,13.40") in the adapter settings.'
+      );
       return;
     }
     if (this.config.panels == void 0 || !Array.isArray(this.config.panels)) {
@@ -573,8 +575,12 @@ class Brightsky extends utils.Adapter {
               parseFloat(this.config.position.split(",")[0]),
               parseFloat(this.config.position.split(",")[1])
             );
-            dailyData.sunset = times.sunset.getTime();
-            dailyData.sunrise = times.sunrise.getTime();
+            if (!isNaN(times.sunset.getTime())) {
+              dailyData.sunset = times.sunset.getTime();
+            }
+            if (!isNaN(times.sunrise.getTime())) {
+              dailyData.sunrise = times.sunrise.getTime();
+            }
             const date = new Date(dailyData.timestamp);
             const systemLanguage = this.library.getLocalLanguage();
             dailyData.dayName_short = date.toLocaleString(systemLanguage, { weekday: "short" });
@@ -679,7 +685,7 @@ class Brightsky extends utils.Adapter {
             item.wind_bearing_text = this.getWindBearingText((_a = item.wind_direction) != null ? _a : void 0);
             const t = new Date(item.timestamp);
             const { sunrise, sunset } = suncalc.getTimes(t, coords[0], coords[1]);
-            const isDayTime = t >= sunrise && t <= sunset;
+            const isDayTime = !isNaN(sunrise.getTime()) && !isNaN(sunset.getTime()) ? t >= sunrise && t <= sunset : t.getUTCHours() >= 6 && t.getUTCHours() < 20;
             const iconsHour = this.pickHourlyWeatherIcon({
               condition: item.condition,
               wind_speed: item.wind_speed,
@@ -750,9 +756,11 @@ class Brightsky extends utils.Adapter {
     const coords = this.config.position.split(",").map(parseFloat);
     const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
     const now = Date.now();
-    const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
-    if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
-      nextInterval = testTime.getTime() - now + 3e4 + Math.ceil(Math.random() * 5e3);
+    if (!isNaN(sunrise.getTime()) && !isNaN(sunset.getTime())) {
+      const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
+      if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
+        nextInterval = testTime.getTime() - now + 3e4 + Math.ceil(Math.random() * 5e3);
+      }
     }
     nextInterval = Math.max(nextInterval, 6e4);
     this.weatherTimeout[0] = this.setTimeout(() => {
@@ -783,7 +791,7 @@ class Brightsky extends utils.Adapter {
           const coords = this.config.position.split(",").map(parseFloat);
           const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
           const now = /* @__PURE__ */ new Date();
-          const isDayTime = now >= sunrise && now <= sunset;
+          const isDayTime = !isNaN(sunrise.getTime()) && !isNaN(sunset.getTime()) ? now >= sunrise && now <= sunset : now.getUTCHours() >= 6 && now.getUTCHours() < 20;
           const iconsNow = this.pickHourlyWeatherIcon({
             condition: weather.condition,
             wind_speed: weather.wind_speed_10,
@@ -1635,13 +1643,19 @@ class Brightsky extends utils.Adapter {
       dayValues[key] = [];
       nightValues[key] = [];
     }
+    const hasValidTimes = !isNaN(sunrise.getTime()) && !isNaN(sunset.getTime()) && sunrise.getTime() < sunset.getTime();
+    if (!hasValidTimes) {
+      this.log.warn(
+        "Sunrise/sunset times are invalid (position may be misconfigured). All hours will be treated as daytime."
+      );
+    }
     const timestamps = dayWeatherArr.timestamp;
     for (let i = 0; i < timestamps.length; i++) {
       if (!timestamps[i]) {
         continue;
       }
       const hourTime = new Date(timestamps[i]);
-      const isDayTime = hourTime >= sunrise && hourTime <= sunset;
+      const isDayTime = !hasValidTimes || hourTime >= sunrise && hourTime <= sunset;
       for (const key of Object.keys(dayWeatherArr)) {
         const value = dayWeatherArr[key][i];
         if (isDayTime) {
@@ -1758,7 +1772,7 @@ class Brightsky extends utils.Adapter {
               return sum;
             }, 0);
             if (avg != null) {
-              if (values.filter((v) => v !== null).length > 2) {
+              if (values.filter((v) => v !== null).length > 0) {
                 avg = Math.round(avg / values.filter((v) => v !== null).length * 10) / 10;
               } else {
                 avg = null;
