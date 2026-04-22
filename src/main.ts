@@ -16,7 +16,7 @@ import {
 import * as suncalc from 'suncalc';
 
 // Load your modules here, e.g.:
-// import * as fs from "fs";
+// import * as fs from "node:fs";
 
 class Brightsky extends utils.Adapter {
     library: Library;
