@@ -10,6 +10,26 @@
             "restart": true,
             "type": "node"
         },
+        {
+            "name": "Launch Adapter (dev-server watch -n)",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/.dev-server/default/node_modules/iobroker.brightsky/build/main.js",
+            "args": ["--debug", "0"],
+            "cwd": "${workspaceFolder}/.dev-server/default",
+            "console": "internalConsole",
+            "outputCapture": "std",
+            "attachSimplePort": 9230,
+            "runtimeArgs": ["--inspect-brk=9230"],
+            "sourceMaps": true,
+            "outFiles": [
+                "${workspaceFolder}/.dev-server/default/node_modules/iobroker.brightsky/build/**/*.js"
+            ],
+            "resolveSourceMapLocations": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/.dev-server/default/node_modules/iobroker.brightsky/build/**"
+            ]
+        }
     ],
     "version": "0.2.0"
 }

@@ -2335,7 +2335,7 @@ class Brightsky extends utils.Adapter {
         }, 30000); // 30 seconds timeout
 
         try {
-            const response = await fetch(url, {
+            const response = await globalThis.fetch(url, {
                 ...init,
                 method: init?.method ?? 'GET',
                 signal: this.controller.signal,
