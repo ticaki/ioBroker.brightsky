@@ -86,6 +86,9 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22 now
+
 ### 1.1.0 (2026-03-23)
 - (ticaki) Fixed: DWD station ID was incorrectly logged as WMO station ID fixes [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)
 - (cavernerg) Added nested hourly forecast data under `daily.XX.hourly.YY` (0 = disabled)
