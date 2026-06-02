@@ -171,8 +171,10 @@ class Brightsky extends utils.Adapter {
       this.config.wmo_station = "";
     }
     this.posId = this.config.dwd_station_id ? `dwd_station_id=${this.config.dwd_station_id}` : this.config.wmo_station == "" ? `lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&` : `wmo_station_id=${this.config.wmo_station}`;
-    if (!this.config.position || typeof this.config.position !== "string" || !this.config.position.split(",").every((coord) => !isNaN(parseFloat(coord)))) {
-      this.log.error("Position is not set in the adapter configuration. Please set it in the adapter settings.");
+    if (!this.config.position || typeof this.config.position !== "string" || this.config.position.split(",").length !== 2 || !this.config.position.split(",").every((coord) => !isNaN(parseFloat(coord)))) {
+      this.log.error(
+        'Position must be set as "latitude,longitude" (e.g. "52.52,13.40") in the adapter settings.'
+      );
       return;
     }
     if (this.config.panels == void 0 || !Array.isArray(this.config.panels)) {
@@ -574,8 +576,12 @@ class Brightsky extends utils.Adapter {
               parseFloat(this.config.position.split(",")[0]),
               parseFloat(this.config.position.split(",")[1])
             );
-            dailyData.sunset = times.sunset.getTime();
-            dailyData.sunrise = times.sunrise.getTime();
+            if (!isNaN(times.sunset.getTime())) {
+              dailyData.sunset = times.sunset.getTime();
+            }
+            if (!isNaN(times.sunrise.getTime())) {
+              dailyData.sunrise = times.sunrise.getTime();
+            }
             const date = new Date(dailyData.timestamp);
             const systemLanguage = this.library.getLocalLanguage();
             dailyData.dayName_short = date.toLocaleString(systemLanguage, { weekday: "short" });

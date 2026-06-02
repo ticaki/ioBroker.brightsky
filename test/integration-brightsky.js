@@ -789,5 +789,56 @@ tests.integration(path.join(__dirname, '..'), {
                 });
             }).timeout(40000);
         });
+
+        // Regression guard: an invalid position (not "lat,lon") must make the adapter
+        // refuse to run instead of producing null/zero daily.XX.day aggregations,
+        // because suncalc needs two coordinates for sunrise/sunset.
+        suite('should refuse to run with an invalid (single-coordinate) position', (getHarness) => {
+            let harness;
+
+            before(() => {
+                harness = getHarness();
+            });
+
+            it('does not create daily.XX.day states when position is not "lat,lon"', () => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        harness = getHarness();
+                        const obj = await harness.objects.getObject('system.adapter.brightsky.0');
+
+                        Object.assign(obj.native, {
+                            position: '52.52', // invalid: only a single coordinate
+                            dwd_station_id: '',
+                            wmo_station: '',
+                            createCurrently: false,
+                            createHourly: false,
+                            createDaily: true,
+                            createRadar: false,
+                            createRadarData: false,
+                            panels: [],
+                        });
+
+                        harness.objects.setObject(obj._id, obj);
+                        await harness.startAdapterAndWait(false, await getMockEnv());
+                        await wait(8000);
+
+                        const stateIds = await harness.dbConnection.getStateIDs('brightsky.0.*');
+                        const dailyDayStates = stateIds.filter(id => /daily\.\d+\.day\./.test(id));
+                        expect(
+                            dailyDayStates,
+                            'no daily.XX.day states must be created with an invalid position',
+                        ).to.have.lengthOf(0);
+
+                        console.log(
+                            `✅ Adapter refused invalid position: ${dailyDayStates.length} daily.XX.day states created`,
+                        );
+                        await harness.stopAdapter();
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }).timeout(40000);
+        });
     }
 });
