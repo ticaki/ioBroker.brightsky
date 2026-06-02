@@ -3,6 +3,19 @@
     "name": "brightsky",
     "version": "1.1.0",
     "news": {
+      "1.2.0": {
+        "en": "Added `conditionUI` (translated condition text) to `current` and `hourly`, matching `daily`\nRequires Node.js >= 22 now; repository checker fixes",
+        "de": "`conditionUI` (übersetzter Wetterzustand) zu `current` und `hourly` hinzugefügt, analog zu `daily`\nBenötigt jetzt Node.js >= 22; Repository-Checker-Korrekturen",
+        "ru": "Добавлено `conditionUI` (переведённый текст состояния) в `current` и `hourly`, как в `daily`\nТеперь требуется Node.js >= 22; исправления repository checker",
+        "pt": "Adicionado `conditionUI` (texto de condição traduzido) a `current` e `hourly`, como em `daily`\nAgora requer Node.js >= 22; correções do repository checker",
+        "nl": "`conditionUI` (vertaalde weersomstandigheid) toegevoegd aan `current` en `hourly`, net als `daily`\nVereist nu Node.js >= 22; repository checker-correcties",
+        "fr": "Ajout de `conditionUI` (texte de condition traduit) à `current` et `hourly`, comme `daily`\nNécessite désormais Node.js >= 22 ; corrections du repository checker",
+        "it": "Aggiunto `conditionUI` (testo della condizione tradotto) a `current` e `hourly`, come `daily`\nOra richiede Node.js >= 22; correzioni del repository checker",
+        "es": "Añadido `conditionUI` (texto de condición traducido) a `current` y `hourly`, como `daily`\nAhora requiere Node.js >= 22; correcciones del repository checker",
+        "pl": "Dodano `conditionUI` (przetłumaczony opis warunków) do `current` i `hourly`, tak jak `daily`\nWymaga teraz Node.js >= 22; poprawki repository checker",
+        "uk": "Додано `conditionUI` (перекладений опис погоди) до `current` і `hourly`, як у `daily`\nТепер потрібен Node.js >= 22; виправлення repository checker",
+        "zh-cn": "为 `current` 和 `hourly` 添加了 `conditionUI`（已翻译的天气状况文本），与 `daily` 一致\n现在需要 Node.js >= 22；仓库检查器修复"
+      },
       "1.1.0": {
         "en": "Fixed: DWD station ID was incorrectly logged as WMO station ID [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nAdded nested hourly forecast data under `daily.XX.hourly.YY` (0 = disabled)\nAdded configurable number of forecast days (`forecastDays`, default 7)\nAdmin UI restructured into labeled sections (Location, Forecast, Current Weather, Radar)",
         "de": "Behoben: Die DWD-Stations-ID wurde fälschlicherweise als WMO-Stations-ID protokolliert [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)\nVerschachtelte stündliche Prognosedaten unter `daily.XX.hourly.YY` hinzugefügt (0 = deaktiviert)\nKonfigurierbare Anzahl von Prognosetagen hinzugefügt (`forecastDays`, Standard 7)\nAdmin-UI in beschriftete Abschnitte unterteilt (Standort, Prognose, Aktuelles Wetter, Radar)",
@@ -154,7 +167,7 @@
     ],
     "globalDependencies": [
       {
-        "admin": ">=7.6.17"
+        "admin": ">=7.6.20"
       }
     ]
   },

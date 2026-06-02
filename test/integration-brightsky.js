@@ -298,7 +298,20 @@ tests.integration(path.join(__dirname, '..'), {
                                 'daily.00.solar_estimate must be 0 without panels',
                             ).to.equal(0);
 
-                            console.log('✅ Value assertions passed (current/hourly temperature, daily temperature_max, solar_estimate)');
+                            // conditionUI: translated condition text, now also for current + hourly.
+                            // No system language is loaded in the harness, so getTranslation()
+                            // returns the (capitalized) raw key -> deterministic expectation.
+                            const capitalize = c => (c ? c.charAt(0).toUpperCase() + c.slice(1) : '');
+                            expect(
+                                valueOf('brightsky.0.current.conditionUI'),
+                                'current.conditionUI should be the translated current.condition',
+                            ).to.equal(capitalize(currentFixture.weather.condition));
+                            expect(
+                                valueOf('brightsky.0.hourly.00.conditionUI'),
+                                'hourly.00.conditionUI should be the translated hourly.00.condition',
+                            ).to.equal(capitalize(hourlyFixture.weather[0].condition));
+
+                            console.log('✅ Value assertions passed (current/hourly temperature, daily temperature_max, solar_estimate, current/hourly conditionUI)');
                         } catch (assertErr) {
                             await harness.stopAdapter();
                             return reject(assertErr);

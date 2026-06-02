@@ -77,5 +77,8 @@
     "Sleet": "Sleet",
     "Snow": "Snow",
     "Hail": "Hail",
-    "Thunderstorm": "Thunderstorm"
+    "Thunderstorm": "Thunderstorm",
+    "General": "General",
+    "Advanced": "Advanced",
+    "N": "N"
 }

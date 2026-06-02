@@ -65,8 +65,6 @@
     "dwd_station_id_link": "Link naar DWD -stationinformatie",
     "efficiency": "Efficiëntie (0-1)",
     "maxDistance": "Maximale afstand tot het weerstation",
-    "option1": "Option1",
-    "option2": "Optie2",
     "overviewOfPanels": "Overzicht van uw zonnepanelen",
     "pollInterval": "Vraaginterval (elk uur op het uur)",
     "pollIntervalCurrently": "Vraaginterval voor het huidige weer (in minuten)",
@@ -80,5 +78,7 @@
     "wr1": "Omvormer 1 max. Power (kW)",
     "wr2": "Omvormer 2 max. Power (kW)",
     "wr3": "Omvormer 3 max. Power (kW)",
-    "wr4": "Omvormer 4 max. Power (kW)"
+    "wr4": "Omvormer 4 max. Power (kW)",
+    "General": "Algemeen",
+    "Advanced": "Geavanceerd"
 }

@@ -77,5 +77,8 @@
     "wr1": "Inversor 1 máx. Power (KW)",
     "wr2": "Inversor 2 máx. Power (KW)",
     "wr3": "Inversor 3 máx. Power (KW)",
-    "wr4": "Inversor 4 máx. Power (KW)"
+    "wr4": "Inversor 4 máx. Power (KW)",
+    "General": "Geral",
+    "Advanced": "Avançado",
+    "N": "N"
 }
