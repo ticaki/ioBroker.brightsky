@@ -191,9 +191,16 @@ class Brightsky extends utils.Adapter {
         if (
             !this.config.position ||
             typeof this.config.position !== 'string' ||
+            this.config.position.split(',').length !== 2 ||
             !this.config.position.split(',').every(coord => !isNaN(parseFloat(coord)))
         ) {
-            this.log.error('Position is not set in the adapter configuration. Please set it in the adapter settings.');
+            // A valid "latitude,longitude" position is required even when a station ID is used:
+            // suncalc needs the coordinates for sunrise/sunset (day/night aggregation, PV estimate).
+            // Without two parseable coordinates suncalc returns Invalid Date, which previously left
+            // all daily.XX.day.* states null/0 instead of failing visibly.
+            this.log.error(
+                'Position must be set as "latitude,longitude" (e.g. "52.52,13.40") in the adapter settings.',
+            );
             return;
         }
         if (this.config.panels == undefined || !Array.isArray(this.config.panels)) {
@@ -670,8 +677,14 @@ class Brightsky extends utils.Adapter {
                             parseFloat(this.config.position.split(',')[0]),
                             parseFloat(this.config.position.split(',')[1]),
                         );
-                        dailyData.sunset = times.sunset.getTime();
-                        dailyData.sunrise = times.sunrise.getTime();
+                        // Guard against suncalc returning Invalid Date (e.g. polar day/night),
+                        // so we never persist NaN timestamps.
+                        if (!isNaN(times.sunset.getTime())) {
+                            dailyData.sunset = times.sunset.getTime();
+                        }
+                        if (!isNaN(times.sunrise.getTime())) {
+                            dailyData.sunrise = times.sunrise.getTime();
+                        }
 
                         // Add weekday names in system language
                         const date = new Date(dailyData.timestamp as string);
