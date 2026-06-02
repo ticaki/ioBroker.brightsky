@@ -78,5 +78,9 @@
     "wr1": "Inversor 1 máx. poder (KW)",
     "wr2": "Inversor 2 máx. poder (KW)",
     "wr3": "Inversor 3 máx. poder (KW)",
-    "wr4": "Inversor 4 max. poder (KW)"
+    "wr4": "Inversor 4 max. poder (KW)",
+    "General": "General",
+    "Advanced": "Avanzado",
+    "weatherTextLanguage": "Idioma de los textos meteorológicos",
+    "weatherTextLanguageTooltip": "Idioma de los valores traducidos (condición, dirección del viento, días de la semana). 'System' usa el idioma del sistema ioBroker."
 }

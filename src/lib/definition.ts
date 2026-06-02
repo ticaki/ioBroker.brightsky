@@ -1456,6 +1456,18 @@ export const genericStateObjects: {
                 },
                 native: {},
             },
+            conditionUI: {
+                _id: 'condition',
+                type: 'state',
+                common: {
+                    name: 'Condition translated',
+                    type: 'string',
+                    role: 'weather.state',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            },
             timestamp: {
                 _id: 'timestamp',
                 type: 'state',
@@ -2179,6 +2191,7 @@ export type BrightskyCurrently = {
     iconUrl?: string;
     temperature: number;
     apparent_temperature?: number | null;
+    conditionUI?: string;
     fallback_source_ids: BrightskyCurrentlyFallback;
     icon: string;
 } & BrightskyCurrentlyFallback;

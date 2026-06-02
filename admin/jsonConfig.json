@@ -6,6 +6,33 @@
             "type": "panel",
             "label": "General",
             "items": {
+                "language": {
+                    "type": "select",
+                    "noTranslation": true,
+                    "label": "weatherTextLanguage",
+                    "tooltip": "weatherTextLanguageTooltip",
+                    "options": [
+                        { "value": "", "label": "System" },
+                        { "value": "en", "label": "English" },
+                        { "value": "de", "label": "Deutsch" },
+                        { "value": "ru", "label": "Русский" },
+                        { "value": "pt", "label": "Português" },
+                        { "value": "nl", "label": "Nederlands" },
+                        { "value": "fr", "label": "Français" },
+                        { "value": "it", "label": "Italiano" },
+                        { "value": "es", "label": "Español" },
+                        { "value": "pl", "label": "Polski" },
+                        { "value": "uk", "label": "Українська" },
+                        { "value": "zh-cn", "label": "中文" }
+                    ],
+                    "default": "",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
+                },
                 "headerLocation": {
                     "type": "header",
                     "size": 5,

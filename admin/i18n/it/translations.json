@@ -78,5 +78,9 @@
     "wr1": "Inverter 1 Max. Potenza (KW)",
     "wr2": "Inverter 2 Max. Potenza (KW)",
     "wr3": "Inverter 3 Max. Potenza (KW)",
-    "wr4": "Inverter 4 Max. Potenza (KW)"
+    "wr4": "Inverter 4 Max. Potenza (KW)",
+    "General": "Generale",
+    "Advanced": "Avanzato",
+    "weatherTextLanguage": "Lingua dei testi meteo",
+    "weatherTextLanguageTooltip": "Lingua dei valori tradotti (condizione, direzione del vento, giorni della settimana). 'System' usa la lingua di sistema di ioBroker."
 }

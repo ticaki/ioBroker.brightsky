@@ -10,7 +10,7 @@
 
 **Tests:** ![Test and Release](https://github.com/ticaki/ioBroker.brightsky/workflows/Test%20and%20Release/badge.svg)
 
-# brightsky adapter for ioBroker
+## brightsky adapter for ioBroker
 
 ## What is the Bright Sky API:
 The Bright Sky API is a free, public API that provides weather data from the German Weather Service (DWD). It was developed to simplify access to this data, as the original DWD data is often in difficult-to-interpret formats. Bright Sky converts this data into an easy-to-use JSON format and makes it accessible via an API.
@@ -86,6 +86,11 @@ The data is as follows Provided:
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ticaki) Added `conditionUI` (translated condition text) to `current` and `hourly.NN`, matching the existing `daily.NN.conditionUI` [#110](https://github.com/ticaki/ioBroker.brightsky/issues/110)
+- (ticaki) Added a config option to choose the language for weather texts independent of the ioBroker system language [#110](https://github.com/ticaki/ioBroker.brightsky/issues/110)
+- (ticaki) Requires Node.js >= 22 now; repository checker fixes (i18n, docs, tooling)
+
 ### 1.1.0 (2026-03-23)
 - (ticaki) Fixed: DWD station ID was incorrectly logged as WMO station ID fixes [#91](https://github.com/ticaki/ioBroker.brightsky/issues/91)
 - (cavernerg) Added nested hourly forecast data under `daily.XX.hourly.YY` (0 = disabled)
@@ -192,6 +197,8 @@ The data is as follows Provided:
 
 ### 0.1.0 (2025-08-19)
 * (ticaki) initial release
+
+[Older changelogs can be found there](CHANGELOG_OLD.md)
 
 ## License
 MIT License

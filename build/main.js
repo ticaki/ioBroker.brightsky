@@ -301,7 +301,7 @@ class Brightsky extends utils.Adapter {
    * raw hourly data nested under daily.XX.hourly.
    */
   async weatherDailyUpdate() {
-    var _a, _b;
+    var _a;
     const startTime = new Date((/* @__PURE__ */ new Date()).setHours(0, 0, 0, 0)).toISOString();
     const forecastDaysCount = this.config.forecastDays || 0;
     const daysToAdd = Math.max(0, forecastDaysCount - 1);
@@ -558,10 +558,7 @@ class Brightsky extends utils.Adapter {
                   });
                   dailyData.icon_special = iconsDay.mdi;
                   dailyData.iconUrl = iconsDay.url;
-                  const condition = (_b = dailyData.condition) != null ? _b : "unknown";
-                  dailyData.conditionUI = this.library.getTranslation(
-                    condition.charAt(0).toUpperCase() + condition.slice(1)
-                  );
+                  dailyData.conditionUI = this.translateCondition(dailyData.condition);
                   break;
                 }
                 default: {
@@ -698,6 +695,7 @@ class Brightsky extends utils.Adapter {
               item.wind_speed,
               item.relative_humidity
             );
+            item.conditionUI = this.translateCondition(item.condition);
             if (this.config.position.split(",").length === 2 && this.config.panels.length > 0 && item.solar) {
               item.solar_estimate = this.estimatePVEnergyForHour(
                 (_b = item.solar) != null ? _b : 0,
@@ -801,6 +799,7 @@ class Brightsky extends utils.Adapter {
             weather.wind_speed_10,
             weather.relative_humidity
           );
+          weather.conditionUI = this.translateCondition(weather.condition);
           await this.library.writeFromJson("current", "weather.current", import_definition.genericStateObjects, weather, true);
           await this.library.writedp(
             "current.sources",
@@ -1092,6 +1091,18 @@ class Brightsky extends utils.Adapter {
     ];
     const index = Math.round(windBearing % 360 / 22.5) % 16;
     return this.library.getTranslation(directions[index]);
+  }
+  /**
+   * Translates a raw weather condition (e.g. "dry", "rain") into the system language
+   * using the same translation logic as the daily forecast (`daily.NN.conditionUI`).
+   * Keeps `current`, `hourly` and `daily` consistent by reusing one mapping.
+   *
+   * @param condition Raw condition value from the BrightSky API (may be null/undefined)
+   * @returns Translated condition text; raw value if no translation exists, '' if no condition
+   */
+  translateCondition(condition) {
+    const c = condition != null ? condition : "unknown";
+    return this.library.getTranslation(c.charAt(0).toUpperCase() + c.slice(1));
   }
   /**
    * Converts wind speed in km/h to Beaufort scale (0-12)

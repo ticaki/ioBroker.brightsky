@@ -642,10 +642,7 @@ class Brightsky extends utils.Adapter {
                                     });
                                     dailyData.icon_special = iconsDay.mdi;
                                     dailyData.iconUrl = iconsDay.url;
-                                    const condition = dailyData.condition ?? 'unknown';
-                                    dailyData.conditionUI = this.library.getTranslation(
-                                        condition.charAt(0).toUpperCase() + condition.slice(1),
-                                    );
+                                    dailyData.conditionUI = this.translateCondition(dailyData.condition);
                                     break;
                                 }
                                 default: {
@@ -823,6 +820,9 @@ class Brightsky extends utils.Adapter {
                             item.relative_humidity,
                         );
 
+                        // Translated condition text (German/system language), same mapping as daily
+                        item.conditionUI = this.translateCondition(item.condition);
+
                         if (
                             this.config.position.split(',').length === 2 &&
                             this.config.panels.length > 0 &&
@@ -941,6 +941,9 @@ class Brightsky extends utils.Adapter {
                         weather.wind_speed_10,
                         weather.relative_humidity,
                     );
+
+                    // Translated condition text (German/system language), same mapping as daily
+                    weather.conditionUI = this.translateCondition(weather.condition);
 
                     await this.library.writeFromJson('current', 'weather.current', genericStateObjects, weather, true);
                     await this.library.writedp(
@@ -1314,6 +1317,19 @@ class Brightsky extends utils.Adapter {
         ];
         const index = Math.round((windBearing % 360) / 22.5) % 16;
         return this.library.getTranslation(directions[index]);
+    }
+
+    /**
+     * Translates a raw weather condition (e.g. "dry", "rain") into the system language
+     * using the same translation logic as the daily forecast (`daily.NN.conditionUI`).
+     * Keeps `current`, `hourly` and `daily` consistent by reusing one mapping.
+     *
+     * @param condition Raw condition value from the BrightSky API (may be null/undefined)
+     * @returns Translated condition text; raw value if no translation exists, '' if no condition
+     */
+    private translateCondition(condition: string | null | undefined): string {
+        const c = condition ?? 'unknown';
+        return this.library.getTranslation(c.charAt(0).toUpperCase() + c.slice(1));
     }
 
     /**

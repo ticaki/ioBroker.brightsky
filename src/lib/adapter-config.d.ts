@@ -24,6 +24,13 @@ declare global {
             position: string;
 
             /**
+             * Language used for all texts the adapter produces itself
+             * (translated state values like conditionUI, weekday/date formatting).
+             * Empty string = use the current ioBroker system language (dynamic).
+             */
+            language: ioBroker.Languages | '';
+
+            /**
              * Polling interval in minutes.
              * Default is 1 minute.
              */
