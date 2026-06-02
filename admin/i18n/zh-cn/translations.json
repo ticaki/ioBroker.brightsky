@@ -80,5 +80,7 @@
     "wr3": "逆变器3最大电力（KW）",
     "wr4": "逆变器4最大电力（KW）",
     "General": "常规",
-    "Advanced": "高级"
+    "Advanced": "高级",
+    "weatherTextLanguage": "天气文本语言",
+    "weatherTextLanguageTooltip": "已翻译状态值的语言（天气状况、风向、星期名称）。'System' 使用 ioBroker 系统语言。"
 }

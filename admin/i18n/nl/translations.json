@@ -80,5 +80,7 @@
     "wr3": "Omvormer 3 max. Power (kW)",
     "wr4": "Omvormer 4 max. Power (kW)",
     "General": "Algemeen",
-    "Advanced": "Geavanceerd"
+    "Advanced": "Geavanceerd",
+    "weatherTextLanguage": "Taal van weerteksten",
+    "weatherTextLanguageTooltip": "Taal voor vertaalde waarden (weersomstandigheid, windrichting, weekdagen). 'System' gebruikt de ioBroker-systeemtaal."
 }

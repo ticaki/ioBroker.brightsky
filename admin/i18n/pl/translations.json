@@ -80,5 +80,7 @@
     "wr4": "Falownik 4 maks. Power (KW)",
     "General": "Ogólne",
     "Advanced": "Zaawansowane",
-    "N": "N"
+    "N": "N",
+    "weatherTextLanguage": "Język tekstów pogodowych",
+    "weatherTextLanguageTooltip": "Język przetłumaczonych wartości (warunki, kierunek wiatru, dni tygodnia). 'System' używa języka systemowego ioBroker."
 }

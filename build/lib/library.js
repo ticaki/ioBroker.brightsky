@@ -620,6 +620,10 @@ class Library extends BaseClass {
     }
   }
   getLocalLanguage() {
+    const configured = this.adapter.config.language;
+    if (configured) {
+      return configured;
+    }
     if (this.adapter.language) {
       return this.adapter.language;
     }
@@ -656,11 +660,12 @@ class Library extends BaseClass {
     return result;
   }
   async checkLanguage() {
+    const lang = this.getLocalLanguage();
     try {
-      this.log.debug(`Load language ${this.adapter.language}`);
-      this.translation = await Promise.resolve().then(() => __toESM(require(`../../admin/i18n/${this.adapter.language}/translations.json`)));
+      this.log.debug(`Load language ${lang}`);
+      this.translation = await Promise.resolve().then(() => __toESM(require(`../../admin/i18n/${lang}/translations.json`)));
     } catch {
-      this.log.warn(`Language ${this.adapter.language} not exist!`);
+      this.log.warn(`Language ${lang} not exist!`);
     }
   }
   sortText(text) {

@@ -80,5 +80,7 @@
     "wr4": "Inversor 4 máx. Power (KW)",
     "General": "Geral",
     "Advanced": "Avançado",
-    "N": "N"
+    "N": "N",
+    "weatherTextLanguage": "Idioma dos textos meteorológicos",
+    "weatherTextLanguageTooltip": "Idioma dos valores traduzidos (condição, direção do vento, dias da semana). 'System' usa o idioma do sistema ioBroker."
 }

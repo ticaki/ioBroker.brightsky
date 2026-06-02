@@ -80,5 +80,7 @@
     "wr3": "Wechselrichter 3 Max. Leistung (KW)",
     "wr4": "Wechselrichter 4 Max. Leistung (KW)",
     "General": "Allgemein",
-    "Advanced": "Erweitert"
+    "Advanced": "Erweitert",
+    "weatherTextLanguage": "Sprache der Wettertexte",
+    "weatherTextLanguageTooltip": "Sprache für übersetzte Statuswerte (Wetterzustand, Windrichtung, Wochentage). 'System' verwendet die ioBroker-Systemsprache."
 }

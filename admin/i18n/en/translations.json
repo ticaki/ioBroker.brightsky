@@ -80,5 +80,7 @@
     "Thunderstorm": "Thunderstorm",
     "General": "General",
     "Advanced": "Advanced",
-    "N": "N"
+    "N": "N",
+    "weatherTextLanguage": "Language for weather texts",
+    "weatherTextLanguageTooltip": "Language for translated state values (condition text, wind direction, weekday names). 'System' uses the ioBroker system language."
 }

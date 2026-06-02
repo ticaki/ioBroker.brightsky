@@ -738,5 +738,56 @@ tests.integration(path.join(__dirname, '..'), {
                 });
             }).timeout(40000);
         });
+
+        // Verify the configurable translation language (issue #110): with
+        // language='de' the adapter-produced condition text must be German
+        // ("Trocken"), proving the config override is honored end-to-end even
+        // though no system language is loaded in the harness.
+        suite('should translate texts into the configured language', (getHarness) => {
+            let harness;
+
+            before(() => {
+                harness = getHarness();
+            });
+
+            it("writes current.conditionUI in the configured language (de)", () => {
+                return new Promise(async (resolve, reject) => {
+                    try {
+                        harness = getHarness();
+                        const obj = await harness.objects.getObject('system.adapter.brightsky.0');
+
+                        Object.assign(obj.native, {
+                            position: GERMAN_COORDINATES,
+                            language: 'de',
+                            createCurrently: true,
+                            createHourly: false,
+                            createDaily: false,
+                            createRadar: false,
+                            createRadarData: false,
+                            panels: [],
+                        });
+
+                        harness.objects.setObject(obj._id, obj);
+                        await harness.startAdapterAndWait(false, await getMockEnv());
+                        await wait(15000);
+
+                        const stateIds = await harness.dbConnection.getStateIDs('brightsky.0.*');
+                        const values = await readStates(harness, stateIds);
+
+                        // current fixture condition = "dry" -> German translation "Trocken"
+                        expect(
+                            values['brightsky.0.current.conditionUI'],
+                            "current.conditionUI must be German when language='de'",
+                        ).to.equal('Trocken');
+
+                        console.log("✅ conditionUI translated to configured language: 'Trocken'");
+                        await harness.stopAdapter();
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }).timeout(40000);
+        });
     }
 });

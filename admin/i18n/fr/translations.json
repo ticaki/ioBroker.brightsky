@@ -80,5 +80,7 @@
     "wr3": "Onduleur 3 max. Power (KW)",
     "wr4": "Onduleur 4 max. Power (KW)",
     "General": "Général",
-    "Advanced": "Avancé"
+    "Advanced": "Avancé",
+    "weatherTextLanguage": "Langue des textes météo",
+    "weatherTextLanguageTooltip": "Langue des valeurs traduites (condition, direction du vent, jours de la semaine). 'System' utilise la langue système d'ioBroker."
 }
