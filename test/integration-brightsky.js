@@ -1,16 +1,57 @@
-
-// Load test setup FIRST to configure mocking for offline testing
-require('./test-setup');
-
 const path = require('path');
 const { tests } = require('@iobroker/testing');
+const { expect } = require('chai');
+const { startMockServer } = require('./mock-server');
 
-// Load test data to verify expected values
-const dailyWeatherData = require('./data/daily_weather.json');
+// Fixtures used to derive expected values for assertions.
+const currentFixture = require('./data/current_weather.json');
+const hourlyFixture = require('./data/hourly_weather.json');
+const dailyFixture = require('./data/daily_weather.json');
+
+// A local mock server answers every Bright Sky endpoint from the fixtures. The
+// adapter (spawned as a SEPARATE process by the harness) is pointed at it via
+// the BRIGHTSKY_API_BASE env var, so the tests never reach the real API.
+// Started lazily on first use and reused across all suites.
+let mockServer = null;
+const getMockEnv = async () => {
+    if (!mockServer) {
+        mockServer = await startMockServer();
+    }
+    return { BRIGHTSKY_API_BASE: mockServer.url };
+};
+after(async () => {
+    if (mockServer) {
+        await mockServer.close();
+        mockServer = null;
+    }
+});
 
 // German coordinates for testing (Berlin)
 const GERMAN_COORDINATES = '52.520008,13.404954';
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Read all states for the given ids into an id -> value map.
+ *
+ * @param {object} harness test harness
+ * @param {string[]} stateIds state ids to read
+ * @returns {Promise<Record<string, any>>} map of state id to value
+ */
+async function readStates(harness, stateIds) {
+    const allStates = await new Promise((resolve, reject) => {
+        harness.states.getStates(stateIds, (err, states) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(states || []);
+        });
+    });
+    const map = {};
+    stateIds.forEach((id, idx) => {
+        map[id] = allStates[idx] ? allStates[idx].val : undefined;
+    });
+    return map;
+}
 // Run integration tests
 tests.integration(path.join(__dirname, '..'), {
     // Define additional tests that test the adapter with German coordinates
@@ -61,7 +102,7 @@ tests.integration(path.join(__dirname, '..'), {
 
                     console.log('✅ Step 1: Configuration written, starting adapter...');
 
-                    await harness.startAdapterAndWait();
+                    await harness.startAdapterAndWait(false, await getMockEnv());
 
                     console.log('✅ Step 2: Adapter started');
 
@@ -216,6 +257,53 @@ tests.integration(path.join(__dirname, '..'), {
                             console.log(`✅ Found ${sourceStates.length} weather source datapoints`);
                         }
 
+                        // --- Value assertions against the known fixture inputs ---
+                        // These turn the test into a real regression guard for extensions:
+                        // deterministic inputs (fixtures) -> exact expected outputs.
+                        try {
+                            const valueOf = id => {
+                                const idx = stateIds.indexOf(id);
+                                return idx >= 0 && allStates[idx] ? allStates[idx].val : undefined;
+                            };
+
+                            // current.temperature is written through unchanged from the fixture
+                            const expectedCurrentTemp = currentFixture.weather.temperature;
+                            expect(
+                                valueOf('brightsky.0.current.temperature'),
+                                'current.temperature should match fixture',
+                            ).to.equal(expectedCurrentTemp);
+
+                            // hourly.00 corresponds to the first hourly fixture item
+                            const expectedHourlyTemp = hourlyFixture.weather[0].temperature;
+                            expect(
+                                valueOf('brightsky.0.hourly.00.temperature'),
+                                'hourly.00.temperature should match fixture',
+                            ).to.equal(expectedHourlyTemp);
+
+                            // daily.00 aggregates the first 24 hourly items (today 00:00..23:00
+                            // after the mock re-anchors timestamps to "now")
+                            const day0Temps = dailyFixture.weather
+                                .slice(0, 24)
+                                .map(x => x.temperature)
+                                .filter(v => v != null);
+                            const expectedDailyMax = Math.max(...day0Temps);
+                            expect(
+                                valueOf('brightsky.0.daily.00.temperature_max'),
+                                'daily.00.temperature_max should equal max of day-0 hourly temps',
+                            ).to.equal(expectedDailyMax);
+
+                            // No panels configured -> PV estimate must be exactly 0
+                            expect(
+                                valueOf('brightsky.0.daily.00.solar_estimate'),
+                                'daily.00.solar_estimate must be 0 without panels',
+                            ).to.equal(0);
+
+                            console.log('✅ Value assertions passed (current/hourly temperature, daily temperature_max, solar_estimate)');
+                        } catch (assertErr) {
+                            await harness.stopAdapter();
+                            return reject(assertErr);
+                        }
+
                         console.log('\n🎉 === INTEGRATION TEST SUMMARY ===');
                         console.log(`✅ Adapter initialized with German coordinates: ${GERMAN_COORDINATES}`);
                         console.log(`✅ Adapter started successfully using offline test data`);
@@ -281,7 +369,7 @@ tests.integration(path.join(__dirname, '..'), {
                         });
 
                         console.log('🔍 Step 3: Starting adapter...');
-                        await harness.startAdapterAndWait();
+                        await harness.startAdapterAndWait(false, await getMockEnv());
                         console.log('✅ Step 4: Adapter started');
 
                         console.log('⏳ Step 5: Waiting 20 seconds for states...');
@@ -359,7 +447,7 @@ tests.integration(path.join(__dirname, '..'), {
                         });
 
                         harness.objects.setObject(obj._id, obj);
-                        await harness.startAdapterAndWait();
+                        await harness.startAdapterAndWait(false, await getMockEnv());
                         console.log('✅ Step 1: Adapter started');
 
                         await wait(20000);
@@ -427,7 +515,7 @@ tests.integration(path.join(__dirname, '..'), {
                         });
 
                         harness.objects.setObject(obj._id, obj);
-                        await harness.startAdapterAndWait();
+                        await harness.startAdapterAndWait(false, await getMockEnv());
                         console.log('✅ Step 1: Adapter started');
 
                         await wait(20000);
@@ -495,7 +583,7 @@ tests.integration(path.join(__dirname, '..'), {
                         });
 
                         harness.objects.setObject(obj._id, obj);
-                        await harness.startAdapterAndWait();
+                        await harness.startAdapterAndWait(false, await getMockEnv());
                         console.log('✅ Step 1: Adapter started');
 
                         await wait(20000);
@@ -553,7 +641,7 @@ tests.integration(path.join(__dirname, '..'), {
                         });
 
                         harness.objects.setObject(obj._id, obj);
-                        await harness.startAdapterAndWait();
+                        await harness.startAdapterAndWait(false, await getMockEnv());
                         console.log('✅ Step 1: Adapter started');
 
                         await wait(20000);
@@ -602,6 +690,31 @@ tests.integration(path.join(__dirname, '..'), {
                             }
                         }
                         console.log(`✅ All ${expectedCumulative.length} cumulative forecast states exist`);
+
+                        // --- Value assertions: deterministic uniform grid in the mock ---
+                        // Mock radar grid = 25 (0.01mm) per cell, 1 row x 3 cols => 0.25 mm
+                        // after the adapter's /100 conversion. Per-5min max is therefore 0.25;
+                        // the cumulative sum over N 5-min intervals is 0.25 * N.
+                        const radarValues = await readStates(harness, stateIds);
+                        const base = 'brightsky.0.radar.max_precipitation_forecast.';
+
+                        // Unit conversion: 25 (0.01mm) -> 0.25 mm per 5-min window
+                        expect(radarValues[`${base}next_05min`], 'next_05min unit conversion').to.equal(0.25);
+
+                        // Cumulative sums: 0.25 mm * number of 5-min intervals
+                        const expectedSums = {
+                            next_05min_sum: 0.25, // 1 interval
+                            next_10min_sum: 0.5, // 2
+                            next_15min_sum: 0.75, // 3
+                            next_30min_sum: 1.5, // 6
+                            next_45min_sum: 2.25, // 9
+                            next_60min_sum: 3.0, // 12
+                            next_90min_sum: 4.5, // 18
+                        };
+                        for (const [key, expected] of Object.entries(expectedSums)) {
+                            expect(radarValues[`${base}${key}`], `${key} cumulative value`).to.equal(expected);
+                        }
+                        console.log('✅ Radar value assertions passed (unit conversion + cumulative sums)');
 
                         await harness.stopAdapter();
                         console.log('✅ Test passed: radar states include cumulative values');

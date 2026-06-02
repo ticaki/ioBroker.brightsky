@@ -39,6 +39,10 @@ class Brightsky extends utils.Adapter {
   // This is distinct from the processed radarData array, which contains converted/processed values.
   rawRadarData = [];
   radarRotationTimeout = void 0;
+  // Base URL of the Bright Sky API. Overridable via the BRIGHTSKY_API_BASE environment
+  // variable - used by the integration tests to point at a local mock server (so no real
+  // requests hit api.brightsky.dev), and usable in production against a self-hosted instance.
+  apiBaseUrl = process.env.BRIGHTSKY_API_BASE || "https://api.brightsky.dev";
   /**
    * Creates a new instance of the Brightsky adapter
    *
@@ -307,10 +311,10 @@ class Brightsky extends utils.Adapter {
     const endTime = endDate.toISOString();
     try {
       const response = await this.fetch(
-        `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
+        `${this.apiBaseUrl}/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
       this.log.debug(
-        `https://api.brightsky.dev/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
+        `${this.apiBaseUrl}/weather?lat=${this.config.position.split(",")[0]}&lon=${this.config.position.split(",")[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
       if (response.status !== 200) {
         throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
@@ -426,7 +430,7 @@ class Brightsky extends utils.Adapter {
                             return sum + newValue;
                           }
                           return sum;
-                        });
+                        }, 0);
                         dailyData.solar_estimate = dailyData.solar_estimate ? Math.round(dailyData.solar_estimate * 1e3) / 1e3 : dailyData.solar_estimate;
                       }
                     }
@@ -661,7 +665,7 @@ class Brightsky extends utils.Adapter {
     const endTime = new Date((/* @__PURE__ */ new Date()).setHours((/* @__PURE__ */ new Date()).getHours() + this.config.hours, 0, 0, 0)).toISOString();
     try {
       const response = await this.fetch(
-        `https://api.brightsky.dev/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
+        `${this.apiBaseUrl}/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`
       );
       if (response.status !== 200) {
         throw new Error(`Error fetching hourly weather data: ${response.status} ${response.statusText}`);
@@ -767,7 +771,7 @@ class Brightsky extends utils.Adapter {
     var _a;
     try {
       const response = await this.fetch(
-        `https://api.brightsky.dev/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`
+        `${this.apiBaseUrl}/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`
       );
       if (response.status !== 200) {
         throw new Error(`Error fetching current weather data: ${response.status} ${response.statusText}`);
@@ -850,7 +854,7 @@ class Brightsky extends utils.Adapter {
       const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1e3);
       const dateParam = now.toISOString();
       const response = await this.fetch(
-        `https://api.brightsky.dev/radar?lat=${coords[0]}&lon=${coords[1]}&distance=${this.config.radarDistance}&date=${dateParam}&format=plain`
+        `${this.apiBaseUrl}/radar?lat=${coords[0]}&lon=${coords[1]}&distance=${this.config.radarDistance}&date=${dateParam}&format=plain`
       );
       if (response.status !== 200) {
         throw new Error(`Error fetching radar data: ${response.status} ${response.statusText}`);
@@ -1956,7 +1960,7 @@ class Brightsky extends utils.Adapter {
       }
     }, 3e4);
     try {
-      const response = await fetch(url, {
+      const response = await globalThis.fetch(url, {
         ...init,
         method: (_a = init == null ? void 0 : init.method) != null ? _a : "GET",
         signal: this.controller.signal
