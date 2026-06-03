@@ -98,26 +98,8 @@ class Brightsky extends utils.Adapter {
             await this.library.writedp('hourly', null, genericStateObjects.weather.hourly._channel);
             await this.library.writedp('hourly.sources', undefined, genericStateObjects.weather.sources._channel);
         }
-        // Remove legacy fallback_source_ids objects from the daily subtree
-        const fbObjects = await this.getObjectListAsync({
-            startkey: `${this.namespace}.daily.`,
-            endkey: `${this.namespace}.daily.\u9999`,
-        });
-        for (const row of fbObjects.rows ?? []) {
-            if (row.id.includes('.fallback_source_ids')) {
-                await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ''), { recursive: true });
-            }
-        }
-        // Remove legacy fallback_source_ids objects from the hourly subtree
-        const fbHourlyObjects = await this.getObjectListAsync({
-            startkey: `${this.namespace}.hourly.`,
-            endkey: `${this.namespace}.hourly.\u9999`,
-        });
-        for (const row of fbHourlyObjects.rows ?? []) {
-            if (row.id.includes('.fallback_source_ids')) {
-                await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ''), { recursive: true });
-            }
-        }
+        await this.removeLegacyFallbackSourceIds('daily');
+        await this.removeLegacyFallbackSourceIds('hourly');
         if (!this.config.createRadar) {
             await this.delObjectAsync('radar', { recursive: true });
         } else {
@@ -437,227 +419,21 @@ class Brightsky extends utils.Adapter {
                         }
                     }
                     for (let i = 0; i < weatherArr.length; i++) {
-                        const dailyData: Partial<BrightskyDailyData> = {};
                         this.log.debug(`Processing daily data for day ${i}: ${JSON.stringify(weatherArr[i])}`);
-                        for (const key of Object.keys(weatherArr[i])) {
-                            const k = key as keyof BrightskyWeather;
-                            switch (k) {
-                                case 'precipitation':
-                                case 'wind_gust_speed':
-                                case 'precipitation_probability':
-                                case 'precipitation_probability_6h':
-                                case 'wind_speed': {
-                                    const values = weatherArr[i][k] as (number | null)[];
-                                    if (values && values.length > 0) {
-                                        for (let j = 0; j < values.length; j++) {
-                                            if (values[j] === null) {
-                                                values[j] = 0; // Set null values to 0
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            switch (k) {
-                                case 'timestamp': {
-                                    // Use middle timestamp of the day instead of first to avoid timezone issues
-                                    const middleIndex = Math.floor(weatherArr[i].timestamp.length / 2);
-                                    dailyData.timestamp = weatherArr[i].timestamp[middleIndex] as string;
-                                    break;
-                                }
-                                case 'source_id': {
-                                    dailyData.source_id = weatherArr[i].source_id[0] as number;
-                                    break;
-                                }
-                                case 'precipitation':
-                                case 'wind_speed':
-                                case 'solar':
-                                case 'temperature': {
-                                    const values = weatherArr[i][k] as (number | null)[];
-                                    if (values && values.length > 0) {
-                                        const min = Math.min(...(values.filter(v => v !== null) as number[]));
-                                        const max = Math.max(...(values.filter(v => v !== null) as number[]));
-
-                                        if (k !== 'solar') {
-                                            dailyData[`${k}_min`] = min !== Infinity ? min : null;
-                                        } else {
-                                            dailyData.solar_estimate = 0;
-                                            if (
-                                                this.config.position.split(',').length === 2 &&
-                                                this.config.panels.length > 0
-                                            ) {
-                                                dailyData.solar_estimate = values.reduce((sum, value, index) => {
-                                                    if (typeof sum !== 'number') {
-                                                        sum = 0; // Initialize sum to 0 if it's not a number
-                                                    }
-                                                    if (value) {
-                                                        const newValue = this.estimatePVEnergyForHour(
-                                                            value,
-                                                            new Date(weatherArr[i].timestamp[index] as string),
-                                                            {
-                                                                lat: parseFloat(this.config.position.split(',')[0]),
-                                                                lon: parseFloat(this.config.position.split(',')[1]),
-                                                            },
-                                                            this.config.panels,
-                                                        );
-
-                                                        return sum + newValue;
-                                                    }
-                                                    return sum;
-                                                }, 0);
-                                                dailyData.solar_estimate = dailyData.solar_estimate
-                                                    ? Math.round(dailyData.solar_estimate * 1000) / 1000
-                                                    : dailyData.solar_estimate;
-                                            }
-                                        }
-                                        dailyData[`${k}_max`] = max !== -Infinity ? max : null;
-                                    } else {
-                                        if (k !== 'solar') {
-                                            dailyData[`${k}_min`] = null;
-                                        }
-                                    }
-                                }
-                                // eslint-disable-next-line no-fallthrough
-                                case 'sunshine': {
-                                    if (k === 'precipitation' || k === 'sunshine' || k === 'solar') {
-                                        const t = weatherArr[i][k].reduce((sum, value) => {
-                                            if (typeof sum !== 'number') {
-                                                sum = 0; // Initialize sum to 0 if it's not a number
-                                            }
-                                            if (value != null && typeof value === 'number') {
-                                                return sum + value;
-                                            }
-                                            return sum;
-                                        }, 0);
-                                        dailyData[k] = null;
-                                        if (t !== null && typeof t === 'number') {
-                                            dailyData[k] =
-                                                k !== 'solar' ? Math.round(t * 10) / 10 : Math.round(t * 1000) / 1000;
-                                        }
-                                        break;
-                                    }
-                                }
-                                // eslint-disable-next-line no-fallthrough
-                                case 'wind_direction':
-                                case 'cloud_cover':
-                                case 'dew_point':
-                                case 'relative_humidity':
-                                case 'pressure_msl':
-                                case 'visibility':
-                                case 'wind_gust_direction':
-                                case 'wind_gust_speed':
-                                case 'precipitation_probability':
-                                case 'precipitation_probability_6h':
-                                case 'apparent_temperature': {
-                                    const values = weatherArr[i][k] as (number | null)[];
-                                    if (values && values.length > 0) {
-                                        if (values && values.length > 0) {
-                                            let median: number | null = null;
-                                            if (values.filter(v => v !== null).length > 0) {
-                                                const sortedValues = values
-                                                    .filter(v => v !== null)
-                                                    .sort((a, b) => a - b);
-                                                const mid = Math.floor(sortedValues.length / 2);
-                                                if (sortedValues.length % 2 === 0) {
-                                                    median = (sortedValues[mid - 1] + sortedValues[mid]) / 2;
-                                                } else {
-                                                    median = sortedValues[mid];
-                                                }
-                                            }
-                                            let avg = values.reduce((sum, value) => {
-                                                if (value != null) {
-                                                    return sum == null ? 0 + value : sum + value;
-                                                }
-                                                return sum;
-                                            }, 0);
-                                            if (avg != null) {
-                                                if (values.filter(v => v !== null).length > 6) {
-                                                    if (
-                                                        k === 'relative_humidity' ||
-                                                        k === 'cloud_cover' ||
-                                                        k === 'visibility' ||
-                                                        k === 'wind_direction' ||
-                                                        k === 'wind_gust_direction' ||
-                                                        k === 'pressure_msl'
-                                                    ) {
-                                                        avg = Math.round(avg / values.filter(v => v !== null).length);
-                                                    } else {
-                                                        avg =
-                                                            Math.round(
-                                                                (avg / values.filter(v => v !== null).length) * 10,
-                                                            ) / 10;
-                                                    }
-                                                } else {
-                                                    avg = null;
-                                                }
-                                            }
-
-                                            // For apparent_temperature, also calculate min/max like temperature
-                                            if (k === 'apparent_temperature') {
-                                                const min = Math.min(...(values.filter(v => v !== null) as number[]));
-                                                const max = Math.max(...(values.filter(v => v !== null) as number[]));
-                                                dailyData.apparent_temperature_min =
-                                                    min !== Infinity ? Math.round(min * 10) / 10 : null;
-                                                dailyData.apparent_temperature_max =
-                                                    max !== -Infinity ? Math.round(max * 10) / 10 : null;
-                                                dailyData.apparent_temperature_median =
-                                                    median !== null ? Math.round(median * 10) / 10 : null;
-                                                dailyData.apparent_temperature = avg; // Add average daily value
-                                            } else {
-                                                dailyData[`${k}_median`] = median;
-                                                dailyData[k] = avg;
-                                            }
-                                        } else {
-                                            if (k === 'apparent_temperature') {
-                                                dailyData.apparent_temperature_min = null;
-                                                dailyData.apparent_temperature_max = null;
-                                                dailyData.apparent_temperature_median = null;
-                                                dailyData.apparent_temperature = null; // Add average daily value
-                                            } else {
-                                                dailyData[k] = null;
-                                                dailyData[`${k}_median`] = null;
-                                            }
-                                        }
-                                    }
-                                    break;
-                                }
-                                case 'icon':
-                                case 'condition': {
-                                    const tempArr: { value: string | number; count: number }[] = [];
-                                    for (const value of weatherArr[i][k]) {
-                                        if (value) {
-                                            const index = tempArr.findIndex(el => el.value === value);
-                                            if (index !== -1) {
-                                                tempArr[index].count++;
-                                            } else {
-                                                tempArr.push({ value, count: 1 });
-                                            }
-                                        }
-                                    }
-                                    tempArr.sort((a, b) => b.count - a.count);
-                                    if (tempArr.length > 0) {
-                                        if (k === 'icon') {
-                                            tempArr[0].value = (tempArr[0].value as string).replace('-night', '-day');
-                                        }
-                                        dailyData[k] = tempArr[0].value as string;
-                                    } else {
-                                        dailyData[k] = null;
-                                    }
-                                    const iconsDay = this.pickDailyWeatherIcon({
-                                        condition: weatherArr[i].condition as (string | null | undefined)[],
-                                        wind_speed: weatherArr[i].wind_speed as (number | null | undefined)[],
-                                        cloud_cover: weatherArr[i].cloud_cover as (number | null | undefined)[],
-                                    });
-                                    dailyData.icon_special = iconsDay.mdi;
-                                    dailyData.iconUrl = iconsDay.url;
-                                    dailyData.conditionUI = this.translateCondition(dailyData.condition);
-                                    break;
-                                }
-                                default: {
-                                    //this.log.warn(`Unhandled key in daily data aggregation: ${k}`);
-                                    break;
-                                }
-                            }
-                        }
+                        const dailyData: Partial<BrightskyDailyData> = this.aggregateWeatherValues(weatherArr[i], {
+                            timestamp: 'middle',
+                            avgMinCount: 6,
+                            integerRoundKeys: new Set([
+                                'relative_humidity',
+                                'cloud_cover',
+                                'visibility',
+                                'wind_direction',
+                                'wind_gust_direction',
+                                'pressure_msl',
+                            ]),
+                            computeSolarEstimate: true,
+                            emitConditionUI: true,
+                        }) as Partial<BrightskyDailyData>;
 
                         /*const dailyData: Partial<BrightskyDailyData> = {
                         ...weatherArr.d[i],
@@ -2006,15 +1782,44 @@ class Brightsky extends utils.Adapter {
     }
 
     /**
-     * Process aggregated weather data (common logic for both day and night)
+     * Aggregates a bucket of hourly weather values (one array per parameter) into a single
+     * set of daily / day / night values. Shared by weatherDailyUpdate (full day) and
+     * calculateDayNightData (day & night halves), which previously held two near-identical
+     * ~210-line copies of this switch. Only the genuine differences are passed via `options`.
      *
-     * @param weatherValues Weather data arrays
-     * @returns Processed weather data
+     * @param weatherValues Arrays of hourly values keyed by parameter name (may carry a `day` flag)
+     * @param options Behavioural differences between the daily and the day/night aggregation
+     * @param options.timestamp Which hourly timestamp represents the bucket ('middle' for the
+     *        full day to dodge timezone edges, 'first' for the day/night halves)
+     * @param options.avgMinCount Minimum number of non-null samples required to emit an average
+     * @param options.integerRoundKeys Keys whose average is rounded to an integer (else 1 decimal)
+     * @param options.computeSolarEstimate Whether to derive solar_estimate (PV yield) from solar
+     * @param options.emitConditionUI Whether to add the translated conditionUI text
+     * @param options.setMaxNullWhenEmpty Whether an empty min/max bucket also nulls `${k}_max`
+     * @returns Aggregated values (superset of BrightskyDailyData / BrightskyDayNightData fields)
      */
-    private processAggregatedWeatherData(
+    private aggregateWeatherValues(
         weatherValues: Record<string, (string | number | null)[]> & { day?: boolean },
-    ): Partial<BrightskyDayNightData> {
-        const result: Partial<BrightskyDayNightData> = {};
+        options: {
+            timestamp: 'first' | 'middle';
+            avgMinCount: number;
+            integerRoundKeys?: ReadonlySet<string>;
+            computeSolarEstimate?: boolean;
+            emitConditionUI?: boolean;
+            setMaxNullWhenEmpty?: boolean;
+        },
+    ): Record<string, any> {
+        const result: Record<string, any> = {};
+        const integerRoundKeys = options.integerRoundKeys ?? new Set<string>();
+
+        const median = (values: (number | null)[]): number | null => {
+            const xs = values.filter((v): v is number => v !== null).sort((a, b) => a - b);
+            if (xs.length === 0) {
+                return null;
+            }
+            const mid = Math.floor(xs.length / 2);
+            return xs.length % 2 === 0 ? (xs[mid - 1] + xs[mid]) / 2 : xs[mid];
+        };
 
         for (const key of Object.keys(weatherValues)) {
             const k = key as keyof BrightskyWeather;
@@ -2038,7 +1843,9 @@ class Brightsky extends utils.Adapter {
 
             switch (k) {
                 case 'timestamp': {
-                    result.timestamp = weatherValues.timestamp[0] as string;
+                    // Daily uses the middle timestamp to dodge timezone edges; day/night uses the first.
+                    const idx = options.timestamp === 'middle' ? Math.floor(weatherValues.timestamp.length / 2) : 0;
+                    result.timestamp = weatherValues.timestamp[idx] as string;
                     break;
                 }
                 case 'source_id': {
@@ -2051,18 +1858,45 @@ class Brightsky extends utils.Adapter {
                 case 'temperature': {
                     const values = weatherValues[k] as (number | null)[];
                     if (values && values.length > 0) {
-                        const min = Math.min(...(values.filter(v => v !== null) as number[]));
-                        const max = Math.max(...(values.filter(v => v !== null) as number[]));
+                        const nonNull = values.filter((v): v is number => v !== null);
+                        const min = Math.min(...nonNull);
+                        const max = Math.max(...nonNull);
 
                         if (k !== 'solar') {
-                            (result as any)[`${k}_min`] = min !== Infinity ? min : null;
+                            result[`${k}_min`] = min !== Infinity ? min : null;
+                        } else if (options.computeSolarEstimate) {
+                            result.solar_estimate = 0;
+                            if (this.config.position.split(',').length === 2 && this.config.panels.length > 0) {
+                                result.solar_estimate = values.reduce((sum: number, value, index) => {
+                                    if (value) {
+                                        return (
+                                            sum +
+                                            this.estimatePVEnergyForHour(
+                                                value,
+                                                new Date(weatherValues.timestamp[index] as string),
+                                                {
+                                                    lat: parseFloat(this.config.position.split(',')[0]),
+                                                    lon: parseFloat(this.config.position.split(',')[1]),
+                                                },
+                                                this.config.panels,
+                                            )
+                                        );
+                                    }
+                                    return sum;
+                                }, 0);
+                                result.solar_estimate = result.solar_estimate
+                                    ? Math.round(result.solar_estimate * 1000) / 1000
+                                    : result.solar_estimate;
+                            }
                         }
-                        (result as any)[`${k}_max`] = max !== -Infinity ? max : null;
+                        result[`${k}_max`] = max !== -Infinity ? max : null;
                     } else {
                         if (k !== 'solar') {
-                            (result as any)[`${k}_min`] = null;
+                            result[`${k}_min`] = null;
                         }
-                        (result as any)[`${k}_max`] = null;
+                        if (options.setMaxNullWhenEmpty) {
+                            result[`${k}_max`] = null;
+                        }
                     }
                 }
                 // eslint-disable-next-line no-fallthrough
@@ -2089,6 +1923,7 @@ class Brightsky extends utils.Adapter {
                 case 'cloud_cover':
                 case 'dew_point':
                 case 'relative_humidity':
+                case 'pressure_msl':
                 case 'visibility':
                 case 'wind_gust_direction':
                 case 'wind_gust_speed':
@@ -2097,56 +1932,37 @@ class Brightsky extends utils.Adapter {
                 case 'apparent_temperature': {
                     const values = weatherValues[k] as (number | null)[];
                     if (values && values.length > 0) {
-                        let median: number | null = null;
-                        if (values.filter(v => v !== null).length > 0) {
-                            const sortedValues = values
-                                .filter(v => v !== null)
-                                .sort((a, b) => (a as number) - (b as number));
-                            const mid = Math.floor(sortedValues.length / 2);
-                            if (sortedValues.length % 2 === 0) {
-                                median = ((sortedValues[mid - 1] as number) + (sortedValues[mid] as number)) / 2;
-                            } else {
-                                median = sortedValues[mid] as number;
-                            }
-                        }
-                        let avg = values.reduce((sum, value) => {
-                            if (value != null) {
-                                return sum == null ? 0 + (value as number) : (sum as number) + (value as number);
-                            }
-                            return sum;
-                        }, 0);
-                        if (avg != null) {
-                            if (values.filter(v => v !== null).length > 2) {
-                                avg = Math.round(((avg as number) / values.filter(v => v !== null).length) * 10) / 10;
-                            } else {
-                                avg = null;
-                            }
+                        const med = median(values);
+                        const nonNull = values.filter((v): v is number => v !== null);
+                        const cnt = nonNull.length;
+                        let avg: number | null = nonNull.reduce((sum, value) => sum + value, 0);
+                        if (cnt > options.avgMinCount) {
+                            avg = integerRoundKeys.has(k) ? Math.round(avg / cnt) : Math.round((avg / cnt) * 10) / 10;
+                        } else {
+                            avg = null;
                         }
 
                         // For apparent_temperature, also calculate min/max like temperature
                         if (k === 'apparent_temperature') {
-                            const min = Math.min(...(values.filter(v => v !== null) as number[]));
-                            const max = Math.max(...(values.filter(v => v !== null) as number[]));
-                            (result as any).apparent_temperature_min =
-                                min !== Infinity ? Math.round(min * 10) / 10 : null;
-                            (result as any).apparent_temperature_max =
-                                max !== -Infinity ? Math.round(max * 10) / 10 : null;
-                            (result as any).apparent_temperature_median =
-                                median !== null ? Math.round(median * 10) / 10 : null;
-                            result.apparent_temperature = avg as number | null; // Add average value
+                            const min = Math.min(...nonNull);
+                            const max = Math.max(...nonNull);
+                            result.apparent_temperature_min = min !== Infinity ? Math.round(min * 10) / 10 : null;
+                            result.apparent_temperature_max = max !== -Infinity ? Math.round(max * 10) / 10 : null;
+                            result.apparent_temperature_median = med !== null ? Math.round(med * 10) / 10 : null;
+                            result.apparent_temperature = avg; // Add average value
                         } else {
-                            (result as any)[`${k}_median`] = median;
-                            result[k] = avg as number;
+                            result[`${k}_median`] = med;
+                            result[k] = avg;
                         }
                     } else {
                         if (k === 'apparent_temperature') {
-                            (result as any).apparent_temperature_min = null;
-                            (result as any).apparent_temperature_max = null;
-                            (result as any).apparent_temperature_median = null;
+                            result.apparent_temperature_min = null;
+                            result.apparent_temperature_max = null;
+                            result.apparent_temperature_median = null;
                             result.apparent_temperature = null; // Add average value
                         } else {
                             result[k] = null;
-                            (result as any)[`${k}_median`] = null;
+                            result[`${k}_median`] = null;
                         }
                     }
                     break;
@@ -2166,56 +1982,23 @@ class Brightsky extends utils.Adapter {
                     }
                     tempArr.sort((a, b) => b.count - a.count);
                     if (tempArr.length > 0) {
-                        if (k === 'icon') {
-                            if (weatherValues.day !== false) {
-                                tempArr[0].value = (tempArr[0].value as string).replace('-night', '-day');
-                            }
+                        if (k === 'icon' && weatherValues.day !== false) {
+                            tempArr[0].value = (tempArr[0].value as string).replace('-night', '-day');
                         }
                         result[k] = tempArr[0].value as string;
                     } else {
                         result[k] = null;
                     }
-                    const iconsAgg = this.pickDailyWeatherIcon({
+                    const icons = this.pickDailyWeatherIcon({
                         condition: weatherValues.condition as (string | null | undefined)[],
                         wind_speed: weatherValues.wind_speed as (number | null | undefined)[],
                         cloud_cover: weatherValues.cloud_cover as (number | null | undefined)[],
                         day: weatherValues.day,
                     });
-                    result.icon_special = iconsAgg.mdi;
-                    result.iconUrl = iconsAgg.url;
-                    break;
-                }
-                case 'pressure_msl': {
-                    const values = weatherValues[k] as (number | null)[];
-                    if (values && values.length > 0) {
-                        let median: number | null = null;
-                        if (values.filter(v => v !== null).length > 0) {
-                            const sortedValues = values
-                                .filter(v => v !== null)
-                                .sort((a, b) => (a as number) - (b as number));
-                            const mid = Math.floor(sortedValues.length / 2);
-                            if (sortedValues.length % 2 === 0) {
-                                median = ((sortedValues[mid - 1] as number) + (sortedValues[mid] as number)) / 2;
-                            } else {
-                                median = sortedValues[mid] as number;
-                            }
-                        }
-                        let avg = values.reduce((sum, value) => {
-                            if (value != null) {
-                                return sum == null ? 0 + (value as number) : (sum as number) + (value as number);
-                            }
-                            return sum;
-                        }, 0);
-                        if (avg != null && values.filter(v => v !== null).length > 2) {
-                            avg = Math.round(((avg as number) / values.filter(v => v !== null).length) * 10) / 10;
-                        } else {
-                            avg = null;
-                        }
-                        (result as any)[`${k}_median`] = median;
-                        result[k] = avg as number;
-                    } else {
-                        result[k] = null;
-                        (result as any)[`${k}_median`] = null;
+                    result.icon_special = icons.mdi;
+                    result.iconUrl = icons.url;
+                    if (options.emitConditionUI) {
+                        result.conditionUI = this.translateCondition(result.condition);
                     }
                     break;
                 }
@@ -2223,6 +2006,40 @@ class Brightsky extends utils.Adapter {
         }
 
         return result;
+    }
+
+    /**
+     * Removes legacy `*.fallback_source_ids` objects left over from older adapter versions
+     * from the given subtree. These are API metadata, not weather datapoints.
+     *
+     * @param subtree State subtree to clean up (e.g. 'daily' or 'hourly')
+     */
+    private async removeLegacyFallbackSourceIds(subtree: string): Promise<void> {
+        const objects = await this.getObjectListAsync({
+            startkey: `${this.namespace}.${subtree}.`,
+            endkey: `${this.namespace}.${subtree}.\u9999`,
+        });
+        for (const row of objects.rows ?? []) {
+            if (row.id.includes('.fallback_source_ids')) {
+                await this.delObjectAsync(row.id.replace(`${this.namespace}.`, ''), { recursive: true });
+            }
+        }
+    }
+
+    /**
+     * Process aggregated weather data (common logic for both day and night)
+     *
+     * @param weatherValues Weather data arrays
+     * @returns Processed weather data
+     */
+    private processAggregatedWeatherData(
+        weatherValues: Record<string, (string | number | null)[]> & { day?: boolean },
+    ): Partial<BrightskyDayNightData> {
+        return this.aggregateWeatherValues(weatherValues, {
+            timestamp: 'first',
+            avgMinCount: 2,
+            setMaxNullWhenEmpty: true,
+        }) as Partial<BrightskyDayNightData>;
     }
 
     /**
@@ -2355,7 +2172,7 @@ class Brightsky extends utils.Adapter {
      * @param url URL to fetch
      * @param init Optional fetch initialization options
      * @returns Promise resolving to Response object
-     * @throws Error if request fails or times out
+     * @throws {Error} if request fails or times out
      */
     async fetch(url: string, init?: RequestInit): Promise<Response> {
         this.controller = new AbortController();
