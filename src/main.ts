@@ -435,15 +435,6 @@ class Brightsky extends utils.Adapter {
                             emitConditionUI: true,
                         }) as Partial<BrightskyDailyData>;
 
-                        /*const dailyData: Partial<BrightskyDailyData> = {
-                        ...weatherArr.d[i],
-                        precipitation_min: weatherArr.min[i].precipitation,
-                        precipitation_max: weatherArr.max[i].precipitation,
-                        wind_speed_min: weatherArr.min[i].wind_speed,
-                        wind_speed_max: weatherArr.max[i].wind_speed,
-                        temperature_min: weatherArr.min[i].temperature,
-                        temperature_max: weatherArr.max[i].temperature,
-                    };*/
                         // Calculate sunrise/sunset based on day index, not timestamp, to avoid timezone issues
                         const currentDayLocal = new Date(new Date().setHours(12, 0, 0, 0));
                         const targetDate = new Date(currentDayLocal);
