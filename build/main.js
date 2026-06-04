@@ -804,51 +804,45 @@ class Brightsky extends utils.Adapter {
    * Analyzes radar data to determine max precipitation in 5, 10, 15, 30, 45, 60, and 90 minute windows
    */
   async writeMaxPrecipitationForecasts() {
+    var _a;
     const intervals = [5, 10, 15, 30, 45, 60, 90];
     const forecasts = {};
     const cumulativeForecasts = {};
     for (const interval of intervals) {
       const numIntervals = Math.ceil(interval / 5);
-      let maxPrecipitation = -1;
-      let maxCumulative = -1;
+      let maxPrecipitation = null;
+      let maxCumulative = null;
       if (this.radarData.length > 0) {
         for (let i = 0; i < numIntervals && i < this.radarData.length; i++) {
           const item = this.radarData[i];
-          if (item.precipitation_5_max !== void 0 && item.precipitation_5_max > maxPrecipitation) {
+          if (item.precipitation_5_max !== void 0 && (maxPrecipitation === null || item.precipitation_5_max > maxPrecipitation)) {
             maxPrecipitation = item.precipitation_5_max;
           }
         }
       }
       if (this.rawRadarData.length > 0) {
-        let numCols = 0;
-        if (this.rawRadarData[0] && Array.isArray(this.rawRadarData[0].precipitation_5)) {
-          for (const row of this.rawRadarData[0].precipitation_5) {
-            if (Array.isArray(row) && row.length > numCols) {
-              numCols = row.length;
-            }
+        const cellSums = /* @__PURE__ */ new Map();
+        for (let i = 0; i < numIntervals && i < this.rawRadarData.length; i++) {
+          const item = this.rawRadarData[i];
+          if (!Array.isArray(item.precipitation_5)) {
+            continue;
           }
-        }
-        if (numCols > 0) {
-          const columnSums = new Array(numCols).fill(0);
-          for (let i = 0; i < numIntervals && i < this.rawRadarData.length; i++) {
-            const item = this.rawRadarData[i];
-            if (Array.isArray(item.precipitation_5)) {
-              for (const row of item.precipitation_5) {
-                if (Array.isArray(row)) {
-                  for (let col = 0; col < row.length && col < numCols; col++) {
-                    const value = row[col];
-                    if (typeof value === "number") {
-                      columnSums[col] += value / 100;
-                    }
-                  }
-                }
+          for (let row = 0; row < item.precipitation_5.length; row++) {
+            const cols = item.precipitation_5[row];
+            if (!Array.isArray(cols)) {
+              continue;
+            }
+            for (let col = 0; col < cols.length; col++) {
+              const value = cols[col];
+              if (typeof value === "number") {
+                const key2 = `${row},${col}`;
+                cellSums.set(key2, ((_a = cellSums.get(key2)) != null ? _a : 0) + value / 100);
               }
             }
           }
-          if (columnSums.length > 0) {
-            maxCumulative = Math.max(...columnSums);
-            maxCumulative = Math.round(maxCumulative * 100) / 100;
-          }
+        }
+        if (cellSums.size > 0) {
+          maxCumulative = Math.round(Math.max(...cellSums.values()) * 100) / 100;
         }
       }
       const key = interval.toString().padStart(2, "0");

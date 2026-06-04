@@ -980,63 +980,58 @@ class Brightsky extends utils.Adapter {
      */
     private async writeMaxPrecipitationForecasts(): Promise<void> {
         const intervals = [5, 10, 15, 30, 45, 60, 90]; // minutes
-        const forecasts: { [key: string]: number } = {};
-        const cumulativeForecasts: { [key: string]: number } = {};
+        const forecasts: { [key: string]: number | null } = {};
+        const cumulativeForecasts: { [key: string]: number | null } = {};
 
         for (const interval of intervals) {
             const numIntervals = Math.ceil(interval / 5); // How many 5-minute intervals to check
-            let maxPrecipitation = -1;
-            let maxCumulative = -1;
+            let maxPrecipitation: number | null = null;
+            let maxCumulative: number | null = null;
 
             if (this.radarData.length > 0) {
                 // Get maximum precipitation per 5-minute interval from the next N time intervals
                 for (let i = 0; i < numIntervals && i < this.radarData.length; i++) {
                     const item = this.radarData[i];
-                    if (item.precipitation_5_max !== undefined && item.precipitation_5_max > maxPrecipitation) {
+                    if (
+                        item.precipitation_5_max !== undefined &&
+                        (maxPrecipitation === null || item.precipitation_5_max > maxPrecipitation)
+                    ) {
                         maxPrecipitation = item.precipitation_5_max;
                     }
                 }
             }
 
-            // Calculate cumulative sum across columns for this time window
+            // Calculate the maximum accumulated precipitation for a single grid cell across this time window.
+            // Each radar item is one 5-minute frame; its precipitation_5 array is a purely spatial grid
+            // (rows × cols of geographic pixels). We accumulate every cell over time and then take the
+            // worst (maximum) cell, so the result is independent of the configured grid size (radarDistance).
             if (this.rawRadarData.length > 0) {
-                // Determine number of columns from first interval
-                let numCols = 0;
-                if (this.rawRadarData[0] && Array.isArray(this.rawRadarData[0].precipitation_5)) {
-                    for (const row of this.rawRadarData[0].precipitation_5) {
-                        if (Array.isArray(row) && row.length > numCols) {
-                            numCols = row.length;
+                // Per-cell sums keyed by "row,col"
+                const cellSums = new Map<string, number>();
+
+                for (let i = 0; i < numIntervals && i < this.rawRadarData.length; i++) {
+                    const item = this.rawRadarData[i];
+                    if (!Array.isArray(item.precipitation_5)) {
+                        continue;
+                    }
+                    for (let row = 0; row < item.precipitation_5.length; row++) {
+                        const cols = item.precipitation_5[row];
+                        if (!Array.isArray(cols)) {
+                            continue;
+                        }
+                        for (let col = 0; col < cols.length; col++) {
+                            const value = cols[col];
+                            if (typeof value === 'number') {
+                                const key = `${row},${col}`;
+                                cellSums.set(key, (cellSums.get(key) ?? 0) + value / 100); // Convert from 0.01mm to mm
+                            }
                         }
                     }
                 }
 
-                if (numCols > 0) {
-                    // Initialize column sums for this time window
-                    const columnSums: number[] = new Array(numCols).fill(0);
-
-                    // Sum across all intervals in this time window
-                    for (let i = 0; i < numIntervals && i < this.rawRadarData.length; i++) {
-                        const item = this.rawRadarData[i];
-                        if (Array.isArray(item.precipitation_5)) {
-                            for (const row of item.precipitation_5) {
-                                if (Array.isArray(row)) {
-                                    for (let col = 0; col < row.length && col < numCols; col++) {
-                                        const value = row[col];
-                                        if (typeof value === 'number') {
-                                            columnSums[col] += value / 100; // Convert from 0.01mm to mm
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Find maximum column sum
-                    if (columnSums.length > 0) {
-                        maxCumulative = Math.max(...columnSums);
-                        // Round to 2 decimal places
-                        maxCumulative = Math.round(maxCumulative * 100) / 100;
-                    }
+                if (cellSums.size > 0) {
+                    // Find the maximum accumulated cell and round to 2 decimal places
+                    maxCumulative = Math.round(Math.max(...cellSums.values()) * 100) / 100;
                 }
             }
             const key = interval.toString().padStart(2, '0');
