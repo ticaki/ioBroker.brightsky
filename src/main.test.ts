@@ -147,70 +147,54 @@ describe('Radar Precipitation Unit Conversion', () => {
         }
     });
 
-    it('should calculate cumulative precipitation sum correctly', () => {
-        // Simulate a 2D grid of precipitation values (in 0.01mm)
-        // Each column represents a specific geographical area
-        const precipitationGrid = [
-            [20, 10], // Row 1: Column 0 gets 0.20mm, Column 1 gets 0.10mm
-            [10, 40], // Row 2: Column 0 gets 0.10mm, Column 1 gets 0.40mm
-            [5, 5], // Row 3: Column 0 gets 0.05mm, Column 1 gets 0.05mm
-        ];
-
-        // Convert to mm and calculate sum for each column
-        const numCols = 2;
-        const columnSums: number[] = [0, 0];
-
-        for (const row of precipitationGrid) {
-            for (let col = 0; col < numCols; col++) {
-                columnSums[col] += row[col] / 100; // Convert from 0.01mm to mm
-            }
-        }
-
-        // Round to 2 decimal places to avoid floating point issues
-        const roundedSums = columnSums.map(sum => Math.round(sum * 100) / 100);
-
-        // Column 0 sum: 0.20 + 0.10 + 0.05 = 0.35mm
-        // Column 1 sum: 0.10 + 0.40 + 0.05 = 0.55mm
-        // Maximum sum across all columns should be 0.55
-        const maxSum = Math.max(...roundedSums);
-
-        expect(roundedSums).to.deep.equal([0.35, 0.55]);
-        expect(maxSum).to.equal(0.55);
-    });
-
-    it('should calculate cumulative sum across multiple time intervals', () => {
-        // Simulate 2 time intervals (for a 10-minute forecast)
-        const interval1 = [
-            [10, 20], // Column 0: 0.10mm, Column 1: 0.20mm
-            [5, 15], // Column 0: 0.05mm, Column 1: 0.15mm
-        ];
-        const interval2 = [
-            [15, 10], // Column 0: 0.15mm, Column 1: 0.10mm
-            [10, 20], // Column 0: 0.10mm, Column 1: 0.20mm
-        ];
-
-        const numCols = 2;
-        const columnSums: number[] = [0, 0];
-
-        // Process both intervals
-        for (const interval of [interval1, interval2]) {
-            for (const row of interval) {
-                for (let col = 0; col < numCols; col++) {
-                    columnSums[col] += row[col] / 100; // Convert from 0.01mm to mm
+    // Helper mirroring writeMaxPrecipitationForecasts: accumulate each grid cell over
+    // the time intervals, then take the worst (maximum) single cell. Values are in 0.01mm.
+    const maxCumulativeCell = (intervals: number[][][]): number => {
+        const cellSums = new Map<string, number>();
+        for (const grid of intervals) {
+            for (let row = 0; row < grid.length; row++) {
+                const cols = grid[row];
+                for (let col = 0; col < cols.length; col++) {
+                    const key = `${row},${col}`;
+                    cellSums.set(key, (cellSums.get(key) ?? 0) + cols[col] / 100); // Convert from 0.01mm to mm
                 }
             }
         }
+        return Math.round(Math.max(...cellSums.values()) * 100) / 100;
+    };
 
-        // Round to 2 decimal places
-        const roundedSums = columnSums.map(sum => Math.round(sum * 100) / 100);
+    it('should take the maximum single cell, not a column total', () => {
+        // Simulate a 2D grid of precipitation values (in 0.01mm) for a single 5-minute frame.
+        // The grid is purely spatial, so the cumulative value must be the worst single cell,
+        // independent of how many rows (i.e. how large the configured area) the grid has.
+        const precipitationGrid = [
+            [20, 10], // Row 0: 0.20mm, 0.10mm
+            [10, 40], // Row 1: 0.10mm, 0.40mm
+            [5, 5], // Row 2: 0.05mm, 0.05mm
+        ];
 
-        // Column 0: (0.10 + 0.05) + (0.15 + 0.10) = 0.15 + 0.25 = 0.40mm
-        // Column 1: (0.20 + 0.15) + (0.10 + 0.20) = 0.35 + 0.30 = 0.65mm
-        // Maximum: 0.65mm
-        const maxSum = Math.max(...roundedSums);
+        // Worst single cell is 0.40mm (row 1, col 1). The old (buggy) logic summed whole
+        // columns and would have reported 0.55mm, which inflates with grid size.
+        expect(maxCumulativeCell([precipitationGrid])).to.equal(0.4);
+    });
 
-        expect(roundedSums).to.deep.equal([0.4, 0.65]);
-        expect(maxSum).to.equal(0.65);
+    it('should accumulate each cell across multiple time intervals', () => {
+        // Simulate 2 time intervals (for a 10-minute forecast)
+        const interval1 = [
+            [10, 20], // (0,0): 0.10mm, (0,1): 0.20mm
+            [5, 15], // (1,0): 0.05mm, (1,1): 0.15mm
+        ];
+        const interval2 = [
+            [15, 10], // (0,0): 0.15mm, (0,1): 0.10mm
+            [10, 20], // (1,0): 0.10mm, (1,1): 0.20mm
+        ];
+
+        // Per-cell accumulation over time:
+        // (0,0): 0.10 + 0.15 = 0.25mm
+        // (0,1): 0.20 + 0.10 = 0.30mm
+        // (1,0): 0.05 + 0.10 = 0.15mm
+        // (1,1): 0.15 + 0.20 = 0.35mm  ← worst cell
+        expect(maxCumulativeCell([interval1, interval2])).to.equal(0.35);
     });
 
     it('should round values to 2 decimal places', () => {
