@@ -18,6 +18,23 @@ import * as suncalc from 'suncalc';
 // Load your modules here, e.g.:
 // import * as fs from "node:fs";
 
+// HTTP status codes that indicate a temporary problem on the Bright Sky side (or in between).
+// Requests are retried for these and they are logged as warnings instead of errors.
+const RETRYABLE_HTTP_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+// Network level errors that are worth a retry as well
+const RETRYABLE_NETWORK_CODES = new Set([
+    'ECONNRESET',
+    'ECONNREFUSED',
+    'ETIMEDOUT',
+    'EAI_AGAIN',
+    'ENOTFOUND',
+    'EPIPE',
+    'UND_ERR_CONNECT_TIMEOUT',
+    'UND_ERR_SOCKET',
+]);
+// Number of attempts per request (1 initial attempt + 2 retries)
+const FETCH_MAX_ATTEMPTS = 3;
+
 class Brightsky extends utils.Adapter {
     library: Library;
     unload: boolean = false;
@@ -359,7 +376,7 @@ class Brightsky extends utils.Adapter {
                 `${this.apiBaseUrl}/weather?lat=${this.config.position.split(',')[0]}&lon=${this.config.position.split(',')[1]}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
             if (response.status !== 200) {
-                throw new Error(`Error fetching daily weather data: ${response.status} ${response.statusText}`);
+                throw this.createHttpError('daily weather data', response);
             }
             const result = { data: await response.json() } as {
                 data: { weather: BrightskyWeather[]; sources: any[] } | null;
@@ -485,21 +502,82 @@ class Brightsky extends utils.Adapter {
         }
     }
 
+    /**
+     * Creates an Error that carries the HTTP status of a failed API response.
+     * The status property marks it as an HTTP error for handleFetchError, which then logs
+     * it without a stack trace - and only as a warning if the status is a temporary one.
+     *
+     * @param context Description of the failed request, e.g. 'current weather data'
+     * @param response The failed response
+     * @returns Error carrying the HTTP status
+     */
+    createHttpError(context: string, response: Response): Error & { status: number } {
+        const error = new Error(`Error fetching ${context}: ${response.status} ${response.statusText}`) as Error & {
+            status: number;
+        };
+        error.status = response.status;
+        return error;
+    }
+
+    /**
+     * Extracts the underlying network error code from an error.
+     * undici wraps connection problems into a plain `TypeError: fetch failed` and puts the
+     * real reason into `cause` - which in turn can be an AggregateError holding one error
+     * per resolved address, so the code has to be searched for recursively.
+     *
+     * @param error The caught error
+     * @param depth Recursion guard
+     * @returns The first network error code found, if any
+     */
+    getErrorCode(error: any, depth: number = 0): string | undefined {
+        if (!error || typeof error !== 'object' || depth > 3) {
+            return undefined;
+        }
+        if (typeof error.code === 'string') {
+            return error.code;
+        }
+        if (Array.isArray(error.errors)) {
+            for (const inner of error.errors) {
+                const code = this.getErrorCode(inner, depth + 1);
+                if (code) {
+                    return code;
+                }
+            }
+        }
+        return this.getErrorCode(error.cause, depth + 1);
+    }
+
+    /**
+     * Checks whether an error is a temporary problem (server side HTTP error or network hiccup)
+     * that will most likely be gone at the next poll and therefore does not deserve an error log.
+     *
+     * @param error The caught error
+     * @returns true if the error is considered temporary
+     */
+    isTransientError(error: any): boolean {
+        if (error && typeof error.status === 'number' && RETRYABLE_HTTP_STATUS.has(error.status)) {
+            return true;
+        }
+        const code = this.getErrorCode(error);
+        return code !== undefined && RETRYABLE_NETWORK_CODES.has(code);
+    }
+
     handleFetchError(error: any): void {
         if (error.name !== 'AbortError') {
+            // Temporary upstream problems are logged as warnings - they are not adapter bugs
+            const log = this.isTransientError(error) ? this.log.warn.bind(this.log) : this.log.error.bind(this.log);
             // Detailed error logging
             const errorDetails: string[] = [];
             if (error instanceof Error) {
-                let isHttpError = false;
+                let isHttpError = typeof (error as any).status === 'number';
                 errorDetails.push(`  Name: ${error.name}`);
-                if (
-                    error.cause &&
-                    typeof error.cause === 'object' &&
-                    'code' in error.cause &&
-                    typeof error.cause.code === 'string'
-                ) {
+                if ((error as any).status) {
+                    errorDetails.push(`  HTTP Status: ${(error as any).status}`);
+                }
+                const code = this.getErrorCode(error);
+                if (code !== undefined) {
                     isHttpError = true;
-                    errorDetails.push(`  code: ${error.cause.code}`);
+                    errorDetails.push(`  code: ${code}`);
                 }
                 errorDetails.push(`  Message: ${error.message}`);
 
@@ -525,7 +603,7 @@ class Brightsky extends utils.Adapter {
                 errorDetails.push(`  Raw Error: ${String(error)}`);
             }
 
-            this.log.error(errorDetails.join('\n'));
+            log(errorDetails.join('\n'));
         }
     }
 
@@ -562,7 +640,7 @@ class Brightsky extends utils.Adapter {
                 `${this.apiBaseUrl}/weather?${this.posId}&max_dist=${this.config.maxDistance}&date=${startTime}&last_date=${endTime}`,
             );
             if (response.status !== 200) {
-                throw new Error(`Error fetching hourly weather data: ${response.status} ${response.statusText}`);
+                throw this.createHttpError('hourly weather data', response);
             }
             const result = { data: await response.json() } as {
                 data: BrightskyHourly | null;
@@ -690,7 +768,7 @@ class Brightsky extends utils.Adapter {
                 `${this.apiBaseUrl}/current_weather?${this.posId}&max_dist=${this.config.maxDistance}`,
             );
             if (response.status !== 200) {
-                throw new Error(`Error fetching current weather data: ${response.status} ${response.statusText}`);
+                throw this.createHttpError('current weather data', response);
             }
             const result = { data: await response.json() } as any;
             if (result.data) {
@@ -789,7 +867,7 @@ class Brightsky extends utils.Adapter {
             );
 
             if (response.status !== 200) {
-                throw new Error(`Error fetching radar data: ${response.status} ${response.statusText}`);
+                throw this.createHttpError('radar data', response);
             }
 
             const result = (await response.json()) as BrightskyRadarResponse;
@@ -2152,8 +2230,10 @@ class Brightsky extends utils.Adapter {
     }
 
     /**
-     * Wrapper for fetch with automatic 30-second timeout and abort controller
-     * Ensures API requests don't hang indefinitely
+     * Wrapper for fetch with automatic 30-second timeout, abort controller and retries
+     * Temporary problems (5xx/429 from Bright Sky, network hiccups) are retried with a
+     * short backoff, so a single failing request does not leave the states stale until
+     * the next poll interval.
      *
      * @param url URL to fetch
      * @param init Optional fetch initialization options
@@ -2161,6 +2241,43 @@ class Brightsky extends utils.Adapter {
      * @throws {Error} if request fails or times out
      */
     async fetch(url: string, init?: RequestInit): Promise<Response> {
+        for (let attempt = 1; ; attempt++) {
+            const isLastAttempt = attempt >= FETCH_MAX_ATTEMPTS;
+            try {
+                const response = await this.fetchOnce(url, init);
+                if (isLastAttempt || !RETRYABLE_HTTP_STATUS.has(response.status)) {
+                    return response;
+                }
+                this.log.debug(
+                    `Request failed with ${response.status} ${response.statusText}, retrying (attempt ${attempt}/${FETCH_MAX_ATTEMPTS}): ${url}`,
+                );
+            } catch (error: any) {
+                // Aborts (adapter shutdown or the 30s timeout) and non temporary errors are passed on
+                if (isLastAttempt || error?.name === 'AbortError' || !this.isTransientError(error)) {
+                    throw error;
+                }
+                this.log.debug(
+                    `Request failed with ${error?.message ?? String(error)}, retrying (attempt ${attempt}/${FETCH_MAX_ATTEMPTS}): ${url}`,
+                );
+            }
+            // Backoff: 3s, 6s, ... plus a bit of jitter
+            await this.delay(attempt * 3000 + Math.ceil(Math.random() * 1000));
+            if (this.unload) {
+                throw new Error('Adapter is shutting down');
+            }
+        }
+    }
+
+    /**
+     * Performs a single fetch with automatic 30-second timeout and abort controller
+     * Ensures API requests don't hang indefinitely
+     *
+     * @param url URL to fetch
+     * @param init Optional fetch initialization options
+     * @returns Promise resolving to Response object
+     * @throws {Error} if request fails or times out
+     */
+    async fetchOnce(url: string, init?: RequestInit): Promise<Response> {
         this.controller = new AbortController();
         const currentController = this.controller;
         this.timeoutId = this.setTimeout(() => {
