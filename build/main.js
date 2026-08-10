@@ -386,15 +386,13 @@ class Brightsky extends utils.Adapter {
             const currentDayLocal = new Date((/* @__PURE__ */ new Date()).setHours(12, 0, 0, 0));
             const targetDate = new Date(currentDayLocal);
             targetDate.setDate(currentDayLocal.getDate() + i);
-            const times = suncalc.getTimes(
+            const times = this.getSunTimes(
               targetDate,
               parseFloat(this.config.position.split(",")[0]),
               parseFloat(this.config.position.split(",")[1])
             );
-            if (!isNaN(times.sunset.getTime())) {
+            if (times.hasSunTimes) {
               dailyData.sunset = times.sunset.getTime();
-            }
-            if (!isNaN(times.sunrise.getTime())) {
               dailyData.sunrise = times.sunrise.getTime();
             }
             const date = new Date(dailyData.timestamp);
@@ -421,6 +419,27 @@ class Brightsky extends utils.Adapter {
       this.handleFetchError(error);
       await this.setState("info.connection", false, true);
     }
+  }
+  /**
+   * Returns sunrise and sunset for the solar day of the given date and position.
+   * suncalc returns `null` for both on days where the sun never crosses the horizon
+   * (polar day/night). In that case substitute values that keep the day/night logic
+   * working: a polar day counts as daytime from start to end, a polar night never
+   * counts as daytime.
+   *
+   * @param date Date to calculate for
+   * @param lat Latitude
+   * @param lon Longitude
+   * @returns sunrise/sunset and whether the sun actually rises and sets on that day
+   */
+  getSunTimes(date, lat, lon) {
+    const times = suncalc.getTimes(date, lat, lon);
+    if (times.sunrise && times.sunset && !isNaN(times.sunrise.getTime()) && !isNaN(times.sunset.getTime())) {
+      return { sunrise: times.sunrise, sunset: times.sunset, hasSunTimes: true };
+    }
+    const dayStart = new Date(new Date(date).setHours(0, 0, 0, 0));
+    const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1e3 - 1);
+    return times.alwaysUp ? { sunrise: dayStart, sunset: dayEnd, hasSunTimes: false } : { sunrise: dayEnd, sunset: dayStart, hasSunTimes: false };
   }
   /**
    * Creates an Error that carries the HTTP status of a failed API response.
@@ -560,7 +579,7 @@ class Brightsky extends utils.Adapter {
             item.solar_estimate = 0;
             item.wind_bearing_text = this.getWindBearingText((_a = item.wind_direction) != null ? _a : void 0);
             const t = new Date(item.timestamp);
-            const { sunrise, sunset } = suncalc.getTimes(t, coords[0], coords[1]);
+            const { sunrise, sunset } = this.getSunTimes(t, coords[0], coords[1]);
             const isDayTime = t >= sunrise && t <= sunset;
             const iconsHour = this.pickHourlyWeatherIcon({
               condition: item.condition,
@@ -631,11 +650,13 @@ class Brightsky extends utils.Adapter {
     await this.weatherCurrentlyUpdate();
     let nextInterval = this.config.pollIntervalCurrently * 6e4 + Math.ceil(Math.random() * 8e3);
     const coords = this.config.position.split(",").map(parseFloat);
-    const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
+    const { sunrise, sunset, hasSunTimes } = this.getSunTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
     const now = Date.now();
-    const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
-    if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
-      nextInterval = testTime.getTime() - now + 3e4 + Math.ceil(Math.random() * 5e3);
+    if (hasSunTimes) {
+      const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
+      if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
+        nextInterval = testTime.getTime() - now + 3e4 + Math.ceil(Math.random() * 5e3);
+      }
     }
     nextInterval = Math.max(nextInterval, 6e4);
     this.weatherTimeout[0] = this.setTimeout(() => {
@@ -664,7 +685,7 @@ class Brightsky extends utils.Adapter {
           weather.wind_force = this.getBeaufortScale(weather.wind_speed_10);
           weather.wind_force_desc = this.getBeaufortDescription(weather.wind_force);
           const coords = this.config.position.split(",").map(parseFloat);
-          const { sunrise, sunset } = suncalc.getTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
+          const { sunrise, sunset } = this.getSunTimes(/* @__PURE__ */ new Date(), coords[0], coords[1]);
           const now = /* @__PURE__ */ new Date();
           const isDayTime = now >= sunrise && now <= sunset;
           const iconsNow = this.pickHourlyWeatherIcon({
@@ -1816,8 +1837,8 @@ class Brightsky extends utils.Adapter {
     const ALBEDO = 0.2;
     const date = time instanceof Date ? time : new Date(time);
     const pos = suncalc.getPosition(date, coords.lat, coords.lon);
-    const sunEl = pos.altitude;
-    const sunAzDeg = (pos.azimuth * 180 / Math.PI + 180 + 360) % 360;
+    const sunEl = toRad(pos.altitude);
+    const sunAzDeg = (pos.azimuth % 360 + 360) % 360;
     const sunAz = toRad(sunAzDeg);
     if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
       return 0;

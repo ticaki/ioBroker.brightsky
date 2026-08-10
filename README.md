@@ -91,6 +91,8 @@ The data is as follows Provided:
 - (ticaki) Changed: radar precipitation forecasts now report `null` instead of `-1` when no radar data is available
 - (ticaki) Added: API requests are retried up to two times on temporary failures (HTTP 408/425/429/5xx and connection errors) with a short backoff
 - (ticaki) Changed: temporary API problems (e.g. `500 Internal Server Error` from Bright Sky) are logged as warnings without a stack trace instead of errors
+- (ticaki) Changed: updated suncalc to 2.x, which reports sun position in degrees instead of radians — the solar yield estimate is adjusted accordingly and stays unchanged (deviation < 0.3°, from the more precise refraction correction of 2.x)
+- (ticaki) Fixed: days without sunrise or sunset (polar day/night) are handled explicitly — a polar day counts as daytime throughout, a polar night as nighttime, and `daily.NN.sunrise`/`sunset` stay empty instead of holding substitute values
 
 ### 1.2.0 (2026-06-02)
 - (ticaki) Added `conditionUI` (translated condition text) to `current` and `hourly.NN`, matching the existing `daily.NN.conditionUI` [#110](https://github.com/ticaki/ioBroker.brightsky/issues/110)
