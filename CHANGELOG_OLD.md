@@ -1,4 +1,34 @@
 # Older changes
+## 0.6.7 (2025-10-26)
+- (ticaki) Corrected some roles for Lovelance
+- (ticaki) Added conditionUI
+- (ticaki) Air pressure and humidity are now integers
+- (ticaki) Added air pressure to daily data
+- (ticaki) Improved error logging
+
+[Older changelogs can be found there](CHANGELOG_OLD.md)## License
+MIT License
+
+Copyright (c) 2025-2026 ticaki <github@renopoint.de>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 ## 0.6.6 (2025-10-11)
 - (ticaki) Added apparent temperature datapoints for current, hourly, and daily weather data
 
