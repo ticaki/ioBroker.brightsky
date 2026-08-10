@@ -89,6 +89,8 @@ The data is as follows Provided:
 ### **WORK IN PROGRESS**
 - (ticaki) Fixed: radar `max_precipitation_forecast.*_sum` cumulative values were inflated because precipitation was summed across whole grid columns and scaled with `radarDistance`; the cumulative forecast now accumulates each grid cell over time and reports the maximum single location
 - (ticaki) Changed: radar precipitation forecasts now report `null` instead of `-1` when no radar data is available
+- (ticaki) Added: API requests are retried up to two times on temporary failures (HTTP 408/425/429/5xx and connection errors) with a short backoff
+- (ticaki) Changed: temporary API problems (e.g. `500 Internal Server Error` from Bright Sky) are logged as warnings without a stack trace instead of errors
 
 ### 1.2.0 (2026-06-02)
 - (ticaki) Added `conditionUI` (translated condition text) to `current` and `hourly.NN`, matching the existing `daily.NN.conditionUI` [#110](https://github.com/ticaki/ioBroker.brightsky/issues/110)
