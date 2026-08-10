@@ -456,17 +456,15 @@ class Brightsky extends utils.Adapter {
                         const currentDayLocal = new Date(new Date().setHours(12, 0, 0, 0));
                         const targetDate = new Date(currentDayLocal);
                         targetDate.setDate(currentDayLocal.getDate() + i);
-                        const times = suncalc.getTimes(
+                        const times = this.getSunTimes(
                             targetDate,
                             parseFloat(this.config.position.split(',')[0]),
                             parseFloat(this.config.position.split(',')[1]),
                         );
-                        // Guard against suncalc returning Invalid Date (e.g. polar day/night),
-                        // so we never persist NaN timestamps.
-                        if (!isNaN(times.sunset.getTime())) {
+                        // On polar days there is no sunrise/sunset, so leave the states untouched
+                        // instead of persisting substitute timestamps.
+                        if (times.hasSunTimes) {
                             dailyData.sunset = times.sunset.getTime();
-                        }
-                        if (!isNaN(times.sunrise.getTime())) {
                             dailyData.sunrise = times.sunrise.getTime();
                         }
 
@@ -500,6 +498,31 @@ class Brightsky extends utils.Adapter {
             this.handleFetchError(error);
             await this.setState('info.connection', false, true);
         }
+    }
+
+    /**
+     * Returns sunrise and sunset for the solar day of the given date and position.
+     * suncalc returns `null` for both on days where the sun never crosses the horizon
+     * (polar day/night). In that case substitute values that keep the day/night logic
+     * working: a polar day counts as daytime from start to end, a polar night never
+     * counts as daytime.
+     *
+     * @param date Date to calculate for
+     * @param lat Latitude
+     * @param lon Longitude
+     * @returns sunrise/sunset and whether the sun actually rises and sets on that day
+     */
+    getSunTimes(date: Date, lat: number, lon: number): { sunrise: Date; sunset: Date; hasSunTimes: boolean } {
+        const times = suncalc.getTimes(date, lat, lon);
+        if (times.sunrise && times.sunset && !isNaN(times.sunrise.getTime()) && !isNaN(times.sunset.getTime())) {
+            return { sunrise: times.sunrise, sunset: times.sunset, hasSunTimes: true };
+        }
+        const dayStart = new Date(new Date(date).setHours(0, 0, 0, 0));
+        const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000 - 1);
+        // Polar day: the whole day is daytime. Polar night: sunrise after sunset, so no hour matches.
+        return times.alwaysUp
+            ? { sunrise: dayStart, sunset: dayEnd, hasSunTimes: false }
+            : { sunrise: dayEnd, sunset: dayStart, hasSunTimes: false };
     }
 
     /**
@@ -658,7 +681,7 @@ class Brightsky extends utils.Adapter {
                         item.wind_bearing_text = this.getWindBearingText(item.wind_direction ?? undefined);
                         // Determine day/night for this hour
                         const t = new Date(item.timestamp);
-                        const { sunrise, sunset } = suncalc.getTimes(t, coords[0], coords[1]);
+                        const { sunrise, sunset } = this.getSunTimes(t, coords[0], coords[1]);
                         const isDayTime = t >= sunrise && t <= sunset;
                         // Icons for hourly
                         const iconsHour = this.pickHourlyWeatherIcon({
@@ -743,13 +766,16 @@ class Brightsky extends utils.Adapter {
         let nextInterval = this.config.pollIntervalCurrently * 60000 + Math.ceil(Math.random() * 8000);
 
         const coords = this.config.position.split(',').map(parseFloat);
-        const { sunrise, sunset } = suncalc.getTimes(new Date(), coords[0], coords[1]);
+        const { sunrise, sunset, hasSunTimes } = this.getSunTimes(new Date(), coords[0], coords[1]);
 
         const now = Date.now();
-        const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
+        // Without a real sunrise/sunset (polar day/night) there is nothing to align the poll to
+        if (hasSunTimes) {
+            const testTime = now > sunset.getTime() ? sunrise : now > sunrise.getTime() ? sunset : sunrise;
 
-        if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
-            nextInterval = testTime.getTime() - now + 30000 + Math.ceil(Math.random() * 5000);
+            if (now + nextInterval > testTime.getTime() && testTime.getTime() > now) {
+                nextInterval = testTime.getTime() - now + 30000 + Math.ceil(Math.random() * 5000);
+            }
         }
         nextInterval = Math.max(nextInterval, 60000); // Ensure minimum interval of 1 minute
 
@@ -780,7 +806,7 @@ class Brightsky extends utils.Adapter {
                     weather.wind_force_desc = this.getBeaufortDescription(weather.wind_force);
 
                     const coords = this.config.position.split(',').map(parseFloat);
-                    const { sunrise, sunset } = suncalc.getTimes(new Date(), coords[0], coords[1]);
+                    const { sunrise, sunset } = this.getSunTimes(new Date(), coords[0], coords[1]);
                     const now = new Date();
                     const isDayTime = now >= sunrise && now <= sunset;
 
@@ -2164,9 +2190,9 @@ class Brightsky extends utils.Adapter {
         // Sonnenstand holen
         const date = time instanceof Date ? time : new Date(time);
         const pos = suncalc.getPosition(date, coords.lat, coords.lon);
-        const sunEl = pos.altitude; // Elevation in rad
-        // SunCalc-Azimut: 0 = Süd, +West; auf 0=N, 90=E normieren:
-        const sunAzDeg = ((pos.azimuth * 180) / Math.PI + 180 + 360) % 360;
+        // SunCalc >= 2 liefert Grad statt Radiant, Azimut bereits nordbasiert (0 = N, 90 = O)
+        const sunEl = toRad(pos.altitude); // Elevation in rad
+        const sunAzDeg = ((pos.azimuth % 360) + 360) % 360;
         const sunAz = toRad(sunAzDeg);
 
         if (sunEl <= 0 || valueWhPerM2 <= 0 || panels.length === 0) {
